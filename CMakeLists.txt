@@ -4,20 +4,43 @@ project(capture VERSION 0.1.0)
 include(CTest)
 enable_testing()
 
+if (CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)")
+    set (X86 TRUE)
+    set (X64 FALSE)
+    message(STATUS "HOST Processor: ${CMAKE_HOST_SYSTEM_PROCESSOR}. Switching to X86 compilation.")
+elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "(x64)|(X64)|(amd64)|(AMD64)")
+    set (X64 TRUE)
+    set (X86 FALSE)
+    message(STATUS "HOST Processor: ${CMAKE_HOST_SYSTEM_PROCESSOR}. Switching to X64 compilation.")
+else()
+    message(SEND_ERROR "HOST Processor, ${CMAKE_HOST_SYSTEM_PROCESSOR}, not compatible." )
+endif ()
+
 #Set Useful Paths
 set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+
+#Find packeges
+message(STATUS "${CMAKE_MODULE_PATH}")
+find_package(Spinnaker REQUIRED)
 
 #Include Path Libraries
 include_directories("${PROJECT_SOURCE_DIR}/include"
+                    SYSTEM ${Spinnaker_INCLUDE_DIRS}
                     )
 
 #Include Libraries
 #add_subdirectory(src)
+link_directories( ${Spinnaker_LIBRARIES} )
+set (LIBS ${Spinnaker_LIBRARIES} )
 
 #Generate Execs
 add_executable(capture ${PROJECT_SOURCE_DIR}/scripts/main.cpp)
+#add_executable(acq ${PROJECT_SOURCE_DIR}/scripts/acq.cpp)
+target_link_libraries(capture ${LIBS})
+#target_link_libraries(acq ${LIBS})
 
 #Library Linking
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
