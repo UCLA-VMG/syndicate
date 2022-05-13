@@ -1,5 +1,10 @@
+#DEV Notes:
+#cmake --build ./ --target build_all --config Debug
+#cmake --build ./ --target {custom .exe} --config Debug
+
 cmake_minimum_required(VERSION 3.0.0)
-project(capture VERSION 0.1.0)
+project(syndicate VERSION 0.1.0)
+
 
 include(CTest)
 enable_testing()
@@ -28,19 +33,27 @@ find_package(Spinnaker REQUIRED)
 
 #Include Path Libraries
 include_directories("${PROJECT_SOURCE_DIR}/include"
+                    "${PROJECT_SOURCE_DIR}/src"
+                    "${PROJECT_SOURCE_DIR}/Spintest"
                     SYSTEM ${Spinnaker_INCLUDE_DIRS}
                     )
 
 #Include Libraries
 #add_subdirectory(src)
-link_directories( ${Spinnaker_LIBRARIES} )
-set (LIBS ${Spinnaker_LIBRARIES} )
+# link_directories( ${Spinnaker_LIBRARIES} )
+add_subdirectory(src)
+add_subdirectory(Spintest)
+set (LIBS ${Spinnaker_LIBRARIES} myIndents Spintest)
 
 #Generate Execs
 add_executable(capture ${PROJECT_SOURCE_DIR}/scripts/main.cpp)
-#add_executable(acq ${PROJECT_SOURCE_DIR}/scripts/acq.cpp)
+add_executable(acq ${PROJECT_SOURCE_DIR}/scripts/acq.cpp)
 target_link_libraries(capture ${LIBS})
-#target_link_libraries(acq ${LIBS})
+target_link_libraries(acq ${LIBS})
+
+#Targets
+ADD_CUSTOM_TARGET(build_all)
+ADD_DEPENDENCIES(build_all capture acq)
 
 #Library Linking
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
