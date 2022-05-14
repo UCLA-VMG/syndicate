@@ -1,0 +1,9 @@
+C:/Users/Adnan/Documents/syndicate/build/CMakeFiles/rgb.dir
+C:/Users/Adnan/Documents/syndicate/build/CMakeFiles/nir.dir
+C:/Users/Adnan/Documents/syndicate/build/CMakeFiles/polarized.dir
+C:/Users/Adnan/Documents/syndicate/build/CMakeFiles/rgb_continuous.dir
+C:/Users/Adnan/Documents/syndicate/build/CMakeFiles/nir_continuous.dir
+C:/Users/Adnan/Documents/syndicate/build/CMakeFiles/polarized_continuous.dir
+C:/Users/Adnan/Documents/syndicate/build/CMakeFiles/build_all.dir
+C:/Users/Adnan/Documents/syndicate/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/Adnan/Documents/syndicate/build/CMakeFiles/ZERO_CHECK.dir
