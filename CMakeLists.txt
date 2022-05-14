@@ -140,11 +140,13 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 find_package(Spinnaker REQUIRED)
 find_package(SpinVideo REQUIRED)
+find_package(Vimba REQUIRED)
 # find_package(OpenImageIO CONFIG REQUIRED)
 
 include_directories(  
     SYSTEM ${Spinnaker_INCLUDE_DIRS}
     SYSTEM ${SpinVideo_INCLUDE_DIRS}
+    SYSTEM ${Vimba_INCLUDE_DIRS}
 )
 link_directories( ${Spinnaker_LIBRARIES} ${SpinVideo_LIBRARIES})
 set (LIBS ${Spinnaker_LIBRARIES} ${SpinVideo_LIBRARIES})
