@@ -16,7 +16,7 @@ void thread_fun(boost::barrier& cur_barier, boost::atomic<int>& current)
 {
     ++current;
     cur_barier.wait();
-    // boost::lock_guard<boost::mutex> locker(io_mutex);
+    boost::lock_guard<boost::mutex> locker(io_mutex);
     std::cout << current << std::endl;
 }
 
