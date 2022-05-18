@@ -4,8 +4,7 @@
 
 cmake_minimum_required(VERSION 3.0.0)
 project(syndicate VERSION 0.1.0)
-
-
+set (CMAKE_CXX_STANDARD 23)
 include(CTest)
 enable_testing()
 
@@ -31,19 +30,24 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 message(STATUS "${CMAKE_MODULE_PATH}")
 find_package(Spinnaker REQUIRED)
 
+# set(Boost_USE_STATIC_LIBS ON)
+set(Boost_USE_STATIC_LIBS        ON)
+set(Boost_USE_MULTITHREADED      ON)
+set(Boost_USE_STATIC_RUNTIME    OFF)
+set(BOOST_ROOT "C:/Program Files/boost/boost_1_78_0")
+find_package(Boost COMPONENTS thread REQUIRED)
+
 #Include Path Libraries
 include_directories("${PROJECT_SOURCE_DIR}/include"
                     "${PROJECT_SOURCE_DIR}/src"
-                    "${PROJECT_SOURCE_DIR}/Spintest"
                     SYSTEM ${Spinnaker_INCLUDE_DIRS}
+                    ${Boost_INCLUDE_DIR}
                     )
 
 #Include Libraries
-#add_subdirectory(src)
-# link_directories( ${Spinnaker_LIBRARIES} )
 add_subdirectory(src)
-add_subdirectory(Spintest)
-set (LIBS ${Spinnaker_LIBRARIES} myIndents Spintest)
+add_subdirectory(Syndicate)
+set (LIBS ${Spinnaker_LIBRARIES} ${Boost_LIBRARIES} myIndents syndicate )
 
 #Generate Execs
 add_executable(capture ${PROJECT_SOURCE_DIR}/scripts/main.cpp)
