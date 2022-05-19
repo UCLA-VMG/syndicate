@@ -1,7 +1,7 @@
 
-set(syndicateSOURCE sensor.cpp)
+set(syndicateSOURCE sensorStack.cpp sensor.cpp)
 
-set(syndicateHEADER sensor.h)
+set(syndicateHEADER sensorStack.h sensor.h)
 
 add_library(syndicate ${syndicateSOURCE} ${syndicateHEADER})
 
@@ -11,6 +11,7 @@ target_include_directories(syndicate
   )
 
 add_subdirectory(SpinnakerHelp)
+add_subdirectory(SimpleSensor)
 
-target_link_libraries (syndicate SpinnakerHelper)
+target_link_libraries (syndicate SimpleSensor SpinnakerHelper)
 

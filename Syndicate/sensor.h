@@ -1,12 +1,15 @@
+#pragma once
+
 #include <iostream>
 #include <queue>
 #include <vector>
 #include <memory>
-
-#include <thread>
-#include <barrier>
-#include <mutex>
 #include <chrono>
+
+#include <boost/thread.hpp>
+#include <boost/thread/barrier.hpp>
+#include <boost/bind.hpp>
+#include <boost/atomic.hpp>
 
 enum HealthCode
 {
@@ -17,12 +20,12 @@ enum HealthCode
 
 enum OpMode
 {
+    NONE,
     COLLECT,
     INFERENCE
 };
 
-struct Sensor{
-
+template <class T> struct Sensor{
     static size_t numSensors;
     std::shared_ptr<Sensor> primarySensor;
 
@@ -61,16 +64,16 @@ struct Sensor{
 
     // virtual void RecordTimeStamp();
 
-    // virtual double AtomicAcquire();
+    virtual T AtomicAcquire()=0;
 
     //-------- Capture Data Functions : operatingCode == OpMode::COLLECT -------------
     void AcquireSaveHsync(double seconds);
 
     void AcquireSaveHsync(long int frames);
 
-    // void AcquireSaveSsync(double seconds, std::barrier<on_completion3>& frameBarrier);
+    void AcquireSaveSsync(double seconds, boost::barrier& frameBarrier);
 
-    // void AcquireSaveSsync(long int frames, std::barrier* frameBarrier);
+    void AcquireSaveSsync(long int frames, boost::barrier& frameBarrier);
 
     void AcquireSave(double seconds);
 
@@ -80,9 +83,9 @@ struct Sensor{
 
     std::vector<double> AcquireHsync(long int frames);
 
-    // std::vector<double> AcquireSsync(double seconds, std::barrier& frameBarrier);
+    std::vector<double> AcquireSsync(double seconds, boost::barrier& frameBarrier);
 
-    // std::vector<double> AcquireSsync(long int frames, std::barrier& frameBarrier);
+    std::vector<double> AcquireSsync(long int frames, boost::barrier& frameBarrier);
 
     std::vector<double> Acquire(double seconds);
 
@@ -92,3 +95,23 @@ struct Sensor{
     void ContiniousAcquire(size_t queue_size);
 
 };
+
+template <class T>
+size_t Sensor<T>::numSensors(0);
+
+template <class T>
+Sensor<T>::Sensor(std::string sensor_name, std::string root_path)
+    : sensorName(sensor_name),
+    rootPath(root_path),
+    bufferSize(0),
+    extrinsicMatrix(3, std::vector<double>(4, 0)),
+    statusCode(HealthCode::OFFLINE), operatingCode(OpMode::NONE) 
+{
+    ++numSensors;
+}
+
+template <class T>
+Sensor<T>::~Sensor()
+{
+    std::cout << "Sensor " << sensorName << " is shutting down.\n";
+}
