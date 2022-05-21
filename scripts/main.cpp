@@ -2,10 +2,12 @@
 #include <Spinnaker.h>
 #include <functional>
 #include <boost/shared_ptr.hpp>
+#include <unordered_map>
 
-#include "myIndent.h"
 #include "sensor.h"
 #include "simpleSensor.h"
+#include "sensorStack.h"
+#include "SpinnakerCamera.h"
 
 boost::mutex io_mutex;
 
@@ -20,21 +22,53 @@ void thread_fun(boost::barrier& cur_barier, boost::atomic<int>& current)
 int main(int, char**) {
     std::cout << "Hello, world!\n";
     
-    SimpleSensor a("i", "i");
-    a.printPls();
-    auto b = a.AtomicAcquire();
-    std::cout << b.count() << "\n";
-    std::cout << a.sensorName << "\n";
+    //1. Create Configurations
+    std::unordered_map<std::string, std::any> sample_config = {
+        {"FPS", 60},
+        {"Sensor Name", std::string("Simp1")},
+        {"Root Path", std::string("/rand/rand/...")}
+    };
+    std::unordered_map<std::string, std::any> sample_config2 = {
+        {"FPS", 60},
+        {"Sensor Name", std::string("Simp2")},
+        {"Root Path", std::string("/rand/rand/...")}
+    };
+    std::unordered_map<std::string, std::any> nir_config = {
+        {"Camera ID", std::string("21190637")},
+        {"FPS", 30},{"Height", 640}, {"Width", 640},
+        {"Sensor Name", std::string("NIR Camera")},
+        {"Root Path", std::string("/rand/rand/...")}
+    };
+    std::unordered_map<std::string, std::any> polarized_config = {
+        {"Camera ID", std::string("19224369")},
+        {"FPS", 30},{"Height", 640}, {"Width", 640},
+        {"Sensor Name", std::string("Polarized Camera")},
+        {"Root Path", std::string("/rand/rand/...")}
+    };
+    
+    //2. Add Configurations and Factory Generator Functions into std::vectors
+    std::vector<std::unique_ptr<Sensor>(*)(std::unordered_map<std::string, std::any>&)> sensor_list;
+    // sensor_list.emplace_back(makeSensor<SimpleSensor>);
+    // sensor_list.emplace_back(makeSensor<SimpleSensor>);
+    // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    std::vector<std::unordered_map<std::string, std::any>> configs{polarized_config};//sample_config, sample_config2, nir_config, polarized_config};
+    
+    //3. Initialize Sensor Stack
+    SensorStack mainStack(sensor_list, configs);
+    
+    // //4. Acquire Data
 
-    boost::shared_ptr<int> p1{new int{1}};
-    std::cout << *p1 << '\n';
+    //4.1 Asynchronously Acquire Data
+    std::cout << "\n\n\nAsyn Capture \n";
+    mainStack.Acquire(1);
+    // //4.2 Barrier Sync Acquire Data
+    std::cout << "\n\n\n Barrier Sync Capture\n";
+    mainStack.AcquireBarrier(1);
 
-    boost::barrier bar(3);
-    boost::atomic<int> current(0);
-    boost::thread thr1(boost::bind(&thread_fun, boost::ref(bar), boost::ref(current)));
-    boost::thread thr2(boost::bind(&thread_fun, boost::ref(bar), boost::ref(current)));
-    boost::thread thr3(boost::bind(&thread_fun, boost::ref(bar), boost::ref(current)));
-    thr1.join();
-    thr2.join();
-    thr3.join();
+    //Test base class calling derived class func
+    // SimpleSensor a(sample_config);
+    // Sensor* b = nullptr;
+    // b = &a;
+    // b->AcquireSave(10);
 }

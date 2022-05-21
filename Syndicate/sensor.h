@@ -5,6 +5,7 @@
 #include <vector>
 #include <memory>
 #include <chrono>
+#include <any>
 
 #include <boost/thread.hpp>
 #include <boost/thread/barrier.hpp>
@@ -25,7 +26,8 @@ enum OpMode
     INFERENCE
 };
 
-template <class T> struct Sensor{
+struct Sensor
+{
     static size_t numSensors;
     std::shared_ptr<Sensor> primarySensor;
 
@@ -36,8 +38,6 @@ template <class T> struct Sensor{
     //Operating Status/Mode
     HealthCode statusCode;
     OpMode operatingCode;
-    //Operating Characteristics
-    double fps;
     
     //-------- Capture Data Structures : operatingCode == OpMode::COLLECT -------------
     std::vector<std::vector<double>> extrinsicMatrix;
@@ -50,7 +50,7 @@ template <class T> struct Sensor{
     const int bufferSize;
 
     //-------- General Functions -------------------------------------------------------
-    Sensor(std::string sensor_name, std::string root_path);
+    Sensor(std::unordered_map<std::string, std::any>& sample_config);
 
     Sensor(int buffer_size);
 
@@ -64,54 +64,32 @@ template <class T> struct Sensor{
 
     // virtual void RecordTimeStamp();
 
-    virtual T AtomicAcquire()=0;
-
     //-------- Capture Data Functions : operatingCode == OpMode::COLLECT -------------
-    void AcquireSaveHsync(double seconds);
+    // virtual void AcquireSaveHsync(double seconds) = 0;
 
-    void AcquireSaveHsync(long int frames);
+    virtual void AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier) = 0;
 
-    void AcquireSaveSsync(double seconds, boost::barrier& frameBarrier);
+    virtual void AcquireSave(double seconds) = 0;
 
-    void AcquireSaveSsync(long int frames, boost::barrier& frameBarrier);
+    // std::vector<double> AcquireHsync(double seconds);
 
-    void AcquireSave(double seconds);
+    // std::vector<double> AcquireHsync(long int frames);
 
-    void AcquireSave(long int frames);
+    // std::vector<double> AcquireSsync(double seconds, boost::barrier& frameBarrier);
 
-    std::vector<double> AcquireHsync(double seconds);
+    // std::vector<double> AcquireSsync(long int frames, boost::barrier& frameBarrier);
 
-    std::vector<double> AcquireHsync(long int frames);
+    // std::vector<double> Acquire(double seconds);
 
-    std::vector<double> AcquireSsync(double seconds, boost::barrier& frameBarrier);
-
-    std::vector<double> AcquireSsync(long int frames, boost::barrier& frameBarrier);
-
-    std::vector<double> Acquire(double seconds);
-
-    std::vector<double> Acquire(long int frames);
+    // std::vector<double> Acquire(long int frames);
 
     //-------- Inference Functions : operatingCode == OpMode::INFERENCE ---------
     void ContiniousAcquire(size_t queue_size);
 
 };
 
-template <class T>
-size_t Sensor<T>::numSensors(0);
-
-template <class T>
-Sensor<T>::Sensor(std::string sensor_name, std::string root_path)
-    : sensorName(sensor_name),
-    rootPath(root_path),
-    bufferSize(0),
-    extrinsicMatrix(3, std::vector<double>(4, 0)),
-    statusCode(HealthCode::OFFLINE), operatingCode(OpMode::NONE) 
+template<class T>
+std::unique_ptr<Sensor> makeSensor(std::unordered_map<std::string, std::any>& sample_config)
 {
-    ++numSensors;
-}
-
-template <class T>
-Sensor<T>::~Sensor()
-{
-    std::cout << "Sensor " << sensorName << " is shutting down.\n";
+    return std::make_unique<T>(sample_config);
 }

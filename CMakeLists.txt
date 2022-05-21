@@ -45,9 +45,8 @@ include_directories("${PROJECT_SOURCE_DIR}/include"
                     )
 
 #Include Libraries
-add_subdirectory(src)
 add_subdirectory(Syndicate)
-set (LIBS ${Spinnaker_LIBRARIES} ${Boost_LIBRARIES} myIndents syndicate )
+set (LIBS ${Spinnaker_LIBRARIES} ${Boost_LIBRARIES} syndicate )
 
 #Generate Execs
 add_executable(capture ${PROJECT_SOURCE_DIR}/scripts/main.cpp)

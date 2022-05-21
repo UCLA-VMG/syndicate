@@ -1,7 +1,7 @@
 
-set(syndicateSOURCE sensorStack.cpp sensor.cpp)
+set(syndicateSOURCE sensorStack.cpp sensor.cpp camera.cpp)
 
-set(syndicateHEADER sensorStack.h sensor.h)
+set(syndicateHEADER sensorStack.h sensor.h camera.h)
 
 add_library(syndicate ${syndicateSOURCE} ${syndicateHEADER})
 
@@ -10,8 +10,8 @@ target_include_directories(syndicate
     ${CMAKE_CURRENT_LIST_DIR}
   )
 
-add_subdirectory(SpinnakerHelp)
+add_subdirectory(SpinnakerCamera)
 add_subdirectory(SimpleSensor)
 
-target_link_libraries (syndicate SimpleSensor SpinnakerHelper)
+target_link_libraries (syndicate SimpleSensor SpinnakerCamera)
 
