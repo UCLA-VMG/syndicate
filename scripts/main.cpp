@@ -50,9 +50,9 @@ int main(int, char**) {
     std::vector<std::unique_ptr<Sensor>(*)(std::unordered_map<std::string, std::any>&)> sensor_list;
     // sensor_list.emplace_back(makeSensor<SimpleSensor>);
     // sensor_list.emplace_back(makeSensor<SimpleSensor>);
-    // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
     sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
-    std::vector<std::unordered_map<std::string, std::any>> configs{polarized_config};//sample_config, sample_config2, nir_config, polarized_config};
+    sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    std::vector<std::unordered_map<std::string, std::any>> configs{nir_config, polarized_config};//sample_config, sample_config2, nir_config, polarized_config};
     
     //3. Initialize Sensor Stack
     SensorStack mainStack(sensor_list, configs);
@@ -61,10 +61,10 @@ int main(int, char**) {
 
     //4.1 Asynchronously Acquire Data
     std::cout << "\n\n\nAsyn Capture \n";
-    mainStack.Acquire(1);
+    mainStack.Acquire(20);
     // //4.2 Barrier Sync Acquire Data
     std::cout << "\n\n\n Barrier Sync Capture\n";
-    mainStack.AcquireBarrier(1);
+    mainStack.AcquireBarrier(20);
 
     //Test base class calling derived class func
     // SimpleSensor a(sample_config);

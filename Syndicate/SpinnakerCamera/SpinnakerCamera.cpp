@@ -202,27 +202,58 @@ bool setResolution(INodeMap& nodeMap, int height, int width) {
 
 bool setFps(INodeMap& nodeMap, float fps) {
     bool result = true;
+    // try {
+    //     // Set frame_rate_auto_node to false
+    //     CEnumerationPtr frame_rate_auto_node = nodeMap.GetNode("AcquisitionFrameRateAuto");
+    //     CEnumEntryPtr node_frame_rate_auto_off = frame_rate_auto_node->GetEntryByName("Off");
+    //     const int64_t frame_rate_auto_off = node_frame_rate_auto_off->GetValue();
+    //     frame_rate_auto_node->SetIntValue(frame_rate_auto_off);
+
+    //     // Set frame_rate_enable to true
+    //     CBooleanPtr enable_rate_mode = nodeMap.GetNode("AcquisitionFrameRateEnabled");
+    //     if (!IsWritable(enable_rate_mode)) {
+    //         std::cout << "enable_rate_mode not writable. Aborting..." << endl << endl;
+    //         return false;
+    //     }
+    //     try {
+    //         enable_rate_mode->SetValue(true);
+    //         std::cout << "Correctly Set!!!!\n";
+    //     }
+    //     catch(Exception& e) {
+    //         std::cerr << e.what() << '\n'; // "Could not enable frame rate: {0}".format(ex)
+    //     }
+    //     CBooleanPtr acquisition_frame_rate_enable = nodeMap.GetNode("AcquisitionFrameRateEnable");
+    //     std::cout << acquisition_frame_rate_enable->GetValue() << "\n";
+    //     // Set fps
+    //     CFloatPtr acquisition_frame_rate = nodeMap.GetNode("AcquisitionFrameRate");
+    //     if(!IsWritable(acquisition_frame_rate->GetAccessMode()) || !IsReadable(acquisition_frame_rate->GetAccessMode()) ) {
+    //         std::cout << "Unable to set Frame Rate. Aborting..." << endl << endl;
+    //         return false;
+    //     }
+    //     acquisition_frame_rate->SetValue(fps);
+    //     float frameRateToSet = static_cast<float>(acquisition_frame_rate->GetValue());
+    //     std::cout << "Frame rate to be set to " << frameRateToSet << "..." << endl;
+    // }
+    // catch (Exception& e) {
+    //     std::cout << "Error configuring fps: " << e.what() << endl;
+    //     result = false;
+    // }
+
     try {
-        // Set frame_rate_auto_node to false
-        CEnumerationPtr frame_rate_auto_node = nodeMap.GetNode("AcquisitionFrameRateAuto");
-        CEnumEntryPtr node_frame_rate_auto_off = frame_rate_auto_node->GetEntryByName("Off");
-        const int64_t frame_rate_auto_off = node_frame_rate_auto_off->GetValue();
-        frame_rate_auto_node->SetIntValue(frame_rate_auto_off);
-
-        // Set frame_rate_enable to true
-        CBooleanPtr enable_rate_mode = nodeMap.GetNode("AcquisitionFrameRateEnabled");
-        if (!IsWritable(enable_rate_mode)) {
-            std::cout << "enable_rate_mode not writable. Aborting..." << endl << endl;
-            return false;
-        }
         try {
-            enable_rate_mode->SetValue(true);
+            // Set frame_rate_auto_node to false
+            CEnumerationPtr frame_rate_auto_node = nodeMap.GetNode("AcquisitionFrameRateAuto");
+            CEnumEntryPtr node_frame_rate_auto_off = frame_rate_auto_node->GetEntryByName("Off");
+            const int64_t frame_rate_auto_off = node_frame_rate_auto_off->GetValue();
+            frame_rate_auto_node->SetIntValue(frame_rate_auto_off);
         }
-        catch(Exception& e) {
-            std::cerr << e.what() << '\n'; // "Could not enable frame rate: {0}".format(ex)
-        }
+        catch (Exception& e) {}
         CBooleanPtr acquisition_frame_rate_enable = nodeMap.GetNode("AcquisitionFrameRateEnable");
+        std::cout << acquisition_frame_rate_enable->GetValue() << "\n";
 
+        acquisition_frame_rate_enable->SetValue(true);
+        std::cout << "Correctly Set!!!!\n";
+        std::cout << acquisition_frame_rate_enable->GetValue() << "\n";
         // Set fps
         CFloatPtr acquisition_frame_rate = nodeMap.GetNode("AcquisitionFrameRate");
         if(!IsWritable(acquisition_frame_rate->GetAccessMode()) || !IsReadable(acquisition_frame_rate->GetAccessMode()) ) {
@@ -237,6 +268,7 @@ bool setFps(INodeMap& nodeMap, float fps) {
         std::cout << "Error configuring fps: " << e.what() << endl;
         result = false;
     }
+
     return result;
 }
 
