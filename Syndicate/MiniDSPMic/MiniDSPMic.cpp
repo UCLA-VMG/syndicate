@@ -54,11 +54,65 @@ MiniDSPMic::MiniDSPMic(std::unordered_map<std::string, std::any>& sample_config)
 }
 
 void AcquireSave(double seconds) {
-    cout << "TBD";
+    int total_frames, number_samples, number_bytes;
+
+    _max_frame_index = total_frames = seconds * _fs; /* Record for a few seconds. */
+    _frame_index = 0;
+    number_samples = total_frames * _channels;
+    number_bytes = number_samples * sizeof(float);
+    audio_samples_1 = (float*)malloc(number_bytes); /* From now on, recordedSamples is initialised. */
+
+    err = Pa_StartStream(record_stream);
+    if (err != paNoError)
+    {
+        fprintf(stderr, "An error occurred while using the portaudio stream\n");
+        fprintf(stderr, "Error number: %d\n", err);
+        fprintf(stderr, "Error message: %s\n", Pa_GetErrorText(err));
+        ~MiniDSPMic();
+    }
+    std::cout << "---------------- Now recording!! Please speak into the microphone. ----------------" << std::endl << std::endl; 
+
+    while ((err = Pa_IsStreamActive(record_stream)) == 1)
+    {
+        Pa_Sleep(1000);
+        std::cout << "Frame = " << _frame_index <<std::endl; 
+        fflush(stdout);
+    }
+    if (err != paNoError)
+    {
+        fprintf(stderr, "An error occurred while using the portaudio stream\n");
+        fprintf(stderr, "Error number: %d\n", err);
+        fprintf(stderr, "Error message: %s\n", Pa_GetErrorText(err));
+        ~MiniDSPMic();
+    }
+
+    err = Pa_CloseStream(record_stream);
+
+    if (err != paNoError)
+    {
+        fprintf(stderr, "An error occurred while using the portaudio stream\n");
+        fprintf(stderr, "Error number: %d\n", err);
+        fprintf(stderr, "Error message: %s\n", Pa_GetErrorText(err));
+        ~MiniDSPMic();
+    }
+
+    // Save the recording 
+    FILE* fid;
+    fid = fopen("recorded.raw", "wb");
+    if (fid == NULL)
+    {
+        std::cout << "Could not open file." << std::endl;
+    }
+    else
+    {
+        fwrite(audio_samples_1, _channels * sizeof(float), total_frames, fid);
+        fclose(fid);
+        std::cout << "Wrote data to 'recorded.raw'" << std::endl;
+    }
 }
 
 void AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier) {
-    cout << "TBD";
+    std::cout << "TBD" << std::endl << std::endl;
 }
 
 MiniDSPMic::~MiniDSPMic() {
