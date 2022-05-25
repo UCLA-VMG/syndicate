@@ -1,5 +1,0 @@
-C:/Users/Adnan/Documents/syndicate/out/build/x64-debug/CMakeFiles/nir.dir
-C:/Users/Adnan/Documents/syndicate/out/build/x64-debug/CMakeFiles/nir_continuous.dir
-C:/Users/Adnan/Documents/syndicate/out/build/x64-debug/CMakeFiles/build_all.dir
-C:/Users/Adnan/Documents/syndicate/out/build/x64-debug/CMakeFiles/edit_cache.dir
-C:/Users/Adnan/Documents/syndicate/out/build/x64-debug/CMakeFiles/rebuild_cache.dir

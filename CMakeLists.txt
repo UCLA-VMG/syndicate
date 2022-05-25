@@ -140,31 +140,66 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 find_package(Spinnaker REQUIRED)
 find_package(SpinVideo REQUIRED)
-find_package(Vimba REQUIRED)
-# find_package(OpenImageIO CONFIG REQUIRED)
+# find_package(Vimba REQUIRED)
+find_package(VimbaCPP REQUIRED)
+find_package(VimbaC REQUIRED)
+find_package(VimbaImageTransform REQUIRED)
+find_package(OpenCV REQUIRED)
+find_package(OpenImageIO CONFIG REQUIRED)
 
 include_directories(  
     SYSTEM ${Spinnaker_INCLUDE_DIRS}
     SYSTEM ${SpinVideo_INCLUDE_DIRS}
-    SYSTEM ${Vimba_INCLUDE_DIRS}
+    # SYSTEM ${Vimba_INCLUDE_DIRS}
+    SYSTEM ${VimbaCPP_INCLUDE_DIRS}
+    SYSTEM ${VimbaC_INCLUDE_DIRS}
+    SYSTEM ${VimbaImageTransform_INCLUDE_DIRS}
+    SYSTEM (${OpenCV_INCLUDE_DIRS})
+    # "C:/Users/Public Documents/Allied Vision/Vimba_6.0/VimbaCPP_Examples"
+    # "C:/Users/Public Documents/Allied Vision/Vimba_6.0/Source"
+    # SYSTEM "C:/Users/Public Documents/Allied Vision/Vimba_6.0"
+    # SYSTEM "C:/Users/Public Documents/Allied Vision/Vimba_6.0/VimbaCPP_Source/Build/VS2010/x64/Debug"
+    # "C:/Users/Public Documents/Allied Vision/Vimba_6.0"
+    # "C:/Program Files/Allied Vision/Vimba_6.0/"
+    # "C:/Program Files/Allied Vision/Vimba_6.0/VimbaCPP/"
+    # "C:/Program Files/Allied Vision/Vimba_6.0/VimbaCPP/Source"
+    # "C:/Program Files/Allied Vision/Vimba_6.0/VimbaC/"
+    # "C:/Program Files/Allied Vision/Vimba_6.0/VimbaCPP/Bin/Win64"
+    # "C:/Program Files/Allied Vision/Vimba_6.0/VimbaC/Bin/Win64"
 )
-link_directories( ${Spinnaker_LIBRARIES} ${SpinVideo_LIBRARIES})
-set (LIBS ${Spinnaker_LIBRARIES} ${SpinVideo_LIBRARIES})
+# link_directories( ${Spinnaker_LIBRARIES} ${SpinVideo_LIBRARIES} ${Vimba_LIBRARIES} ${VimbaCPP_LIBRARIES} ${VimbaC_LIBRARIES})
+# set (LIBS ${Spinnaker_LIBRARIES} ${SpinVideo_LIBRARIES} ${Vimba_LIBRARIES} ${VimbaCPP_LIBRARIES} ${VimbaC_LIBRARIES})
+link_directories( ${Spinnaker_LIBRARIES} ${SpinVideo_LIBRARIES} ${VimbaCPP_LIBRARIES} ${VimbaC_LIBRARIES} ${VimbaImageTransform_LIBRARIES} ${OpenCV_LIBS} OpenImageIO::OpenImageIO OpenImageIO::OpenImageIO_Util)
+set (LIBS ${Spinnaker_LIBRARIES} ${SpinVideo_LIBRARIES} ${VimbaCPP_LIBRARIES} ${VimbaC_LIBRARIES} ${VimbaImageTransform_LIBRARIES} ${OpenCV_LIBS} OpenImageIO::OpenImageIO OpenImageIO::OpenImageIO_Util)
+# link_directories( ${Spinnaker_LIBRARIES} ${SpinVideo_LIBRARIES} ${Vimba_LIBRARIES} ${VimbaC_LIBRARIES})
+# set (LIBS ${Spinnaker_LIBRARIES} ${SpinVideo_LIBRARIES} ${Vimba_LIBRARIES} ${VimbaC_LIBRARIES})
 
 #Generate Execs
 add_executable(rgb ${PROJECT_SOURCE_DIR}/src/preset/rgb.cpp)
 add_executable(nir ${PROJECT_SOURCE_DIR}/src/preset/nir.cpp)
+# add_executable(nir2 ${PROJECT_SOURCE_DIR}/src/nir2.cpp)
+add_executable(nir2 ${PROJECT_SOURCE_DIR}/src/Vimba_helper/main.cpp ${PROJECT_SOURCE_DIR}/src/Vimba_helper/ApiController.cpp ${PROJECT_SOURCE_DIR}/src/Vimba_helper/ApiController.h
+                                                                    ${PROJECT_SOURCE_DIR}/src/Vimba_helper/CameraObserver.cpp ${PROJECT_SOURCE_DIR}/src/Vimba_helper/CameraObserver.h
+                                                                    ${PROJECT_SOURCE_DIR}/src/Vimba_helper/FrameObserver.cpp ${PROJECT_SOURCE_DIR}/src/Vimba_helper/FrameObserver.h
+                                                                    ${PROJECT_SOURCE_DIR}/src/Vimba_helper/Bitmap.cpp ${PROJECT_SOURCE_DIR}/src/Vimba_helper/Bitmap.h
+                                                                    ${PROJECT_SOURCE_DIR}/src/Vimba_helper/TransformImage.h
+                                                                    ${PROJECT_SOURCE_DIR}/src/Vimba_helper/ErrorCodeToMessage.h
+                                                                    ${PROJECT_SOURCE_DIR}/src/Vimba_helper/StreamSystemInfo.h)
 add_executable(polarized ${PROJECT_SOURCE_DIR}/src/preset/polarized.cpp)
 add_executable(rgb_continuous ${PROJECT_SOURCE_DIR}/src/continuous/rgb_continuous.cpp)
 add_executable(nir_continuous ${PROJECT_SOURCE_DIR}/src/continuous/nir_continuous.cpp)
 add_executable(polarized_continuous ${PROJECT_SOURCE_DIR}/src/continuous/polarized_continuous.cpp)
+# add_executable(thermal ${PROJECT_SOURCE_DIR}/src/thermal.cpp ${PROJECT_SOURCE_DIR}/include/thermal.h)
+add_executable(thermal ${PROJECT_SOURCE_DIR}/src/thermal.cpp)
 target_link_libraries(rgb ${LIBS})
 target_link_libraries(nir ${LIBS})
+target_link_libraries(nir2 ${LIBS})
 target_link_libraries(polarized ${LIBS})
 target_link_libraries(rgb_continuous ${LIBS})
 target_link_libraries(nir_continuous ${LIBS})
 target_link_libraries(polarized_continuous ${LIBS})
+target_link_libraries(thermal ${LIBS})
 
 #Targets
 ADD_CUSTOM_TARGET(build_all)
-ADD_DEPENDENCIES(build_all rgb nir polarized rgb_continuous nir_continuous polarized_continuous)
+ADD_DEPENDENCIES(build_all rgb nir nir2 polarized rgb_continuous nir_continuous polarized_continuous thermal)

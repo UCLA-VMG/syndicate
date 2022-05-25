@@ -1,9 +1,0 @@
-# ninja log v5
-0	602	6741106874409224	CMakeFiles/nir.dir/src/nir.cpp.obj	b77e3828e0204617
-602	706	6741106875260039	nir.exe	317e45325026867f
-0	1094	6741955423337095	CMakeFiles/nir.dir/src/nir.cpp.obj	b77e3828e0204617
-2	1097	6741955423327469	CMakeFiles/nir_continuous.dir/src/nir_continuous.cpp.obj	a2b37bd181b3b6aa
-1095	1282	6741955424507164	nir.exe	651c5c579130101c
-1098	1360	6741955425935089	nir_continuous.exe	42c5aa769a35b8af
-3	1082	6742638301660218	CMakeFiles/nir_continuous.dir/src/nir_continuous.cpp.obj	a2b37bd181b3b6aa
-2	325	6742638758202564	nir_continuous.exe	42c5aa769a35b8af

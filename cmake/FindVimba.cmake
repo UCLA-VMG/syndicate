@@ -12,12 +12,13 @@ find_path(Vimba_INCLUDE_DIRS
   NAMES
   "VimbaCPP.h"
   PATHS
-  "C:/Users/Public/Documents/Allied Vision/Vimba_6.0/VimbaCPP_Source/VimbaCPP/Include"
-  # "C:/Users/Public/Documents/Allied Vision/Vimba_6.0/VimbaCPP_Source"
-  # "C:/Users/Public/Documents/Allied Vision/Vimba_6.0/VimbaCPP_Examples"
-  # "C:/Users/Public/Documents/Allied Vision/Vimba_6.0/VimbaCPP_Source/VimbaCPP"
-  # "C:/Users/Public/Documents/Allied Vision/Vimba_6.0/VimbaCPP_Examples/VimbaCPP"
-  # "C:/Users/Public/Documents/Allied Vision/Vimba_6.0/VimbaCPP_Examples/VimbaCPP/Include"
+  "C:/Users/Public/Documents/Allied Vision v2/Vimba_6.0/VimbaCPP_Source/VimbaCPP/Include"
+  "C:/Users/Public/Documents/Allied Vision v2/Vimba_6.0/VimbaCPP_Source/"
+  # "C:/Users/Public/Documents/Allied Vision v2/Vimba_6.0/VimbaCPP_Source"
+  # "C:/Users/Public/Documents/Allied Vision v2/Vimba_6.0/VimbaCPP_Examples"
+  # "C:/Users/Public/Documents/Allied Vision v2/Vimba_6.0/VimbaCPP_Source/VimbaCPP"
+  # "C:/Users/Public/Documents/Allied Vision v2/Vimba_6.0/VimbaCPP_Examples/VimbaCPP"
+  # "C:/Users/Public/Documents/Allied Vision v2/Vimba_6.0/VimbaCPP_Examples/VimbaCPP/Include"
   )
 message(STATUS "find_path result:")
 message(STATUS "${Vimba_INCLUDE_DIRS}")
@@ -26,9 +27,9 @@ find_library(Vimba_LIBRARIES
   NAMES
   VimbaCPP.lib
   PATHS
-  "C:/Users/Public/Documents/Allied Vision/Vimba_6.0/VimbaCPP_Source/Build"
-  "C:/Users/Public/Documents/Allied Vision/Vimba_6.0/VimbaCPP_Source/Build/VS2010/x64/Debug"
-  # "C:/Users/Public/Documents/Allied Vision/Vimba_6.0/VimbaCPP_Source/VimbaCPP/Include"
+  "C:/Users/Public/Documents/Allied Vision v2/Vimba_6.0/VimbaCPP_Source/"
+  "C:/Users/Public/Documents/Allied Vision v2/Vimba_6.0/VimbaCPP_Source/Build/VS2010/x64/Debug"
+  # "C:/Users/Public/Documents/Allied Vision v2/Vimba_6.0/VimbaCPP_Source/VimbaCPP/Include"
   )
 
 message(STATUS "find_library result:")
