@@ -25,6 +25,7 @@ struct SpinnakerCamera : public Syndicate::Camera
     Spinnaker::CameraList camList;
     Spinnaker::CameraPtr flir_cam;
     std::string cameraID;
+    std::string pixelFormat;
 
 };
 

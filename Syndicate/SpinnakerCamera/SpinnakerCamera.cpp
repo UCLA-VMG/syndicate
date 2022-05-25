@@ -8,10 +8,10 @@ using namespace std;
 using namespace Syndicate;
 
 SpinnakerCamera::SpinnakerCamera(std::unordered_map<std::string, std::any>& sample_config)
-    : Syndicate::Camera(sample_config), cameraID(std::any_cast<std::string>(sample_config["Camera ID"]))
+    : Syndicate::Camera(sample_config), 
+    cameraID(std::any_cast<std::string>(sample_config["Camera ID"])),
+    pixelFormat(std::any_cast<std::string>(sample_config["Pixel Format"]))
 {
-    std::cout << "sPinnCamera Cstr\n";
-
     // Retrieve singleton reference to system object
     system = System::GetInstance();
     // Retrieve list of cameras from the system
@@ -27,7 +27,14 @@ SpinnakerCamera::SpinnakerCamera(std::unordered_map<std::string, std::any>& samp
 
     try {
         // Configure camera
-        if (!configure(flir_cam, nodeMap, fps, height, width)) {
+        double fps_correction{0};
+        if(sample_config.find("FPS Correction") != sample_config.end()){
+            fps_correction = std::any_cast<int>(sample_config["FPS Correction"]);
+            std::cout << "FPS Correction Enabled\n";
+        }
+        
+
+        if (!configure(flir_cam, nodeMap, (fps+fps_correction), height, width)) {
             std::cout << "Camera configuration for device " << cameraID << " unsuccessful, aborting...";
         }
     }
@@ -50,6 +57,7 @@ void SpinnakerCamera::AcquireSave(double seconds)
     int num_frames(seconds*fps);
     std::cout << endl << endl << "*** IMAGE ACQUISITION ***" << endl << endl;
     auto start = std::chrono::steady_clock::now();
+    ImagePtr convertedImage = nullptr;
     try {
         // Begin acquiring images
         flir_cam->BeginAcquisition();
@@ -68,22 +76,23 @@ void SpinnakerCamera::AcquireSave(double seconds)
                          << endl;
                 }
                 else {
-                    // Convert image to mono 8
-                    ImagePtr convertedImage = pResultImage->Convert(PixelFormat_Mono8, HQ_LINEAR);
+                    if(pixelFormat == "Mono"){
+                        convertedImage = pResultImage->Convert(PixelFormat_Mono8, NO_COLOR_PROCESSING);
+                    }
+                    else if(pixelFormat == "RGB"){
+                        convertedImage = pResultImage->Convert(PixelFormat_BGR8, NO_COLOR_PROCESSING);
+                    }
+                    else
+                        std::cout << "Error: Pixel Format Invalid. \n";
                     // Create a unique filename
                     ostringstream filename;
-                    filename << "Acquisition-";
-                    if (!deviceSerialNumber.empty()) {
-                        filename << deviceSerialNumber.c_str() << "-";
-                    }
-                    filename << imageCnt << ".jpg";
-                    // Save image
-                    convertedImage->Save(filename.str().c_str());
-                    std::cout << "Image saved at " << filename.str() << endl;
+                    filename << rootPath << sensorName << "_" << imageCnt;
+                    convertedImage->Save(filename.str().c_str(),  Spinnaker::ImageFileFormat::BMP);
+                    std::cout << sensorName << pResultImage->GetFrameID() << "\n";
                 }
                 // Release image
                 pResultImage->Release();
-                std::cout << endl;
+                // std::cout << endl;
             }
             catch (Spinnaker::Exception& e) {
                 std::cout << "Error: " << e.what() << endl;
@@ -107,6 +116,7 @@ void SpinnakerCamera::AcquireSaveBarrier(double seconds, boost::barrier& frameBa
     int num_frames(seconds*fps);
     std::cout << endl << endl << "*** IMAGE ACQUISITION ***" << endl << endl;
     auto start = std::chrono::steady_clock::now();
+    ImagePtr convertedImage = nullptr;
     try {
         // Begin acquiring images
         flir_cam->BeginAcquisition();
@@ -126,22 +136,24 @@ void SpinnakerCamera::AcquireSaveBarrier(double seconds, boost::barrier& frameBa
                          << endl;
                 }
                 else {
-                    // Convert image to mono 8
-                    ImagePtr convertedImage = pResultImage->Convert(PixelFormat_Mono8, HQ_LINEAR);
+                    if(pixelFormat == "Mono"){
+                        convertedImage = pResultImage->Convert(PixelFormat_Mono8, NO_COLOR_PROCESSING);
+                    }
+                    else if(pixelFormat == "RGB"){
+                        convertedImage = pResultImage->Convert(PixelFormat_BGR8, NO_COLOR_PROCESSING);
+                    }
+                    else
+                        std::cout << "Error: Pixel Format Invalid. \n";
                     // Create a unique filename
                     ostringstream filename;
-                    filename << "Acquisition-";
-                    if (!deviceSerialNumber.empty()) {
-                        filename << deviceSerialNumber.c_str() << "-";
-                    }
-                    filename << imageCnt << ".jpg";
-                    // Save image
-                    convertedImage->Save(filename.str().c_str());
-                    std::cout << "Image saved at " << filename.str() << endl;
+                    filename << rootPath << sensorName << "_" << imageCnt;
+                    convertedImage->Save(filename.str().c_str(),  Spinnaker::ImageFileFormat::BMP);
+                    std::cout << sensorName << pResultImage->GetFrameID() << "\n";
+
                 }
                 // Release image
                 pResultImage->Release();
-                std::cout << endl;
+                // std::cout << endl;
             }
             catch (Spinnaker::Exception& e) {
                 std::cout << "Error: " << e.what() << endl;
@@ -202,44 +214,13 @@ bool setResolution(INodeMap& nodeMap, int height, int width) {
 
 bool setFps(INodeMap& nodeMap, float fps) {
     bool result = true;
-    // try {
-    //     // Set frame_rate_auto_node to false
-    //     CEnumerationPtr frame_rate_auto_node = nodeMap.GetNode("AcquisitionFrameRateAuto");
-    //     CEnumEntryPtr node_frame_rate_auto_off = frame_rate_auto_node->GetEntryByName("Off");
-    //     const int64_t frame_rate_auto_off = node_frame_rate_auto_off->GetValue();
-    //     frame_rate_auto_node->SetIntValue(frame_rate_auto_off);
 
-    //     // Set frame_rate_enable to true
-    //     CBooleanPtr enable_rate_mode = nodeMap.GetNode("AcquisitionFrameRateEnabled");
-    //     if (!IsWritable(enable_rate_mode)) {
-    //         std::cout << "enable_rate_mode not writable. Aborting..." << endl << endl;
-    //         return false;
-    //     }
-    //     try {
-    //         enable_rate_mode->SetValue(true);
-    //         std::cout << "Correctly Set!!!!\n";
-    //     }
-    //     catch(Exception& e) {
-    //         std::cerr << e.what() << '\n'; // "Could not enable frame rate: {0}".format(ex)
-    //     }
-    //     CBooleanPtr acquisition_frame_rate_enable = nodeMap.GetNode("AcquisitionFrameRateEnable");
-    //     std::cout << acquisition_frame_rate_enable->GetValue() << "\n";
-    //     // Set fps
-    //     CFloatPtr acquisition_frame_rate = nodeMap.GetNode("AcquisitionFrameRate");
-    //     if(!IsWritable(acquisition_frame_rate->GetAccessMode()) || !IsReadable(acquisition_frame_rate->GetAccessMode()) ) {
-    //         std::cout << "Unable to set Frame Rate. Aborting..." << endl << endl;
-    //         return false;
-    //     }
-    //     acquisition_frame_rate->SetValue(fps);
-    //     float frameRateToSet = static_cast<float>(acquisition_frame_rate->GetValue());
-    //     std::cout << "Frame rate to be set to " << frameRateToSet << "..." << endl;
-    // }
-    // catch (Exception& e) {
-    //     std::cout << "Error configuring fps: " << e.what() << endl;
-    //     result = false;
-    // }
+    CFloatPtr acquisition_frame_rate = nodeMap.GetNode("AcquisitionFrameRate");
+    float frameRateToSet = static_cast<float>(acquisition_frame_rate->GetValue());
+    cout << "Something -  " << frameRateToSet << "..." << endl;
 
     try {
+
         try {
             // Set frame_rate_auto_node to false
             CEnumerationPtr frame_rate_auto_node = nodeMap.GetNode("AcquisitionFrameRateAuto");
@@ -247,27 +228,40 @@ bool setFps(INodeMap& nodeMap, float fps) {
             const int64_t frame_rate_auto_off = node_frame_rate_auto_off->GetValue();
             frame_rate_auto_node->SetIntValue(frame_rate_auto_off);
         }
-        catch (Exception& e) {}
-        CBooleanPtr acquisition_frame_rate_enable = nodeMap.GetNode("AcquisitionFrameRateEnable");
-        std::cout << acquisition_frame_rate_enable->GetValue() << "\n";
+        catch (Exception& e) {std::cout << "AcquisitionFrameRateAuto Unable to Turn off. \n";}
 
-        acquisition_frame_rate_enable->SetValue(true);
-        std::cout << "Correctly Set!!!!\n";
-        std::cout << acquisition_frame_rate_enable->GetValue() << "\n";
+        // Set frame_rate_enable to true
+        CBooleanPtr enable_rate_mode = nodeMap.GetNode("AcquisitionFrameRateEnable");
+        if (!IsWritable(enable_rate_mode)) {
+            cout << "enable_rate_mode not writable. Aborting..." << endl << endl;
+            // return false;
+        }
+        try {
+            enable_rate_mode->SetValue(true);
+        }
+        catch(Exception& e) {
+            std::cerr << e.what() << '\n'; // "Could not enable frame rate: {0}".format(ex)
+        }
+        // CBooleanPtr acquisition_frame_rate_enable = nodeMap.GetNode("AcquisitionFrameRateEnable");
+
         // Set fps
         CFloatPtr acquisition_frame_rate = nodeMap.GetNode("AcquisitionFrameRate");
         if(!IsWritable(acquisition_frame_rate->GetAccessMode()) || !IsReadable(acquisition_frame_rate->GetAccessMode()) ) {
-            std::cout << "Unable to set Frame Rate. Aborting..." << endl << endl;
+            cout << "Unable to set Frame Rate. Aborting..." << endl << endl;
             return false;
         }
         acquisition_frame_rate->SetValue(fps);
         float frameRateToSet = static_cast<float>(acquisition_frame_rate->GetValue());
-        std::cout << "Frame rate to be set to " << frameRateToSet << "..." << endl;
+        cout << "Frame rate to be set to " << frameRateToSet << "..." << endl;
     }
     catch (Exception& e) {
-        std::cout << "Error configuring fps: " << e.what() << endl;
+        cout << "Error configuring fps: " << e.what() << endl;
         result = false;
     }
+
+    acquisition_frame_rate = nodeMap.GetNode("AcquisitionFrameRate");
+    frameRateToSet = static_cast<float>(acquisition_frame_rate->GetValue());
+    cout << "Something -  " << frameRateToSet << "..." << endl;
 
     return result;
 }
@@ -359,7 +353,7 @@ int AcquireImages(CameraPtr pCam, INodeMap& nodeMap, INodeMap& nodeMapTLDevice, 
                     filename << imageCnt << ".jpg";
                     // Save image
                     convertedImage->Save(filename.str().c_str());
-                    std::cout << "Image saved at " << filename.str() << endl;
+                    // std::cout << "Image saved at " << filename.str() << endl;
                 }
                 // Release image
                 pResultImage->Release();
