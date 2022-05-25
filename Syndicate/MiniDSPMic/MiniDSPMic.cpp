@@ -13,7 +13,7 @@ MiniDSPMic::MiniDSPMic(std::unordered_map<std::string, std::any>& sample_config)
         fprintf(stderr, "An error occurred while using the portaudio stream\n");
         fprintf(stderr, "Error number: %d\n", err);
         fprintf(stderr, "Error message: %s\n", Pa_GetErrorText(err));
-        ~MiniDSPMic();
+        return;
     }
     std::cout << "Initialized Port Audio." << std::endl << std::endl;
 
@@ -25,7 +25,7 @@ MiniDSPMic::MiniDSPMic(std::unordered_map<std::string, std::any>& sample_config)
         fprintf(stderr, "An error occurred while using the portaudio stream\n");
         fprintf(stderr, "Error number: %d\n", err);
         fprintf(stderr, "Error message: %s\n", Pa_GetErrorText(err));
-        ~MiniDSPMic();
+        return;
     }
     const PaDeviceInfo* device_info = Pa_GetDeviceInfo(input_params.device);
 
@@ -41,19 +41,19 @@ MiniDSPMic::MiniDSPMic(std::unordered_map<std::string, std::any>& sample_config)
     input_params.hostApiSpecificStreamInfo = NULL;
 
     err = Pa_OpenStream(&record_stream, &input_params, NULL, _fs,
-                        std::any_cast<std::int>(sample_config["Frames per Buffer"]), paClipOff, _callback, NULL);
+                        std::any_cast<std::int>(sample_config["Frames per Buffer"]), paClipOff, _callback, nullptr);
 
     if (err != paNoError)
     {
         fprintf(stderr, "An error occurred while using the portaudio stream\n");
         fprintf(stderr, "Error number: %d\n", err);
         fprintf(stderr, "Error message: %s\n", Pa_GetErrorText(err));
-        ~MiniDSPMic();
+        return;
     }
 
 }
 
-void AcquireSave(double seconds) {
+void MiniDSPMic::MiniDSPMicAcquireSave(double seconds) {
     int total_frames, number_samples, number_bytes;
 
     _max_frame_index = total_frames = seconds * _fs; /* Record for a few seconds. */
@@ -68,7 +68,7 @@ void AcquireSave(double seconds) {
         fprintf(stderr, "An error occurred while using the portaudio stream\n");
         fprintf(stderr, "Error number: %d\n", err);
         fprintf(stderr, "Error message: %s\n", Pa_GetErrorText(err));
-        ~MiniDSPMic();
+        return;
     }
     std::cout << "---------------- Now recording!! Please speak into the microphone. ----------------" << std::endl << std::endl; 
 
@@ -83,7 +83,7 @@ void AcquireSave(double seconds) {
         fprintf(stderr, "An error occurred while using the portaudio stream\n");
         fprintf(stderr, "Error number: %d\n", err);
         fprintf(stderr, "Error message: %s\n", Pa_GetErrorText(err));
-        ~MiniDSPMic();
+        return;
     }
 
     err = Pa_CloseStream(record_stream);
@@ -93,7 +93,7 @@ void AcquireSave(double seconds) {
         fprintf(stderr, "An error occurred while using the portaudio stream\n");
         fprintf(stderr, "Error number: %d\n", err);
         fprintf(stderr, "Error message: %s\n", Pa_GetErrorText(err));
-        ~MiniDSPMic();
+        return;
     }
 
     // Save the recording 
@@ -111,8 +111,53 @@ void AcquireSave(double seconds) {
     }
 }
 
-void AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier) {
+void MiniDSPMic::MiniDSPMicAcquireSaveBarrier(double seconds, boost::barrier& frameBarrier) {
     std::cout << "TBD" << std::endl << std::endl;
+}
+
+int MiniDSPMic::_callback(const void* input_buffer, void* output_buffer,
+    unsigned long frames_per_buffer, const PaStreamCallbackTimeInfo* time_info,
+    PaStreamCallbackFlags status_flags, void* user_data) {
+
+    const float* read_ptr = (const float*)input_buffer;
+    // float* wptr = &data->recordedSamples[data->frameIndex * _channels];
+    float* write_ptr = &audio_samples_1[_frame_index * _channels];
+    long frames_to_calc;
+    long i;
+    int finished;
+    unsigned long frames_remaining = _max_frame_index - _frame_index;
+
+    /* Prevent unused variable warnings. */
+    (void)output_buffer;
+    (void)time_info;
+    (void)status_flags;
+    (void)user_data;
+
+    if (frames_remaining < frames_per_buffer) {
+        frames_to_calc = frames_remaining;
+        finished = paComplete;
+    }
+    else {
+        frames_to_calc = frames_per_buffer;
+        finished = paContinue;
+    }
+
+    if (input_buffer == NULL) {
+        for (i = 0; i < frames_to_calc; i++) {
+            for (int j = 0; j < _channels; j++) {
+                *write_ptr++ = 0.0f;
+            }
+        }
+    }
+    else {
+        for (i = 0; i < frames_to_calc; i++) {
+            for (int j = 0; j < _channels; j++) {
+                *write_ptr++ = *read_ptr++;
+            }
+        }
+    }
+    _frame_index += frames_to_calc;
+    return finished;
 }
 
 MiniDSPMic::~MiniDSPMic() {
