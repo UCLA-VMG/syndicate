@@ -135,44 +135,61 @@
 
 cmake_minimum_required(VERSION 3.0.0)
 project(syndicate VERSION 0.1.0)
+set (CMAKE_CXX_STANDARD 23)
+include(CTest)
+enable_testing()
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+if (CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)")
+    set (X86 TRUE)
+    set (X64 FALSE)
+    message(STATUS "HOST Processor: ${CMAKE_HOST_SYSTEM_PROCESSOR}. Switching to X86 compilation.")
+elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "(x64)|(X64)|(amd64)|(AMD64)")
+    set (X64 TRUE)
+    set (X86 FALSE)
+    message(STATUS "HOST Processor: ${CMAKE_HOST_SYSTEM_PROCESSOR}. Switching to X64 compilation.")
+else()
+    message(SEND_ERROR "HOST Processor, ${CMAKE_HOST_SYSTEM_PROCESSOR}, not compatible." )
+endif ()
 
+#Set Useful Paths
+set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin)
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+
+#Find packeges
+message(STATUS "${CMAKE_MODULE_PATH}")
 find_package(Spinnaker REQUIRED)
 find_package(SpinVideo REQUIRED)
-# find_package(Vimba REQUIRED)
 find_package(VimbaCPP REQUIRED)
 find_package(VimbaC REQUIRED)
-find_package(VimbaImageTransform REQUIRED)
 find_package(OpenCV REQUIRED)
-find_package(OpenImageIO CONFIG REQUIRED)
+find_package(VimbaImageTransform REQUIRED)
+find_package(Boost REQUIRED COMPONENTS thread)
+    # target_link_libraries(main PRIVATE Boost::boost Boost::<lib1> Boost::<lib2> ...)
 
-include_directories(  
-    SYSTEM ${Spinnaker_INCLUDE_DIRS}
-    SYSTEM ${SpinVideo_INCLUDE_DIRS}
-    # SYSTEM ${Vimba_INCLUDE_DIRS}
-    SYSTEM ${VimbaCPP_INCLUDE_DIRS}
-    SYSTEM ${VimbaC_INCLUDE_DIRS}
-    SYSTEM ${VimbaImageTransform_INCLUDE_DIRS}
-    SYSTEM (${OpenCV_INCLUDE_DIRS})
-    # "C:/Users/Public Documents/Allied Vision/Vimba_6.0/VimbaCPP_Examples"
-    # "C:/Users/Public Documents/Allied Vision/Vimba_6.0/Source"
-    # SYSTEM "C:/Users/Public Documents/Allied Vision/Vimba_6.0"
-    # SYSTEM "C:/Users/Public Documents/Allied Vision/Vimba_6.0/VimbaCPP_Source/Build/VS2010/x64/Debug"
-    # "C:/Users/Public Documents/Allied Vision/Vimba_6.0"
-    # "C:/Program Files/Allied Vision/Vimba_6.0/"
-    # "C:/Program Files/Allied Vision/Vimba_6.0/VimbaCPP/"
-    # "C:/Program Files/Allied Vision/Vimba_6.0/VimbaCPP/Source"
-    # "C:/Program Files/Allied Vision/Vimba_6.0/VimbaC/"
-    # "C:/Program Files/Allied Vision/Vimba_6.0/VimbaCPP/Bin/Win64"
-    # "C:/Program Files/Allied Vision/Vimba_6.0/VimbaC/Bin/Win64"
-)
-# link_directories( ${Spinnaker_LIBRARIES} ${SpinVideo_LIBRARIES} ${Vimba_LIBRARIES} ${VimbaCPP_LIBRARIES} ${VimbaC_LIBRARIES})
-# set (LIBS ${Spinnaker_LIBRARIES} ${SpinVideo_LIBRARIES} ${Vimba_LIBRARIES} ${VimbaCPP_LIBRARIES} ${VimbaC_LIBRARIES})
-link_directories( ${Spinnaker_LIBRARIES} ${SpinVideo_LIBRARIES} ${VimbaCPP_LIBRARIES} ${VimbaC_LIBRARIES} ${VimbaImageTransform_LIBRARIES} ${OpenCV_LIBS} OpenImageIO::OpenImageIO OpenImageIO::OpenImageIO_Util)
-set (LIBS ${Spinnaker_LIBRARIES} ${SpinVideo_LIBRARIES} ${VimbaCPP_LIBRARIES} ${VimbaC_LIBRARIES} ${VimbaImageTransform_LIBRARIES} ${OpenCV_LIBS} OpenImageIO::OpenImageIO OpenImageIO::OpenImageIO_Util)
-# link_directories( ${Spinnaker_LIBRARIES} ${SpinVideo_LIBRARIES} ${Vimba_LIBRARIES} ${VimbaC_LIBRARIES})
-# set (LIBS ${Spinnaker_LIBRARIES} ${SpinVideo_LIBRARIES} ${Vimba_LIBRARIES} ${VimbaC_LIBRARIES})
+# set(Boost_USE_STATIC_LIBS ON)
+# set(Boost_USE_STATIC_LIBS        ON)
+# set(Boost_USE_MULTITHREADED      ON)
+# set(Boost_USE_STATIC_RUNTIME    OFF)
+# set(BOOST_ROOT "C:/Program Files/boost/boost_1_78_0")
+
+
+#Include Path Libraries
+include_directories("${PROJECT_SOURCE_DIR}/include"
+                    "${PROJECT_SOURCE_DIR}/src"
+                    SYSTEM ${Spinnaker_INCLUDE_DIRS}
+                    SYSTEM ${SpinVideo_INCLUDE_DIRS}
+                    SYSTEM ${VimbaCPP_INCLUDE_DIRS}
+                    SYSTEM ${VimbaC_INCLUDE_DIRS}
+                    SYSTEM ${VimbaImageTransform_INCLUDE_DIRS}
+                    SYSTEM (${OpenCV_INCLUDE_DIRS})
+                    ${Boost_INCLUDE_DIR}
+                    )
+
+#Include Libraries
+add_subdirectory(Syndicate)
+set (LIBS ${Spinnaker_LIBRARIES} ${SpinVideo_LIBRARIES} ${VimbaCPP_LIBRARIES} ${VimbaC_LIBRARIES} ${VimbaImageTransform_LIBRARIES} ${OpenCV_LIBS} ${Boost_LIBRARIES} syndicate )
 
 #Generate Execs
 add_executable(rgb ${PROJECT_SOURCE_DIR}/src/preset/rgb.cpp)
