@@ -20,11 +20,14 @@ struct SpinnakerCamera : public Syndicate::Camera
 
     void AcquireSave(double seconds);
     void AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier);
+    void ConcurrentAcquire(double seconds, boost::barrier& frameBarrier);
+    void ConcurrentSave();
 
     Spinnaker::SystemPtr system;
     Spinnaker::CameraList camList;
     Spinnaker::CameraPtr flir_cam;
     std::string cameraID;
+    std::string pixelFormat;
 
 };
 

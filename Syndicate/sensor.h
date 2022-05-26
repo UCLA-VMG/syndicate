@@ -11,10 +11,12 @@
 #include <boost/thread/barrier.hpp>
 #include <boost/bind.hpp>
 #include <boost/atomic.hpp>
+#include <boost/thread/mutex.hpp>
 
 enum HealthCode
 {
     OFFLINE,
+    RUNNING,
     BUSY,
     ONLINE
 };
@@ -38,14 +40,16 @@ struct Sensor
     //Operating Status/Mode
     HealthCode statusCode;
     OpMode operatingCode;
+    //Parallel Processing Constructs
+    boost::mutex mtx_; 
     
     //-------- Capture Data Structures : operatingCode == OpMode::COLLECT -------------
     std::vector<std::vector<double>> extrinsicMatrix;
     std::vector<std::chrono::time_point<std::chrono::steady_clock>> timeStamps;
+    std::queue<std::any> runningBuffer; 
     std::string rootPath;
 
     //-------- Inference Data Structures : operatingCode == OpMode::INFERENCE ---------
-    std::queue<double> runningBuffer;
     std::queue<std::chrono::time_point<std::chrono::steady_clock>> runningTimestamps;
     const int bufferSize;
 
@@ -71,6 +75,10 @@ struct Sensor
 
     virtual void AcquireSave(double seconds) = 0;
 
+    virtual void ConcurrentAcquire(double seconds, boost::barrier& frameBarrier) = 0;
+
+    virtual void ConcurrentSave() = 0;
+
     // std::vector<double> AcquireHsync(double seconds);
 
     // std::vector<double> AcquireHsync(long int frames);
@@ -85,6 +93,11 @@ struct Sensor
 
     //-------- Inference Functions : operatingCode == OpMode::INFERENCE ---------
     void ContiniousAcquire(size_t queue_size);
+
+    //-------- Thread Safe Access Function --------------------------------------
+    HealthCode checkHealthCode();
+
+    void setHealthCode(HealthCode stat);
 
 };
 

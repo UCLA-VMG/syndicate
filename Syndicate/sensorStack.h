@@ -18,8 +18,12 @@ struct SensorStack{
                 std::vector<std::unordered_map<std::string, std::any>>& configs);
     // ~SensorStack();
 
+    void ConcurrentAcquireSave(double seconds);
+
     void Acquire(double seconds);
 
     void AcquireBarrier(double seconds);
+
+
 
 };

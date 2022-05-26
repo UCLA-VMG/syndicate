@@ -42,3 +42,30 @@ void SensorStack::AcquireBarrier(double seconds)
         j.join();
     }
 }
+
+void SensorStack::ConcurrentAcquireSave(double seconds)
+{
+    std::vector<boost::thread> threads_acquire;
+    for(auto& i : sensors)
+    {
+        boost::thread thread_(boost::bind(&(Sensor::ConcurrentAcquire), 
+            boost::ref(i), seconds, boost::ref(frameBarrier)));
+        threads_acquire.emplace_back(std::move(thread_)); //We have to move the thread.
+    }
+    std::vector<boost::thread> threads_save;
+    for(auto& i : sensors)
+    {
+        boost::thread thread_(boost::bind(&(Sensor::ConcurrentSave), 
+            boost::ref(i)));
+        threads_save.emplace_back(std::move(thread_)); //We have to move the thread.
+    }
+    
+    for(auto& j : threads_acquire)
+    {
+        j.join();
+    }
+    for(auto& j : threads_save)
+    {
+        j.join();
+    }
+}

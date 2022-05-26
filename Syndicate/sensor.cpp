@@ -16,3 +16,15 @@ Sensor::~Sensor()
 {
     std::cout << "Sensor " << sensorName << " is shutting down.\n";
 }
+
+HealthCode Sensor::checkHealthCode()
+{
+    boost::lock_guard<boost::mutex> guard(mtx_);
+    return statusCode;
+}
+
+void Sensor::setHealthCode(HealthCode stat)
+{
+    boost::lock_guard<boost::mutex> guard(mtx_);
+    statusCode = stat;
+}
