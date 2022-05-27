@@ -1,3 +1,4 @@
+#include <winsock2.h>
 #include <iostream>
 #include <Spinnaker.h>
 #include <functional>
@@ -8,6 +9,7 @@
 #include "simpleSensor.h"
 #include "sensorStack.h"
 #include "SpinnakerCamera.h"
+#include "RFEthernet.h"
 
 boost::mutex io_mutex;
 
@@ -62,15 +64,24 @@ int main(int, char**) {
         {"Sensor Name", std::string("Microphone")},
         {"Root Path", rootPath}
     };
+    std::unordered_map<std::string, std::any> radar_config = {
+        {"data_ip", std::string("192.168.33.30")}, {"adc_ip", std::string("192.168.33.180")}, 
+        {"Timeout", 1000},
+        {"Packet Size", 1456}, {"Max Packer Size ", 4096},
+        {"Sensor Name", std::string("Radar")},
+        {"Root Path", rootPath}
+    };
     
     //2. Add Configurations and Factory Generator Functions into std::vectors
     std::vector<std::unique_ptr<Sensor>(*)(std::unordered_map<std::string, std::any>&)> sensor_list;
     // sensor_list.emplace_back(makeSensor<SimpleSensor>);
     // sensor_list.emplace_back(makeSensor<SimpleSensor>);
-    sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
-    sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
-    sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
-    std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config};//, rgb_config};//sample_config, sample_config2, nir_config, polarized_config};
+    // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    sensor_list.emplace_back(makeSensor<RFEthernet>);
+    std::vector<std::unordered_map<std::string, std::any>> configs{radar_config};
+    // std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config};//, rgb_config};//sample_config, sample_config2, nir_config, polarized_config};
     
     //3. Initialize Sensor Stack
     SensorStack mainStack(sensor_list, configs);
@@ -78,16 +89,16 @@ int main(int, char**) {
     //4. Acquire Data
 
     //4.1 Asynchronously Acquire Data
-    // std::cout << "\n\n\nAsyn Capture \n";
-    // mainStack.Acquire(60);
+    std::cout << "\n\n\nAsyn Capture \n";
+    mainStack.Acquire(10);
 
-    //4.2 Barrier Sync Acquire Data
-    // std::cout << "\n\n\n Barrier Sync Capture\n";
-    // mainStack.AcquireBarrier(60);
+    // 4.2 Barrier Sync Acquire Data
+    std::cout << "\n\n\n Barrier Sync Capture\n";
+    mainStack.AcquireBarrier(10);
 
     //4.3 Barrier Acquire on One thread, and save asynchronously on another thread.
     // std::cout << "\n\n\n Barrier Sync Capture and Asynch Save\n";
-    mainStack.ConcurrentAcquireSave(30);
+    // mainStack.ConcurrentAcquireSave(30);
 
 
     //Test base class calling derived class func

@@ -7,7 +7,8 @@
                 "C:/Program Files/FLIR Systems/Spinnaker/include/**",
                 "C:/Program Files/FLIR Systems/Spinnaker/src/**",
                 "C:/Program Files/boost/boost_1_78_0/**",
-                "C:/Program Files/boost/boost_1_78_0/boost/**"
+                "C:/Program Files/boost/boost_1_78_0/boost/**",
+                "C:/Program Files/npcap-sdk-1.12/Include/**"
             ],
             "defines": [
                 "_DEBUG",

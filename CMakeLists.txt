@@ -29,6 +29,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 #Find packeges
 message(STATUS "${CMAKE_MODULE_PATH}")
 find_package(Spinnaker REQUIRED)
+find_package(Npcap REQUIRED)
 
 # set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_STATIC_LIBS        ON)
@@ -42,21 +43,28 @@ include_directories("${PROJECT_SOURCE_DIR}/include"
                     "${PROJECT_SOURCE_DIR}/src"
                     SYSTEM ${Spinnaker_INCLUDE_DIRS}
                     ${Boost_INCLUDE_DIR}
+                    ${Npcap_INCLUDE_DIRS}
                     )
 
 #Include Libraries
 add_subdirectory(Syndicate)
-set (LIBS ${Spinnaker_LIBRARIES} ${Boost_LIBRARIES} syndicate )
+set (LIBS ${Spinnaker_LIBRARIES} ${Boost_LIBRARIES} ${Npcap_LIBRARIES} syndicate) #wsock32 ws2_32)
 
 #Generate Execs
 add_executable(capture ${PROJECT_SOURCE_DIR}/scripts/main.cpp)
 add_executable(acq ${PROJECT_SOURCE_DIR}/scripts/acq.cpp)
+# add_executable(radar radar.cpp)
+# add_executable(server server.cpp)
+add_executable(packets_acq ${PROJECT_SOURCE_DIR}/scripts/packets_acq.cpp)
 target_link_libraries(capture ${LIBS})
 target_link_libraries(acq ${LIBS})
+# target_link_libraries(radar ${LIBS})
+# target_link_libraries(server ${LIBS})
+target_link_libraries(packets_acq ${LIBS})
 
 #Targets
 ADD_CUSTOM_TARGET(build_all)
-ADD_DEPENDENCIES(build_all capture acq)
+ADD_DEPENDENCIES(build_all capture acq packets_acq)
 
 #Library Linking
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
