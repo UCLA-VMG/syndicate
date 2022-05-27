@@ -12,6 +12,6 @@ target_include_directories(MiniDSPMic
     ${CMAKE_CURRENT_LIST_DIR}
   )
 
-target_link_libraries(MiniDSPMic syndicate)
 find_package(portaudio CONFIG REQUIRED)
 target_link_libraries(MiniDSPMic PRIVATE portaudio)
+target_link_libraries(MiniDSPMic PUBLIC syndicate)

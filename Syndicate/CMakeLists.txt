@@ -13,6 +13,6 @@ target_include_directories(syndicate
 add_subdirectory(SpinnakerCamera)
 add_subdirectory(SimpleSensor)
 add_subdirectory(RFEthernet)
+add_subdirectory(MiniDSPMic)
 
-target_link_libraries (syndicate SimpleSensor SpinnakerCamera RFEthernet)
-
+target_link_libraries (syndicate SimpleSensor SpinnakerCamera RFEthernet MiniDSPMic)
