@@ -10,6 +10,7 @@
 #include "sensorStack.h"
 #include "SpinnakerCamera.h"
 #include "RFEthernet.h"
+#include "MiniDSPMic.h"
 
 boost::mutex io_mutex;
 
@@ -71,6 +72,12 @@ int main(int, char**) {
         {"Sensor Name", std::string("Radar")},
         {"Root Path", rootPath}
     };
+
+    std::unordered_map<std::string, std::any> mic_config = {
+        {"FS", 44100}, {"Channels", 8}, {"Frames per Buffer", 512},
+        {"Sensor Name", std::string("Microphone")},
+        {"Root Path", std::string("/rand/rand/...")}
+    };
     
     //2. Add Configurations and Factory Generator Functions into std::vectors
     std::vector<std::unique_ptr<Sensor>(*)(std::unordered_map<std::string, std::any>&)> sensor_list;
@@ -80,8 +87,9 @@ int main(int, char**) {
     sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
     sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
     sensor_list.emplace_back(makeSensor<RFEthernet>);
-    // std::vector<std::unordered_map<std::string, std::any>> configs{radar_config};
-    std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config, radar_config};//, rgb_config};//sample_config, sample_config2, nir_config, polarized_config};
+    sensor_list.emplace_back(makeSensor<MiniDSPMic>);
+    std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config, radar_config, mic_config};//, rgb_config};//sample_config, sample_config2, nir_config, polarized_config};
+    
     
     //3. Initialize Sensor Stack
     SensorStack mainStack(sensor_list, configs);
