@@ -12,6 +12,7 @@ target_include_directories(syndicate
 
 add_subdirectory(SpinnakerCamera)
 add_subdirectory(SimpleSensor)
+add_subdirectory(RFEthernet)
 
-target_link_libraries (syndicate SimpleSensor SpinnakerCamera)
+target_link_libraries (syndicate SimpleSensor SpinnakerCamera RFEthernet)
 
