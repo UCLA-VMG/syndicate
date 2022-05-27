@@ -24,6 +24,8 @@ struct MiniDSPMic : public Sensor
 
     void AcquireSave(double seconds);
     void AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier);
+    void ConcurrentAcquire(double seconds, boost::barrier& frameBarrier);
+    void ConcurrentSave();
 
     int _fs;
     int _channels;

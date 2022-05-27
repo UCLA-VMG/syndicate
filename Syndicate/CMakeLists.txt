@@ -14,5 +14,6 @@ add_subdirectory(SpinnakerCamera)
 add_subdirectory(SimpleSensor)
 add_subdirectory(RFEthernet)
 add_subdirectory(MiniDSPMic)
+add_subdirectory(MX800)
 
-target_link_libraries (syndicate SimpleSensor SpinnakerCamera RFEthernet MiniDSPMic)
+target_link_libraries (syndicate SimpleSensor SpinnakerCamera RFEthernet MiniDSPMic MX800)

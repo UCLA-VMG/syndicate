@@ -30,13 +30,14 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 message(STATUS "${CMAKE_MODULE_PATH}")
 find_package(Spinnaker REQUIRED)
 find_package(Npcap REQUIRED)
+find_package(OpenCV CONFIG REQUIRED)
 
 # set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_STATIC_LIBS        ON)
 set(Boost_USE_MULTITHREADED      ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
 set(BOOST_ROOT "C:/Program Files/boost/boost_1_78_0")
-find_package(Boost COMPONENTS thread REQUIRED)
+find_package(Boost COMPONENTS thread filesystem REQUIRED)
 
 #Include Path Libraries
 include_directories("${PROJECT_SOURCE_DIR}/include"
@@ -48,7 +49,7 @@ include_directories("${PROJECT_SOURCE_DIR}/include"
 
 #Include Libraries
 add_subdirectory(Syndicate)
-set (LIBS ${Spinnaker_LIBRARIES} ${Boost_LIBRARIES} ${Npcap_LIBRARIES} syndicate) #wsock32 ws2_32)
+set (LIBS ${Spinnaker_LIBRARIES} ${Boost_LIBRARIES} ${Npcap_LIBRARIES} syndicate opencv_ml opencv_dnn opencv_core opencv_flann) #wsock32 ws2_32)
 
 #Generate Execs
 add_executable(capture ${PROJECT_SOURCE_DIR}/scripts/main.cpp)

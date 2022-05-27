@@ -93,7 +93,7 @@ void RFEthernet::AcquireSave(double seconds)
 
 	/* Open the dump file */
     std::ostringstream filename;
-    filename << rootPath << sensorName << ".bin";
+    filename << rootPath << sensorName << ".raw";
 	dumpfile = pcap_dump_open(adhandle, filename.str().c_str());
 
 	if(dumpfile==NULL)

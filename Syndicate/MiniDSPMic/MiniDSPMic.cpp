@@ -172,3 +172,13 @@ MiniDSPMic::~MiniDSPMic() {
     //     fprintf(stderr, "Error message: %s\n", Pa_GetErrorText(err));
     // }
 }
+
+void MiniDSPMic::ConcurrentAcquire(double seconds, boost::barrier& frameBarrier)
+{
+    std::cout << "I am not defined yet.\n";
+}
+
+void MiniDSPMic::ConcurrentSave()
+{
+    std::cout << "I am not defined yet.\n";
+}

@@ -11,6 +11,7 @@
 #include "SpinnakerCamera.h"
 #include "RFEthernet.h"
 #include "MiniDSPMic.h"
+#include "MX800.h"
 
 boost::mutex io_mutex;
 
@@ -72,11 +73,10 @@ int main(int, char**) {
         {"Sensor Name", std::string("Radar")},
         {"Root Path", rootPath}
     };
-
-    std::unordered_map<std::string, std::any> mic_config = {
-        {"FS", 44100}, {"Channels", 8}, {"Frames per Buffer", 512},
-        {"Sensor Name", std::string("Microphone")},
-        {"Root Path", std::string("/rand/rand/...")}
+    std::unordered_map<std::string, std::any> mx800_config = {
+        {"Exe Path", std::string("C:/Users/111/Desktop/repos/mmhealth_2/sensors/VSCaptureMP-master-copy/VSCaptureMP/VSCaptureMP/bin/Debug/VSCaptureMP.exe")},
+        {"Sensor Name", std::string("MX800")},
+        {"Root Path", rootPath}
     };
     
     //2. Add Configurations and Factory Generator Functions into std::vectors
@@ -88,7 +88,8 @@ int main(int, char**) {
     sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
     sensor_list.emplace_back(makeSensor<RFEthernet>);
     sensor_list.emplace_back(makeSensor<MiniDSPMic>);
-    std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config, radar_config, mic_config};//, rgb_config};//sample_config, sample_config2, nir_config, polarized_config};
+    sensor_list.emplace_back(makeSensor<MX800>);
+    std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config, radar_config, mic_config, mx800_config};
     
     
     //3. Initialize Sensor Stack
@@ -98,11 +99,11 @@ int main(int, char**) {
 
     //4.1 Asynchronously Acquire Data
     std::cout << "\n\n\nAsyn Capture \n";
-    mainStack.Acquire(10);
+    mainStack.Acquire(5);
 
     // 4.2 Barrier Sync Acquire Data
     std::cout << "\n\n\n Barrier Sync Capture\n";
-    mainStack.AcquireBarrier(10);
+    mainStack.AcquireBarrier(5);
 
     //4.3 Barrier Acquire on One thread, and save asynchronously on another thread.
     // std::cout << "\n\n\n Barrier Sync Capture and Asynch Save\n";
