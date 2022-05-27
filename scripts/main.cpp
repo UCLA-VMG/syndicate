@@ -76,12 +76,12 @@ int main(int, char**) {
     std::vector<std::unique_ptr<Sensor>(*)(std::unordered_map<std::string, std::any>&)> sensor_list;
     // sensor_list.emplace_back(makeSensor<SimpleSensor>);
     // sensor_list.emplace_back(makeSensor<SimpleSensor>);
-    // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
-    // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
-    // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
     sensor_list.emplace_back(makeSensor<RFEthernet>);
-    std::vector<std::unordered_map<std::string, std::any>> configs{radar_config};
-    // std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config};//, rgb_config};//sample_config, sample_config2, nir_config, polarized_config};
+    // std::vector<std::unordered_map<std::string, std::any>> configs{radar_config};
+    std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config, radar_config};//, rgb_config};//sample_config, sample_config2, nir_config, polarized_config};
     
     //3. Initialize Sensor Stack
     SensorStack mainStack(sensor_list, configs);
