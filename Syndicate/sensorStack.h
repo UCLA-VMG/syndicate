@@ -12,6 +12,8 @@
 struct SensorStack{
 
     std::vector<std::unique_ptr<Sensor>> sensors;
+
+    boost::barrier startAcq;
     boost::barrier frameBarrier;
 
     SensorStack(std::vector<std::unique_ptr<Sensor>(*)(std::unordered_map<std::string, std::any>&)>& sensor_list,

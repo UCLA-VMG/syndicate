@@ -3,7 +3,7 @@
 SensorStack::SensorStack(
     std::vector<std::unique_ptr<Sensor>(*)(std::unordered_map<std::string, std::any>&)>& sensor_list,
     std::vector<std::unordered_map<std::string, std::any>>& configs)
-    : frameBarrier(sensor_list.size())
+    : frameBarrier(sensor_list.size()), startAcq(sensor_list.size())
 {
     assert(sensor_list.size() == configs.size());
 
