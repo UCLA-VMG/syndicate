@@ -10,8 +10,10 @@
 
 typedef struct
 {
-    int    frame_index;  /* Index into sample array. */
-    int    max_frame_index;
+    int     fs;
+    int     channels;
+    int     frame_index;  /* Index into sample array. */
+    int     max_frame_index;
     float* audio_samples_1;
     float* audio_samples_2;
 }
@@ -27,10 +29,8 @@ struct MiniDSPMic : public Sensor
     void ConcurrentAcquire(double seconds, boost::barrier& frameBarrier);
     void ConcurrentSave();
 
-    int _fs;
-    int _channels;
-    // int _frame_index;
-    // int _max_frame_index;
+    // int _fs;
+    // int _channels;
     paRecordData _data;
     PaStream* record_stream;
 

@@ -1,8 +1,10 @@
 #include "miniDSPMic.h"
 
 MiniDSPMic::MiniDSPMic(std::unordered_map<std::string, std::any>& sample_config)
-    : Sensor(sample_config), _fs(std::any_cast<int>(sample_config["FS"])), _channels(std::any_cast<int>(sample_config["Channels"]))
+    : Sensor(sample_config)
 {
+    _data.fs = std::any_cast<int>(sample_config["FS"]);
+    _data.channels = std::any_cast<int>(sample_config["Channels"]);
     PaStreamParameters input_params;
     PaError err = paNoError;
 
@@ -13,7 +15,7 @@ MiniDSPMic::MiniDSPMic(std::unordered_map<std::string, std::any>& sample_config)
         fprintf(stderr, "An error occurred while using the portaudio stream\n");
         fprintf(stderr, "Error number: %d\n", err);
         fprintf(stderr, "Error message: %s\n", Pa_GetErrorText(err));
-        return;
+        exit(1);
     }
     std::cout << "Initialized Port Audio." << std::endl << std::endl;
 
@@ -25,7 +27,7 @@ MiniDSPMic::MiniDSPMic(std::unordered_map<std::string, std::any>& sample_config)
         fprintf(stderr, "An error occurred while using the portaudio stream\n");
         fprintf(stderr, "Error number: %d\n", err);
         fprintf(stderr, "Error message: %s\n", Pa_GetErrorText(err));
-        return;
+        exit(1);
     }
     const PaDeviceInfo* device_info = Pa_GetDeviceInfo(input_params.device);
 
@@ -35,12 +37,12 @@ MiniDSPMic::MiniDSPMic(std::unordered_map<std::string, std::any>& sample_config)
     std::cout << "Max outputs           = " << device_info->maxOutputChannels  << std::endl;
     std::cout << "Default sampling rate = " << device_info->defaultSampleRate       << std::endl;
 
-    input_params.channelCount = _channels;                    /* stereo input */
+    input_params.channelCount = _data.channels;                    /* stereo input */
     input_params.sampleFormat = paFloat32;
     input_params.suggestedLatency = Pa_GetDeviceInfo(input_params.device)->defaultLowInputLatency;
     input_params.hostApiSpecificStreamInfo = NULL;
 
-    err = Pa_OpenStream(&record_stream, &input_params, NULL, _fs,
+    err = Pa_OpenStream(&record_stream, &input_params, NULL, _data.fs,
                         std::any_cast<int>(sample_config["Frames per Buffer"]), paClipOff, _callback, &_data);
 
     if (err != paNoError)
@@ -48,7 +50,7 @@ MiniDSPMic::MiniDSPMic(std::unordered_map<std::string, std::any>& sample_config)
         fprintf(stderr, "An error occurred while using the portaudio stream\n");
         fprintf(stderr, "Error number: %d\n", err);
         fprintf(stderr, "Error message: %s\n", Pa_GetErrorText(err));
-        return;
+        exit(1);
     }
 
 }
@@ -56,9 +58,9 @@ MiniDSPMic::MiniDSPMic(std::unordered_map<std::string, std::any>& sample_config)
 void MiniDSPMic::AcquireSave(double seconds) {
     int total_frames, number_samples, number_bytes;
 
-    _data.max_frame_index = total_frames = seconds * _fs; /* Record for a few seconds. */
+    _data.max_frame_index = total_frames = seconds * _data.fs; /* Record for a few seconds. */
     _data.frame_index = 0;
-    number_samples = total_frames * _channels;
+    number_samples = total_frames * _data.channels;
     number_bytes = number_samples * sizeof(float);
     _data.audio_samples_1 = (float*)malloc(number_bytes); /* From now on, recordedSamples is initialised. */
 
@@ -68,7 +70,7 @@ void MiniDSPMic::AcquireSave(double seconds) {
         fprintf(stderr, "An error occurred while using the portaudio stream\n");
         fprintf(stderr, "Error number: %d\n", err);
         fprintf(stderr, "Error message: %s\n", Pa_GetErrorText(err));
-        return;
+        exit(1);
     }
     std::cout << "---------------- Now recording!! Please speak into the microphone. ----------------" << std::endl << std::endl; 
 
@@ -83,7 +85,7 @@ void MiniDSPMic::AcquireSave(double seconds) {
         fprintf(stderr, "An error occurred while using the portaudio stream\n");
         fprintf(stderr, "Error number: %d\n", err);
         fprintf(stderr, "Error message: %s\n", Pa_GetErrorText(err));
-        return;
+        exit(1);
     }
 
     err = Pa_CloseStream(record_stream);
@@ -93,7 +95,7 @@ void MiniDSPMic::AcquireSave(double seconds) {
         fprintf(stderr, "An error occurred while using the portaudio stream\n");
         fprintf(stderr, "Error number: %d\n", err);
         fprintf(stderr, "Error message: %s\n", Pa_GetErrorText(err));
-        return;
+        exit(1);
     }
 
     // Save the recording 
@@ -107,7 +109,7 @@ void MiniDSPMic::AcquireSave(double seconds) {
     }
     else
     {
-        fwrite(_data.audio_samples_1, _channels * sizeof(float), total_frames, fid);
+        fwrite(_data.audio_samples_1, _data.channels * sizeof(float), total_frames, fid);
         fclose(fid);
         std::cout << "Data has been written." << std::endl;
     }
@@ -122,9 +124,7 @@ static int _callback(const void* input_buffer, void* output_buffer,
     PaStreamCallbackFlags status_flags, void* user_data) {
     paRecordData* data = (paRecordData*)user_data;
     const float* read_ptr = (const float*)input_buffer;
-    int temp_channels = 8;
-    // float* wptr = &data->recordedSamples[data->frameIndex * _channels];
-    float* write_ptr = &data->audio_samples_1[data->frame_index * temp_channels];
+    float* write_ptr = &data->audio_samples_1[data->frame_index * data->channels];
     long frames_to_calc;
     long i;
     int finished;
@@ -147,14 +147,14 @@ static int _callback(const void* input_buffer, void* output_buffer,
 
     if (input_buffer == NULL) {
         for (i = 0; i < frames_to_calc; i++) {
-            for (int j = 0; j < temp_channels; j++) {
-                *write_ptr++ = 0.0f;
+            for (int j = 0; j < data->channels; j++) {
+                *write_ptr++ = 0.0f; // Silence
             }
         }
     }
     else {
         for (i = 0; i < frames_to_calc; i++) {
-            for (int j = 0; j < temp_channels; j++) {
+            for (int j = 0; j < data->channels; j++) {
                 *write_ptr++ = *read_ptr++;
             }
         }
