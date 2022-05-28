@@ -17,6 +17,15 @@
 #include <string>
 #include <memory>
 #include <any>
+#include <boost/thread.hpp>
+
+// typedef struct
+// {
+//     double tick;
+//     u_char *dumpfile;
+// }
+// handlerData;
+
 
 struct RFEthernet : public Sensor 
 {
@@ -30,9 +39,10 @@ struct RFEthernet : public Sensor
 
     pcap_if_t *all_devs;
 	pcap_if_t *curr_dev;
+	pcap_t *adhandle;
     int _timeout;
-	                    pcap_t *adhandle;
-	                    pcap_dumper_t *dumpfile;
+
+    void interrupt_pcap_loop(double seconds);
 
 #ifdef _WIN32
     bool LoadNpcapDlls();

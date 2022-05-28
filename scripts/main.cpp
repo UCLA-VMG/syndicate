@@ -99,11 +99,11 @@ int main(int, char**) {
 
     //4.1 Asynchronously Acquire Data
     std::cout << "\n\n\nAsyn Capture \n";
-    mainStack.Acquire(5);
+    mainStack.Acquire(10);
 
     // 4.2 Barrier Sync Acquire Data
-    std::cout << "\n\n\n Barrier Sync Capture\n";
-    mainStack.AcquireBarrier(5);
+    // std::cout << "\n\n\n Barrier Sync Capture\n";
+    // mainStack.AcquireBarrier(5);
 
     //4.3 Barrier Acquire on One thread, and save asynchronously on another thread.
     // std::cout << "\n\n\n Barrier Sync Capture and Asynch Save\n";

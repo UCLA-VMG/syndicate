@@ -15,7 +15,7 @@ void MX800::AcquireSave(double seconds) {
 }
 
 void MX800::AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier) {
-    std::cout << "TBD" << std::endl << std::endl;
+    std::cout << "I am not defined yet.\n\n";
 }
 
 MX800::~MX800()

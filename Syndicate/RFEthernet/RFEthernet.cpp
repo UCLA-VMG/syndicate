@@ -75,9 +75,10 @@ bool RFEthernet::LoadNpcapDlls()
 
 void RFEthernet::AcquireSave(double seconds)
 {
+	pcap_dumper_t *dumpfile;
 	char errbuf[PCAP_ERRBUF_SIZE];
     /* Open the adapter */
-	if ((adhandle= pcap_open_live(curr_dev->name,	// name of the device
+	if ((adhandle = pcap_open_live(curr_dev->name,	// name of the device
 							 65536,			// portion of the packet to capture. 
 											// 65536 grants that the whole packet will be captured on all the MACs.
 							 1,				// promiscuous mode (nonzero means promiscuous)
@@ -108,33 +109,45 @@ void RFEthernet::AcquireSave(double seconds)
     pcap_freealldevs(all_devs);
     
     /* start the capture */
+	boost::thread interrupt_thread(boost::bind(&RFEthernet::interrupt_pcap_loop, this, seconds));
     pcap_loop(adhandle, 0, packet_handler, (unsigned char *)dumpfile);
+	// handlerData handler_params;
+	// handler_params.dumpfile = (unsigned char *)dumpfile;
+	// handler_params.tick = std::chrono::system_clock::now();
+    // pcap_loop(adhandle, 0, packet_handler, handler_params);
 
+	interrupt_thread.join();
     pcap_close(adhandle);
-}
-
-void RFEthernet::AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier)
-{
-    std::cout << "TBD" << std::endl;
-}
-
-void RFEthernet::ConcurrentAcquire(double seconds, boost::barrier& frameBarrier)
-{
-    std::cout << "TBD" << std::endl;
-}
-
-void RFEthernet::ConcurrentSave()
-{
-    std::cout << "TBD" << std::endl;
-}
-
-
-RFEthernet::~RFEthernet()
-{
 }
 
 static void packet_handler(u_char *dumpfile, const struct pcap_pkthdr *header, const u_char *pkt_data)
 {
 	/* save the packet on the dump file */
 	pcap_dump(dumpfile, header, pkt_data);
+}
+
+void RFEthernet::interrupt_pcap_loop(double seconds)
+{
+    std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(seconds)));
+	pcap_breakloop(adhandle);
+}
+
+void RFEthernet::AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier)
+{
+    std::cout << "I am not defined yet.\n\n";
+}
+
+void RFEthernet::ConcurrentAcquire(double seconds, boost::barrier& frameBarrier)
+{
+    std::cout << "I am not defined yet.\n\n";
+}
+
+void RFEthernet::ConcurrentSave()
+{
+    std::cout << "I am not defined yet.\n\n";
+}
+
+
+RFEthernet::~RFEthernet()
+{
 }

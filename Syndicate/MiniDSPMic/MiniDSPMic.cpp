@@ -98,7 +98,9 @@ void MiniDSPMic::AcquireSave(double seconds) {
 
     // Save the recording 
     FILE* fid;
-    fid = fopen("recorded.raw", "wb");
+    std::ostringstream filename;
+    filename << rootPath << sensorName << ".raw";
+    fid = fopen(filename.str().c_str(), "wb");
     if (fid == NULL)
     {
         std::cout << "Could not open file." << std::endl;
@@ -107,12 +109,12 @@ void MiniDSPMic::AcquireSave(double seconds) {
     {
         fwrite(_data.audio_samples_1, _channels * sizeof(float), total_frames, fid);
         fclose(fid);
-        std::cout << "Wrote data to 'recorded.raw'" << std::endl;
+        std::cout << "Data has been written." << std::endl;
     }
 }
 
 void MiniDSPMic::AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier) {
-    std::cout << "TBD" << std::endl << std::endl;
+    std::cout << "I am not defined yet.\n\n";
 }
 
 static int _callback(const void* input_buffer, void* output_buffer,
@@ -175,10 +177,10 @@ MiniDSPMic::~MiniDSPMic() {
 
 void MiniDSPMic::ConcurrentAcquire(double seconds, boost::barrier& frameBarrier)
 {
-    std::cout << "I am not defined yet.\n";
+    std::cout << "I am not defined yet.\n\n";
 }
 
 void MiniDSPMic::ConcurrentSave()
 {
-    std::cout << "I am not defined yet.\n";
+    std::cout << "I am not defined yet.\n\n";
 }
