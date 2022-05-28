@@ -30,13 +30,13 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 message(STATUS "${CMAKE_MODULE_PATH}")
 find_package(Spinnaker REQUIRED)
 find_package(Npcap REQUIRED)
-find_package(OpenCV CONFIG REQUIRED)
+find_package(OpenCV REQUIRED)
 
 # set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_STATIC_LIBS        ON)
 set(Boost_USE_MULTITHREADED      ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
-set(BOOST_ROOT "C:/Program Files/boost/boost_1_78_0")
+# set(BOOST_ROOT "C:/Program Files/boost/boost_1_78_0")
 find_package(Boost COMPONENTS thread filesystem REQUIRED)
 
 #Include Path Libraries
@@ -45,22 +45,19 @@ include_directories("${PROJECT_SOURCE_DIR}/include"
                     SYSTEM ${Spinnaker_INCLUDE_DIRS}
                     ${Boost_INCLUDE_DIR}
                     ${Npcap_INCLUDE_DIRS}
+                    ${OpenCV_INCLUDE_DIRS}
                     )
 
 #Include Libraries
 add_subdirectory(Syndicate)
-set (LIBS ${Spinnaker_LIBRARIES} ${Boost_LIBRARIES} ${Npcap_LIBRARIES} syndicate opencv_ml opencv_dnn opencv_core opencv_flann) #wsock32 ws2_32)
+set (LIBS ${Spinnaker_LIBRARIES} ${Boost_LIBRARIES} ${Npcap_LIBRARIES} ${OpenCV_LIBRARIES} syndicate )
 
 #Generate Execs
 add_executable(capture ${PROJECT_SOURCE_DIR}/scripts/main.cpp)
 add_executable(acq ${PROJECT_SOURCE_DIR}/scripts/acq.cpp)
-# add_executable(radar radar.cpp)
-# add_executable(server server.cpp)
 add_executable(packets_acq ${PROJECT_SOURCE_DIR}/scripts/packets_acq.cpp)
 target_link_libraries(capture ${LIBS})
 target_link_libraries(acq ${LIBS})
-# target_link_libraries(radar ${LIBS})
-# target_link_libraries(server ${LIBS})
 target_link_libraries(packets_acq ${LIBS})
 
 #Targets

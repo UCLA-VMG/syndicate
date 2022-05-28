@@ -9,6 +9,7 @@
 #include "simpleSensor.h"
 #include "sensorStack.h"
 #include "SpinnakerCamera.h"
+#include "OpenCVCamera.h"
 #include "RFEthernet.h"
 #include "MiniDSPMic.h"
 #include "MX800.h"
@@ -61,9 +62,10 @@ int main(int, char**) {
         {"Sensor Name", std::string("RGB_Camera")},
         {"Root Path", rootPath}, {"Pixel Format", std::string("RGB")}
     };
-    std::unordered_map<std::string, std::any> mic_config = {
-        {"FS", 44100}, {"Channels", 8}, {"Frames per Buffer", 512},
-        {"Sensor Name", std::string("Microphone")},
+    std::unordered_map<std::string, std::any> thermal_config = {
+        {"Camera ID", 0},
+        {"FPS", 30}, {"Height", 512}, {"Width", 640},
+        {"Sensor Name", std::string("Thermal_Camera")},
         {"Root Path", rootPath}
     };
     std::unordered_map<std::string, std::any> radar_config = {
@@ -71,6 +73,11 @@ int main(int, char**) {
         {"Timeout", 1000},
         {"Packet Size", 1456}, {"Max Packer Size ", 4096},
         {"Sensor Name", std::string("Radar")},
+        {"Root Path", rootPath}
+    };
+    std::unordered_map<std::string, std::any> mic_config = {
+        {"FS", 44100}, {"Channels", 8}, {"Frames per Buffer", 512},
+        {"Sensor Name", std::string("Microphone")},
         {"Root Path", rootPath}
     };
     std::unordered_map<std::string, std::any> mx800_config = {
@@ -86,10 +93,11 @@ int main(int, char**) {
     sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
     sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
     sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    sensor_list.emplace_back(makeSensor<OpenCVCamera>);
     sensor_list.emplace_back(makeSensor<RFEthernet>);
     sensor_list.emplace_back(makeSensor<MiniDSPMic>);
     sensor_list.emplace_back(makeSensor<MX800>);
-    std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config, radar_config, mic_config, mx800_config};
+    std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config, thermal_config, radar_config, mic_config, mx800_config};
     
     
     //3. Initialize Sensor Stack
