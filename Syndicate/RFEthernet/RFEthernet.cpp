@@ -102,8 +102,6 @@ void RFEthernet::AcquireSave(double seconds)
 		fprintf(stderr,"\nError opening output file\n");
 		exit(1);
 	}
-    
-    printf("\nlistening on %s... Press Ctrl+C to stop...\n", curr_dev->description);
 	
     /* At this point, we no longer need the device list. Free it */
     pcap_freealldevs(all_devs);
@@ -111,10 +109,7 @@ void RFEthernet::AcquireSave(double seconds)
     /* start the capture */
 	boost::thread interrupt_thread(boost::bind(&RFEthernet::interrupt_pcap_loop, this, seconds));
     pcap_loop(adhandle, 0, packet_handler, (unsigned char *)dumpfile);
-	// handlerData handler_params;
-	// handler_params.dumpfile = (unsigned char *)dumpfile;
-	// handler_params.tick = std::chrono::system_clock::now();
-    // pcap_loop(adhandle, 0, packet_handler, handler_params);
+	std::cout << "RF Execution Complete\n\n";
 
 	interrupt_thread.join();
     pcap_close(adhandle);

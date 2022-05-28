@@ -19,14 +19,6 @@
 #include <any>
 #include <boost/thread.hpp>
 
-// typedef struct
-// {
-//     double tick;
-//     u_char *dumpfile;
-// }
-// handlerData;
-
-
 struct RFEthernet : public Sensor 
 {
     RFEthernet(std::unordered_map<std::string, std::any>& sample_config);
