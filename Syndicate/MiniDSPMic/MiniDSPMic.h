@@ -8,11 +8,19 @@
 #include <memory>
 #include <any>
 
+#define MIC_WAIT_MILLS 100
+#define MIC_SAVE_FACTOR 100
+#define MIC_BUFFER_SIZE (10*MIC_SAVE_FACTOR)
+
 typedef struct
 {
     int     fs;
     int     channels;
-    int     frame_index;  /* Index into sample array. */
+    int     save_index;
+    int     save_bytes;
+    int     buffer_size;
+    int     local_frame_index;  /* Index into sample array. */
+    int     global_frame_index;  /* Index into sample array. */
     int     max_frame_index;
     float* audio_samples_1;
     float* audio_samples_2;
@@ -29,10 +37,10 @@ struct MiniDSPMic : public Sensor
     void ConcurrentAcquire(double seconds, boost::barrier& frameBarrier);
     void ConcurrentSave();
 
-    // int _fs;
-    // int _channels;
+    int _frames_per_buffer;
     paRecordData _data;
     PaStream* record_stream;
+    FILE* fid;
 
     
 };

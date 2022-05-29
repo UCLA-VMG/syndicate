@@ -1,7 +1,7 @@
 #include "miniDSPMic.h"
 
 MiniDSPMic::MiniDSPMic(std::unordered_map<std::string, std::any>& sample_config)
-    : Sensor(sample_config)
+    : Sensor(sample_config), _frames_per_buffer(std::any_cast<int>(sample_config["Frames per Buffer"]))
 {
     _data.fs = std::any_cast<int>(sample_config["FS"]);
     _data.channels = std::any_cast<int>(sample_config["Channels"]);
@@ -42,8 +42,7 @@ MiniDSPMic::MiniDSPMic(std::unordered_map<std::string, std::any>& sample_config)
     input_params.suggestedLatency = Pa_GetDeviceInfo(input_params.device)->defaultLowInputLatency;
     input_params.hostApiSpecificStreamInfo = NULL;
 
-    err = Pa_OpenStream(&record_stream, &input_params, NULL, _data.fs,
-                        std::any_cast<int>(sample_config["Frames per Buffer"]), paClipOff, _callback, &_data);
+    err = Pa_OpenStream(&record_stream, &input_params, NULL, _data.fs, _frames_per_buffer, paClipOff, _callback, &_data);
 
     if (err != paNoError)
     {
@@ -53,16 +52,26 @@ MiniDSPMic::MiniDSPMic(std::unordered_map<std::string, std::any>& sample_config)
         exit(1);
     }
 
+    std::ostringstream filename;
+    filename << rootPath << sensorName << ".raw";
+    fid = fopen(filename.str().c_str(), "wb");
+    if (fid == NULL)
+    {
+        std::cout << "Could not open " << filename.str() << "." << std::endl;
+    }
+
 }
 
 void MiniDSPMic::AcquireSave(double seconds) {
-    int total_frames, number_samples, number_bytes;
-
-    _data.max_frame_index = total_frames = seconds * _data.fs; /* Record for a few seconds. */
-    _data.frame_index = 0;
-    number_samples = total_frames * _data.channels;
-    number_bytes = number_samples * sizeof(float);
-    _data.audio_samples_1 = (float*)malloc(number_bytes); /* From now on, recordedSamples is initialised. */
+    int prev_index  = 0;
+    _data.max_frame_index = seconds * _data.fs;
+    _data.global_frame_index = 0;
+    _data.local_frame_index = 0;
+    _data.save_index = 0;
+    _data.save_bytes  = MIC_SAVE_FACTOR * _frames_per_buffer; // A little over 1 second with MIC_SAVE_FACTOR = 10 and _frames_per_buffer = 512
+    _data.buffer_size = MIC_BUFFER_SIZE * _frames_per_buffer;
+    std::cout << _data.save_bytes << " " << _data.buffer_size << std::endl;
+    _data.audio_samples_1 = (float*)malloc(_data.buffer_size * _data.channels * sizeof(float));
 
     PaError err = Pa_StartStream(record_stream);
     if (err != paNoError)
@@ -76,10 +85,18 @@ void MiniDSPMic::AcquireSave(double seconds) {
 
     while ((err = Pa_IsStreamActive(record_stream)) == 1)
     {
-        Pa_Sleep(1000);
-        std::cout << "Frame = " << _data.frame_index <<std::endl; 
-        fflush(stdout);
+        Pa_Sleep(MIC_WAIT_MILLS);
+        std::cout << "Frame = " << _data.global_frame_index << "\n"; 
+        if (prev_index != _data.save_index)
+        {
+            std::cout << "Start " << _data.save_index << std::endl;
+            fwrite(_data.audio_samples_1 + (prev_index * _data.save_bytes * _data.channels), _data.channels * sizeof(float), _data.save_bytes, fid);
+            std::cout << "End   " << _data.save_index << std::endl;
+            prev_index = _data.save_index;
+        }
     }
+    // Need to account for the final samples being dropped.
+    // fwrite(_data.audio_samples_1 + (prev_index * _data.save_bytes * _data.channels), _data.channels * sizeof(float), _data.save_bytes, fid);
     if (err != paNoError)
     {
         fprintf(stderr, "An error occurred while using the portaudio stream\n");
@@ -99,20 +116,8 @@ void MiniDSPMic::AcquireSave(double seconds) {
     }
 
     // Save the recording 
-    FILE* fid;
-    std::ostringstream filename;
-    filename << rootPath << sensorName << ".raw";
-    fid = fopen(filename.str().c_str(), "wb");
-    if (fid == NULL)
-    {
-        std::cout << "Could not open file." << std::endl;
-    }
-    else
-    {
-        fwrite(_data.audio_samples_1, _data.channels * sizeof(float), total_frames, fid);
-        fclose(fid);
-        std::cout << "Data has been written." << std::endl;
-    }
+    fclose(fid);
+    std::cout << "Data has been written." << std::endl;
 }
 
 void MiniDSPMic::AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier) {
@@ -124,20 +129,19 @@ static int _callback(const void* input_buffer, void* output_buffer,
     PaStreamCallbackFlags status_flags, void* user_data) {
     paRecordData* data = (paRecordData*)user_data;
     const float* read_ptr = (const float*)input_buffer;
-    float* write_ptr = &data->audio_samples_1[data->frame_index * data->channels];
+    float* write_ptr = &data->audio_samples_1[data->local_frame_index * data->channels];
     long frames_to_calc;
-    long i;
     int finished;
-    unsigned long frames_remaining = data->max_frame_index - data->frame_index;
+    unsigned long frames_remaining = data->max_frame_index - data->global_frame_index;
 
     /* Prevent unused variable warnings. */
     (void)output_buffer;
     (void)time_info;
     (void)status_flags;
     (void)user_data;
-
     if (frames_remaining < frames_per_buffer) {
         frames_to_calc = frames_remaining;
+        std::cout << "\nWe are done\n";
         finished = paComplete;
     }
     else {
@@ -146,20 +150,22 @@ static int _callback(const void* input_buffer, void* output_buffer,
     }
 
     if (input_buffer == NULL) {
-        for (i = 0; i < frames_to_calc; i++) {
+        for (int i = 0; i < frames_to_calc; i++) {
             for (int j = 0; j < data->channels; j++) {
                 *write_ptr++ = 0.0f; // Silence
             }
         }
     }
     else {
-        for (i = 0; i < frames_to_calc; i++) {
+        for (int i = 0; i < frames_to_calc; i++) {
             for (int j = 0; j < data->channels; j++) {
                 *write_ptr++ = *read_ptr++;
             }
         }
     }
-    data->frame_index += frames_to_calc;
+    data->global_frame_index += frames_to_calc;
+    data->local_frame_index = (data->local_frame_index + frames_to_calc) % data->buffer_size;
+    data->save_index = data->local_frame_index / data->save_bytes;  
     return finished;
 }
 
