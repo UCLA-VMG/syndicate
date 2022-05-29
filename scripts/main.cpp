@@ -90,14 +90,15 @@ int main(int, char**) {
     std::vector<std::unique_ptr<Sensor>(*)(std::unordered_map<std::string, std::any>&)> sensor_list;
     // sensor_list.emplace_back(makeSensor<SimpleSensor>);
     // sensor_list.emplace_back(makeSensor<SimpleSensor>);
-    sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
-    sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
-    sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
-    sensor_list.emplace_back(makeSensor<OpenCVCamera>);
-    sensor_list.emplace_back(makeSensor<RFEthernet>);
+    // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    // sensor_list.emplace_back(makeSensor<OpenCVCamera>);
+    // sensor_list.emplace_back(makeSensor<RFEthernet>);
     sensor_list.emplace_back(makeSensor<MiniDSPMic>);
-    sensor_list.emplace_back(makeSensor<MX800>);
-    std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config, thermal_config, radar_config, mic_config, mx800_config};
+    // sensor_list.emplace_back(makeSensor<MX800>);
+    std::vector<std::unordered_map<std::string, std::any>> configs{mic_config};
+    // std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config, thermal_config, radar_config, mic_config, mx800_config};
     
     
     //3. Initialize Sensor Stack
