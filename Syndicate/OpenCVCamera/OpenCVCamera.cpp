@@ -1,7 +1,6 @@
 #include "OpenCVCamera.h"
 
 using namespace cv;
-using namespace std;
 
 using namespace Syndicate;
 
@@ -9,16 +8,8 @@ OpenCVCamera::OpenCVCamera(std::unordered_map<std::string, std::any>& sample_con
     : Syndicate::Camera(sample_config), cameraID(std::any_cast<int>(sample_config["Camera ID"]))
 {
     std::cout << "opencv Camera Cstr\n";
-    //--- INITIALIZE MAT
-    Mat frame;
-    std::cout << "opencv Camera Cstr2\n";
     //--- OPEN CAP
-    // cameraID = 0;
-    // std::cout << "opencv Camera Cstr3\n";
-
     cap = openCap(cameraID);
-    std::cout << "opencv Camera Cstr4\n";
-
 }
 
 OpenCVCamera::~OpenCVCamera()
@@ -30,69 +21,82 @@ OpenCVCamera::~OpenCVCamera()
 void OpenCVCamera::AcquireSave(double seconds)
 {
     int num_frames(int(seconds)*int(fps));
-    char filename[100];
-    cout << endl << endl << "*** IMAGE ACQUISITION ***" << endl << endl;
-    auto start = chrono::steady_clock::now();
+    std::cout << std::endl << std::endl << "*** IMAGE ACQUISITION ***" << std::endl << std::endl;
+    auto start = std::chrono::steady_clock::now();
     try {
         for (int i = 0; i < num_frames; i++)
         {
-            // wait for a new frame from camera and store it into 'frame'
+            // Wait for a new frame from camera and store it into 'frame'
             cap.read(frame);
-            // cout << "currentDateTime()=" << currentDateTime() << endl;
-
+            RecordTimeStamp();
             if(!frame.empty() ) {
-                sprintf_s(filename, "%s%s_%d.png", rootPath.c_str(), sensorName.c_str(), i); // select your folder - filename is "Frame_n"
-                // imwrite(filename, frame);
-
-                cout << sensorName <<"_Frame_" << i << endl;
+                runningBuffer.push(frame);
             }
+            
         }
     }
     catch (Exception& e) {
-        cout << "Error: " << e.what() << endl;
+        std::cout << "Error: " << e.what() << std::endl;
     }
-    auto end = chrono::steady_clock::now();
-    cout << "Time Taken for " << sensorName << (end-start).count() << "\n";
+    auto end = std::chrono::steady_clock::now();
+    std::cout << "Time Taken for " << sensorName  << " " << float((end-start).count())/1'000'000'000 << "\n";
+    SaveTimeStamps();
+
+    start = std::chrono::steady_clock::now();
+    cv::Mat save_frame;
+    for (int i = 0; i < num_frames; i++) {
+        save_frame = std::any_cast<cv::Mat>(runningBuffer.front());
+        // Create a unique filename
+        std::ostringstream filename;
+        filename << rootPath << sensorName << "_" << i << ".png";
+        imwrite(filename.str().c_str(), frame);
+        runningBuffer.pop();
+        // sprintf_s(filename, filename.str().c_str()); // select your folder - filename is "Frame_n"
+        // std::cout << sensorName <<"_Frame_" << i << std::endl;
+    }
+    end = std::chrono::steady_clock::now();
+    std::cout <<"Time Taken for Saving " << sensorName << " " << float((end-start).count())/1'000'000'000 << "\n";
+    this->setHealthCode(HealthCode::ONLINE);
 }
 
 void OpenCVCamera::AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier)
 {
     int num_frames(int(seconds)*int(fps));
     char filename[100];
-    cout << endl << endl << "*** IMAGE ACQUISITION ***" << endl << endl;
-    auto start = chrono::steady_clock::now();
+    std::cout << std::endl << std::endl << "*** IMAGE ACQUISITION ***" << std::endl << std::endl;
+    auto start = std::chrono::steady_clock::now();
     try {
         for (int i = 0; i < num_frames; i++)
         {
             frameBarrier.wait();
             // wait for a new frame from camera and store it into 'frame'
             cap.read(frame);
-            cout << "currentDateTime()=" << currentDateTime() << endl;
+            std::cout << "currentDateTime()=" << currentDateTime() << std::endl;
 
             if(!frame.empty() ) {
                 sprintf_s(filename, "%s/%s_%d.png", rootPath, sensorName, i); // select your folder - filename is "Frame_n"
                 imwrite(filename, frame);
-                cout << "Frame_" << i << endl;
+                std::cout << "Frame_" << i << std::endl;
             }
         }
     }
     catch (Exception& e) {
-        cout << "Error: " << e.what() << endl;
+        std::cout << "Error: " << e.what() << std::endl;
     }
-    auto end = chrono::steady_clock::now();
-    cout << "Time Taken for " << sensorName << (end-start).count() << "\n";
+    auto end = std::chrono::steady_clock::now();
+    std::cout << "Time Taken for " << sensorName << (end-start).count() << "\n";
 }
 
 bool setResolution(VideoCapture cap, double width, double height) {
     bool result = true;
     try {
         cap.set(CAP_PROP_FRAME_WIDTH, width);
-        cout << "Width after using video.set(CAP_PROP_FRAME_WIDTH) : " << cap.get(CAP_PROP_FRAME_WIDTH) << endl;
+        std::cout << "Width after using video.set(CAP_PROP_FRAME_WIDTH) : " << cap.get(CAP_PROP_FRAME_WIDTH) << std::endl;
         cap.set(CAP_PROP_FRAME_HEIGHT, height);
-        cout << "Height after using video.set(CAP_PROP_FRAME_HEIGHT) : " << cap.get(CAP_PROP_FRAME_HEIGHT) << endl;
+        std::cout << "Height after using video.set(CAP_PROP_FRAME_HEIGHT) : " << cap.get(CAP_PROP_FRAME_HEIGHT) << std::endl;
     }
     catch (Exception& e) {
-        cout << "Error configuring resolution: " << e.what() << endl;
+        std::cout << "Error configuring resolution: " << e.what() << std::endl;
         result = false;
     }
     return result;
@@ -102,10 +106,10 @@ bool setFps(VideoCapture cap, double fps) {
     bool result = true;
     try {
         cap.set(CAP_PROP_FPS, fps);
-        cout << "Frames per second using video.get(CAP_PROP_FPS) : " << fps << endl;
+        std::cout << "Frames per second using video.get(CAP_PROP_FPS) : " << fps << std::endl;
     }
     catch (Exception& e) {
-        cout << "Error configuring fps: " << e.what() << endl;
+        std::cout << "Error configuring fps: " << e.what() << std::endl;
         result = false;
     }
     return result;
@@ -115,7 +119,7 @@ bool configure(VideoCapture cap, int cameraID, double fps = 30.0, double height 
     bool result = true;
     try {
         // Print the device serial number
-        cout << "Configuring device " << cameraID << endl;
+        std::cout << "Configuring device " << cameraID << std::endl;
 
         // set fps
         if (!setFps(cap, fps)) {
@@ -127,7 +131,7 @@ bool configure(VideoCapture cap, int cameraID, double fps = 30.0, double height 
         }
     }
     catch (Exception& e) {
-        cout << "Error configuring camera: " << e.what() << endl;
+        std::cout << "Error configuring camera: " << e.what() << std::endl;
         result = false;
     }
     return result;
@@ -137,23 +141,23 @@ bool configure(VideoCapture cap, int cameraID, double fps = 30.0, double height 
 bool OpenCVCamera::AcquireImages(VideoCapture cap, int num_frames) {
     bool result = true;
     char filename[100];
-    cout << endl << endl << "*** IMAGE ACQUISITION ***" << endl << endl;
+    std::cout << std::endl << std::endl << "*** IMAGE ACQUISITION ***" << std::endl << std::endl;
     try {
         for (int i = 0; i < num_frames; i++)
         {
             // wait for a new frame from camera and store it into 'frame'
             cap.read(frame);
-            cout << "currentDateTime()=" << currentDateTime() << endl;
+            std::cout << "currentDateTime()=" << currentDateTime() << std::endl;
 
             if(!frame.empty() ) {
                 sprintf_s(filename, "C:/Users/Adnan/Downloads/test/Images/Frame_%d.png", i); // select your folder - filename is "Frame_n"
                 imwrite(filename, frame);
-                cout << "Frame_" << i << endl;
+                std::cout << "Frame_" << i << std::endl;
             }
         }
     }
     catch (Exception& e) {
-        cout << "Error: " << e.what() << endl;
+        std::cout << "Error: " << e.what() << std::endl;
         return false;
     }
     return result;
@@ -163,12 +167,12 @@ bool getResolution(VideoCapture cap) {
     bool result = true;
     try {
         double width = cap.get(CAP_PROP_FRAME_WIDTH);
-        cout << "Width using video.get(CAP_PROP_FRAME_WIDTH) : " << width << endl;
+        std::cout << "Width using video.get(CAP_PROP_FRAME_WIDTH) : " << width << std::endl;
         double height = cap.get(CAP_PROP_FRAME_HEIGHT);
-        cout << "Height using video.get(CAP_PROP_FRAME_HEIGHT) : " << height << endl;
+        std::cout << "Height using video.get(CAP_PROP_FRAME_HEIGHT) : " << height << std::endl;
     }
     catch (Exception& e) {
-        cout << "Error configuring resolution: " << e.what() << endl;
+        std::cout << "Error configuring resolution: " << e.what() << std::endl;
         result = false;
     }
     return result;
@@ -178,10 +182,10 @@ bool getFps(VideoCapture cap) {
     bool result = true;
     try {
         double fps = cap.get(CAP_PROP_FPS);
-        cout << "Frames per second using video.get(CAP_PROP_FPS) : " << fps << endl;
+        std::cout << "Frames per second using video.get(CAP_PROP_FPS) : " << fps << std::endl;
     }
     catch (Exception& e) {
-        cout << "Error configuring fps: " << e.what() << endl;
+        std::cout << "Error configuring fps: " << e.what() << std::endl;
         result = false;
     }
     return result;
@@ -198,7 +202,7 @@ VideoCapture OpenCVCamera::openCap(int cameraID) {
     cap.open(cameraID + apiID);
     // check if we succeeded
     if (!cap.isOpened()) {
-        cerr << "ERROR! Unable to open camera\n";
+        std::cerr << "ERROR! Unable to open camera\n";
     }
     return cap;
 }
@@ -213,7 +217,7 @@ void OpenCVCamera::ConcurrentSave()
     std::cout << "I am not defined yet.\n\n";
 }
 
-const string currentDateTime() {
+const std::string currentDateTime() {
     time_t     now = time(0);
     struct tm  tstruct;
     char       buf[80];

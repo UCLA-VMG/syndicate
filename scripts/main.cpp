@@ -72,7 +72,7 @@ int main(int, char**) {
         {"data_ip", std::string("192.168.33.30")}, {"adc_ip", std::string("192.168.33.180")}, 
         {"Timeout", 1000},
         {"Packet Size", 1456}, {"Max Packer Size ", 4096},
-        {"Sensor Name", std::string("Radar")},
+        {"Sensor Name", std::string("FMCW_Radar")},
         {"Root Path", rootPath}
     };
     std::unordered_map<std::string, std::any> mic_config = {
@@ -90,15 +90,14 @@ int main(int, char**) {
     std::vector<std::unique_ptr<Sensor>(*)(std::unordered_map<std::string, std::any>&)> sensor_list;
     // sensor_list.emplace_back(makeSensor<SimpleSensor>);
     // sensor_list.emplace_back(makeSensor<SimpleSensor>);
-    // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
-    // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
-    // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
-    // sensor_list.emplace_back(makeSensor<OpenCVCamera>);
-    // sensor_list.emplace_back(makeSensor<RFEthernet>);
+    sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    sensor_list.emplace_back(makeSensor<OpenCVCamera>);
+    sensor_list.emplace_back(makeSensor<RFEthernet>);
     sensor_list.emplace_back(makeSensor<MiniDSPMic>);
-    // sensor_list.emplace_back(makeSensor<MX800>);
-    std::vector<std::unordered_map<std::string, std::any>> configs{mic_config};
-    // std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config, thermal_config, radar_config, mic_config, mx800_config};
+    sensor_list.emplace_back(makeSensor<MX800>);
+    std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config, thermal_config, radar_config, mic_config, mx800_config};
     
     
     //3. Initialize Sensor Stack
@@ -108,7 +107,7 @@ int main(int, char**) {
 
     //4.1 Asynchronously Acquire Data
     std::cout << "\n\n\nAsyn Capture \n";
-    mainStack.Acquire(10);
+    mainStack.Acquire(30);
 
     // 4.2 Barrier Sync Acquire Data
     // std::cout << "\n\n\n Barrier Sync Capture\n";

@@ -10,12 +10,45 @@ Sensor::Sensor(std::unordered_map<std::string, std::any>& sample_config)
     statusCode(HealthCode::OFFLINE), operatingCode(OpMode::NONE) 
 {
     ++numSensors;
+    std::filesystem::create_directory(rootPath);
+    rootPath = rootPath + sensorName + std::string("/");
+    std::filesystem::create_directory(rootPath);
+    std::cout << rootPath << "*********************************************\n";
 }
 
 Sensor::~Sensor()
 {
     std::cout << "Sensor " << sensorName << " is shutting down.\n";
 }
+
+void Sensor::RecordTimeStamp()
+{
+    timeStamps.push(std::chrono::system_clock::now());
+}
+
+void Sensor::SaveTimeStamps()
+{
+    std::ofstream timeStampEpochFile(rootPath + "timestamps_epoch.txt");
+    std::ofstream timeStampFile(rootPath + "timestamps.txt");
+
+    while(!timeStamps.empty())
+    { 
+        // Write to the file
+        timeStampEpochFile << timeStamps.front().time_since_epoch().count() << "\n";  
+        // Write in human readable format
+        std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(timeStamps.front().time_since_epoch());
+        std::chrono::seconds s = std::chrono::duration_cast<std::chrono::seconds>(ms);
+        std::time_t t = s.count();
+        std::string fractional_seconds = std::to_string(ms.count() % 1000);
+        std::tm time_struct = *localtime(&t);
+        timeStampFile << std::put_time(&time_struct, "%Y%m%d_%H_%M_%S_")
+                      << std::string(3 - std::min(static_cast<size_t>(3), fractional_seconds.length()), '0') 
+                      << fractional_seconds << "\n"; 
+
+        timeStamps.pop();      
+    }
+}
+
 
 HealthCode Sensor::checkHealthCode()
 {

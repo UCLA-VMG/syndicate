@@ -1,11 +1,14 @@
 #pragma once
 
 #include <iostream>
+#include <fstream>
 #include <queue>
 #include <vector>
 #include <memory>
 #include <chrono>
+#include <ctime>
 #include <any>
+#include <filesystem>
 
 #include <boost/thread.hpp>
 #include <boost/thread/barrier.hpp>
@@ -42,15 +45,27 @@ struct Sensor
     OpMode operatingCode;
     //Parallel Processing Constructs
     boost::mutex mtx_; 
-    
-    //-------- Capture Data Structures : operatingCode == OpMode::COLLECT -------------
+    // extrinsicMatrix
+    // Usage :: Should be used for converting between frame of references between sensors
     std::vector<std::vector<double>> extrinsicMatrix;
-    std::vector<std::chrono::time_point<std::chrono::steady_clock>> timeStamps;
+    // timeStamps
+    // Usage :: holds timestamp objects correlated to a discrete sensor acquistion 
+    // Design Note :: system_clock is used instead of steady_clock with the assumption
+    //                that recordings do not last longer than several minutes.
+    std::queue<std::chrono::time_point<std::chrono::system_clock>> timeStamps;
+    // runningBuffer
+    // Usage :: holds discrete packets of data acquired by discrete sensor.
+    // Design Note :: <std::any> allows for derived classes to fill the buffer with any
+    //                type of data. Additionally, the design is intentionally made to be
+    //                a queue for concurrent save (to minimize memory requirements) or
+    //                for streaming inference mode.
     std::queue<std::any> runningBuffer; 
+    // rootPath
+    // Usage :: path to save data from the sensor
+    // Design Note :: rootPath is reset to <rootPath + sensorName> in constructor.
     std::string rootPath;
-
-    //-------- Inference Data Structures : operatingCode == OpMode::INFERENCE ---------
-    std::queue<std::chrono::time_point<std::chrono::steady_clock>> runningTimestamps;
+    // bufferSize
+    // Usage :: for streaming mode, a bufferSize should be specified to cut off extra data
     const int bufferSize;
 
     //-------- General Functions -------------------------------------------------------
@@ -60,13 +75,11 @@ struct Sensor
 
     ~Sensor();
 
-    // virtual double AcquireDataPoint();
-
-    HealthCode HeartBeat();
-
     // virtual void LogData();
 
-    // virtual void RecordTimeStamp();
+    void RecordTimeStamp();
+
+    void SaveTimeStamps();
 
     //-------- Capture Data Functions : operatingCode == OpMode::COLLECT -------------
     // virtual void AcquireSaveHsync(double seconds) = 0;
@@ -78,18 +91,6 @@ struct Sensor
     virtual void ConcurrentAcquire(double seconds, boost::barrier& frameBarrier) = 0;
 
     virtual void ConcurrentSave() = 0;
-
-    // std::vector<double> AcquireHsync(double seconds);
-
-    // std::vector<double> AcquireHsync(long int frames);
-
-    // std::vector<double> AcquireSsync(double seconds, boost::barrier& frameBarrier);
-
-    // std::vector<double> AcquireSsync(long int frames, boost::barrier& frameBarrier);
-
-    // std::vector<double> Acquire(double seconds);
-
-    // std::vector<double> Acquire(long int frames);
 
     //-------- Inference Functions : operatingCode == OpMode::INFERENCE ---------
     void ContiniousAcquire(size_t queue_size);

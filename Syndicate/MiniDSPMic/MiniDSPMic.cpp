@@ -64,7 +64,7 @@ MiniDSPMic::MiniDSPMic(std::unordered_map<std::string, std::any>& sample_config)
 
 void MiniDSPMic::AcquireSave(double seconds) {
     int prev_index  = 0;
-    _data.max_frame_index = seconds * _data.fs;
+    _data.max_frame_index = static_cast<int>(seconds) * _data.fs;
     _data.global_frame_index = 0;
     _data.local_frame_index = 0;
     _data.save_index = 0;
