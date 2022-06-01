@@ -7,13 +7,25 @@ Sensor::Sensor(std::unordered_map<std::string, std::any>& sample_config)
     rootPath(std::any_cast<std::string>(sample_config["Root Path"])),
     bufferSize(0),
     extrinsicMatrix(3, std::vector<double>(4, 0)),
-    statusCode(HealthCode::OFFLINE), operatingCode(OpMode::NONE) 
+    statusCode(HealthCode::OFFLINE), operatingCode(OpMode::NONE),
+    hardwareSync(false), primary(false)
 {
     ++numSensors;
     std::filesystem::create_directory(rootPath);
     rootPath = rootPath + sensorName + std::string("/");
     std::filesystem::create_directory(rootPath);
-    std::cout << rootPath << "*********************************************\n";
+    logFile = std::ofstream(rootPath + "log_" + sensorName + ".txt", std::ios_base::out | std::ios_base::app );
+    
+    if(sample_config.find("Hardware Sync") != sample_config.end())
+    {
+            hardwareSync = std::any_cast<bool>(sample_config["Hardware Sync"]);
+            std::cout << "Hardware Sync Enabled\n";
+    }
+    if(sample_config.find("Primary") != sample_config.end())
+    {
+            primary = std::any_cast<bool>(sample_config["Primary"]);
+            std::cout << "Primary/Secondary Enabled\n";
+    }
 }
 
 Sensor::~Sensor()
@@ -28,8 +40,8 @@ void Sensor::RecordTimeStamp()
 
 void Sensor::SaveTimeStamps()
 {
-    std::ofstream timeStampEpochFile(rootPath + "timestamps_epoch.txt");
-    std::ofstream timeStampFile(rootPath + "timestamps.txt");
+    std::ofstream timeStampEpochFile(rootPath + "log_timestamps_epoch.txt");
+    std::ofstream timeStampFile(rootPath + "log_timestamps.txt");
 
     while(!timeStamps.empty())
     { 

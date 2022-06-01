@@ -19,7 +19,7 @@ void SensorStack::Acquire(double seconds)
     std::vector<boost::thread> threads_;
     for(auto& i : sensors)
     {
-        boost::thread thread_(boost::bind(&(Sensor::AcquireSave), boost::ref(i), seconds));
+        boost::thread thread_(boost::bind(&(Sensor::AcquireSave), boost::ref(i), seconds, boost::ref(startAcq)));
         threads_.emplace_back(std::move(thread_)); //We have to move the thread.
     }
     for(auto& j : threads_)

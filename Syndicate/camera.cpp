@@ -9,5 +9,9 @@ namespace Syndicate
 
     {
         std::cout << "Camera Cstr\n";
+        if(sample_config.find("Camera Type") != sample_config.end())
+        {
+            cameraType = std::any_cast<std::string>(sample_config["Camera Type"]);
+        }
     }
 }

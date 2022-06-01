@@ -15,7 +15,7 @@ struct SimpleSensor : public Sensor
 
     std::chrono::duration<double> AtomicAcquire();
 
-    void AcquireSave(double seconds);
+    void AcquireSave(double seconds, boost::barrier& startBarrier);
     void AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier);
 
     double fps;

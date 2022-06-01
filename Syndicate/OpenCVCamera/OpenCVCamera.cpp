@@ -18,11 +18,12 @@ OpenCVCamera::~OpenCVCamera()
     // the camera will be deinitialized automatically in VideoCapture destructor
 }
 
-void OpenCVCamera::AcquireSave(double seconds)
+void OpenCVCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
 {
     int num_frames(int(seconds)*int(fps));
     std::cout << std::endl << std::endl << "*** IMAGE ACQUISITION ***" << std::endl << std::endl;
     auto start = std::chrono::steady_clock::now();
+    startBarrier.wait();
     try {
         for (int i = 0; i < num_frames; i++)
         {

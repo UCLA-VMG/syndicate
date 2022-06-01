@@ -24,7 +24,7 @@ struct RFEthernet : public Sensor
     RFEthernet(std::unordered_map<std::string, std::any>& sample_config);
     ~RFEthernet();
 
-    void AcquireSave(double seconds);
+    void AcquireSave(double seconds, boost::barrier& startBarrier);
     void AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier);
     void ConcurrentAcquire(double seconds, boost::barrier& frameBarrier);
     void ConcurrentSave();

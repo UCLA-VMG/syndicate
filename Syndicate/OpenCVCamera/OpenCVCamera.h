@@ -21,7 +21,7 @@ struct OpenCVCamera : public Syndicate::Camera
     OpenCVCamera(std::unordered_map<std::string, std::any>& sample_config);
     ~OpenCVCamera();
 
-    void AcquireSave(double seconds);
+    void AcquireSave(double seconds, boost::barrier& startBarrier);
     void AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier);
     void ConcurrentAcquire(double seconds, boost::barrier& frameBarrier);
     void ConcurrentSave();

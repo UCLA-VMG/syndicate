@@ -73,7 +73,7 @@ bool RFEthernet::LoadNpcapDlls()
 }
 #endif
 
-void RFEthernet::AcquireSave(double seconds)
+void RFEthernet::AcquireSave(double seconds, boost::barrier& startBarrier)
 {
 	pcap_dumper_t *dumpfile;
 	char errbuf[PCAP_ERRBUF_SIZE];
@@ -107,6 +107,7 @@ void RFEthernet::AcquireSave(double seconds)
     pcap_freealldevs(all_devs);
     
     /* start the capture */
+	startBarrier.wait();
 	boost::thread interrupt_thread(boost::bind(&RFEthernet::interrupt_pcap_loop, this, seconds));
     pcap_loop(adhandle, 0, packet_handler, (unsigned char *)dumpfile);
 	std::cout << "RF Execution Complete\n\n";

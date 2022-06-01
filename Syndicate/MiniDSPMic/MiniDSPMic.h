@@ -32,7 +32,7 @@ struct MiniDSPMic : public Sensor
     MiniDSPMic(std::unordered_map<std::string, std::any>& sample_config);
     ~MiniDSPMic();
 
-    void AcquireSave(double seconds);
+    void AcquireSave(double seconds, boost::barrier& startBarrier);
     void AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier);
     void ConcurrentAcquire(double seconds, boost::barrier& frameBarrier);
     void ConcurrentSave();

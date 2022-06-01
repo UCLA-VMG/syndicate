@@ -15,11 +15,12 @@ namespace Syndicate
         Camera(std::unordered_map<std::string, std::any>& sample_config);
         // ~Camera();
 
-        virtual void AcquireSave(double seconds) = 0;
+        virtual void AcquireSave(double seconds, boost::barrier& startBarrier) = 0;
         virtual void AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier) = 0;
 
 
         //Operating Characteristics
+        std::string cameraType;
         double fps;
         int height;
         int width;

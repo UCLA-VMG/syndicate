@@ -32,14 +32,24 @@ SpinnakerCamera::SpinnakerCamera(std::unordered_map<std::string, std::any>& samp
             fps_correction = std::any_cast<int>(sample_config["FPS Correction"]);
             std::cout << "FPS Correction Enabled\n";
         }
-        
-
-        if (!configure(flir_cam, nodeMap, (fps+fps_correction), height, width)) {
+        std::cout << "I am the " << sensorName << "\n";
+        if (!configure(flir_cam, nodeMap, (fps+fps_correction), height, width, cameraType)) {
             std::cout << "Camera configuration for device " << cameraID << " unsuccessful, aborting...";
         }
     }
     catch (Spinnaker::Exception& e) {
         std::cout << "Error: " << e.what() << "\n";
+    }
+    if(hardwareSync)
+    {
+        if(primary)
+        {
+            setPrimary(nodeMap, cameraType);
+        }
+        if(!primary)
+        {
+            setSecondary(nodeMap);
+        }
     }
 
     this->setHealthCode(HealthCode::ONLINE);
@@ -52,7 +62,7 @@ SpinnakerCamera::~SpinnakerCamera()
     flir_cam->DeInit();
 }
 
-void SpinnakerCamera::AcquireSave(double seconds)
+void SpinnakerCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
 {
     int result = 0;
     const string deviceSerialNumber = GetDeviceSerial(flir_cam);
@@ -66,6 +76,8 @@ void SpinnakerCamera::AcquireSave(double seconds)
     std::cout << "Acquiring images..." << endl << endl;
     // Retrieve, convert, and save images
     const unsigned int k_numImages = num_frames;
+    
+    startBarrier.wait();
     for (unsigned int imageCnt = 0; imageCnt < k_numImages; imageCnt++) {
         try {
             // Retrieve next received image
@@ -88,7 +100,7 @@ void SpinnakerCamera::AcquireSave(double seconds)
                 else
                     std::cout << "Error: Pixel Format Invalid. \n";
                 runningBuffer.push(convertedImage);
-                std::cout << sensorName << pResultImage->GetFrameID() << "\n";
+                logFile << sensorName << pResultImage->GetFrameID() << "\n";
             }
             // Release image
             pResultImage->Release();
@@ -302,6 +314,66 @@ std::string GetDeviceSerial(Spinnaker::CameraPtr pCam) {
     return "";
 }
 
+bool setPrimary(INodeMap& nodeMap, std::string& cameraName)
+{
+    if(cameraName == "BackflyS")
+    {
+        std::cout << "***********\n";
+        CEnumerationPtr ptrLine = nodeMap.GetNode("LineSelector");
+        CEnumEntryPtr ptrLine1 = ptrLine->GetEntryByName("Line1");
+        ptrLine->SetIntValue(ptrLine1->GetValue());
+
+        CEnumerationPtr ptrLineMode = nodeMap.GetNode("LineMode");
+        CEnumEntryPtr ptrLineModeVal = ptrLineMode->GetEntryByName("Output");
+        ptrLineMode->SetIntValue(ptrLineModeVal->GetValue());
+
+        CEnumEntryPtr ptrLine2 = ptrLine->GetEntryByName("Line2");
+        ptrLine->SetIntValue(ptrLine2->GetValue());
+
+        CBooleanPtr ptr3_3V = nodeMap.GetNode("V3_3Enable");
+        ptr3_3V->SetValue(true);
+        std::cout << "****done*******\n";
+
+
+
+
+
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+    return false;
+}
+
+bool setSecondary(INodeMap& nodeMap)
+{
+    std::cout << "Setting sec 1\n";
+    CEnumerationPtr ptrTriggerMode = nodeMap.GetNode("TriggerMode");
+    CEnumEntryPtr ptrTriggerModeOff = ptrTriggerMode->GetEntryByName("Off");
+    ptrTriggerMode->SetIntValue(ptrTriggerModeOff->GetValue());
+
+    CEnumerationPtr ptrTriggerSelector = nodeMap.GetNode("TriggerSelector");
+    CEnumEntryPtr ptrTriggerSelectorFrameStart = ptrTriggerSelector->GetEntryByName("FrameStart");
+    ptrTriggerSelector->SetIntValue(ptrTriggerSelectorFrameStart->GetValue());
+
+    CEnumerationPtr ptrTriggerSource = nodeMap.GetNode("TriggerSource");
+    CEnumEntryPtr ptrTriggerSourceHardware = ptrTriggerSource->GetEntryByName("Line3");
+    ptrTriggerSource->SetIntValue(ptrTriggerSourceHardware->GetValue());
+
+    CEnumEntryPtr ptrTriggerModeOn = ptrTriggerMode->GetEntryByName("On");
+    ptrTriggerMode->SetIntValue(ptrTriggerModeOn->GetValue());
+
+    CEnumerationPtr ptrTriggerOverlap = nodeMap.GetNode("TriggerOverlap");
+    CEnumEntryPtr ptrTriggerOverlapReadOut = ptrTriggerOverlap->GetEntryByName("ReadOut");
+    ptrTriggerOverlap->SetIntValue(ptrTriggerOverlapReadOut->GetValue());
+    std::cout << "Setting sec 2\n";
+
+
+    return true;
+}
+
 bool setResolution(INodeMap& nodeMap, int height, int width) {
     bool result = true;
     try {
@@ -411,7 +483,7 @@ bool setContinuousAcquisitionMode(INodeMap& nodeMap) {
     return result;
 }
 
-bool configure(CameraPtr pCam, INodeMap& nodeMap, float fps = 30.0, int height = 640, int width = 640) {
+bool configure(CameraPtr pCam, INodeMap& nodeMap, float fps = 30.0, int height = 640, int width = 640, std::string cameraType = "None") {
     bool result = true;
     try {
         // Get the device serial number

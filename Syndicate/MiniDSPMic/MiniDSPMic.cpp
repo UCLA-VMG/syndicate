@@ -62,7 +62,7 @@ MiniDSPMic::MiniDSPMic(std::unordered_map<std::string, std::any>& sample_config)
 
 }
 
-void MiniDSPMic::AcquireSave(double seconds) {
+void MiniDSPMic::AcquireSave(double seconds, boost::barrier& startBarrier) {
     int prev_index  = 0;
     _data.max_frame_index = static_cast<int>(seconds) * _data.fs;
     _data.global_frame_index = 0;
@@ -83,6 +83,7 @@ void MiniDSPMic::AcquireSave(double seconds) {
     }
     std::cout << "---------------- Now recording!! Please speak into the microphone. ----------------" << std::endl << std::endl; 
 
+    startBarrier.wait();
     while ((err = Pa_IsStreamActive(record_stream)) == 1)
     {
         Pa_Sleep(MIC_WAIT_MILLS);

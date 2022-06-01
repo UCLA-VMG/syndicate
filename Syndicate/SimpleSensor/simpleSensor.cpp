@@ -24,7 +24,7 @@ std::chrono::duration<double> SimpleSensor::AtomicAcquire()
     return end-start;
 }
 
-void SimpleSensor::AcquireSave(double seconds)
+void SimpleSensor::AcquireSave(double seconds, boost::barrier& startBarrier)
 {
     int num_iters = static_cast<int>(seconds*fps);
     std::vector<std::chrono::duration<double>> data;

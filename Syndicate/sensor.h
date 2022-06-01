@@ -45,6 +45,8 @@ struct Sensor
     OpMode operatingCode;
     //Parallel Processing Constructs
     boost::mutex mtx_; 
+    bool hardwareSync;
+    bool primary;
     // extrinsicMatrix
     // Usage :: Should be used for converting between frame of references between sensors
     std::vector<std::vector<double>> extrinsicMatrix;
@@ -67,6 +69,9 @@ struct Sensor
     // bufferSize
     // Usage :: for streaming mode, a bufferSize should be specified to cut off extra data
     const int bufferSize;
+    // logFile
+    // Usage :: file object used for logging details during acuisition.
+    std::ofstream logFile;
 
     //-------- General Functions -------------------------------------------------------
     Sensor(std::unordered_map<std::string, std::any>& sample_config);
@@ -86,7 +91,7 @@ struct Sensor
 
     virtual void AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier) = 0;
 
-    virtual void AcquireSave(double seconds) = 0;
+    virtual void AcquireSave(double seconds, boost::barrier& startBarrier) = 0;
 
     virtual void ConcurrentAcquire(double seconds, boost::barrier& frameBarrier) = 0;
 
