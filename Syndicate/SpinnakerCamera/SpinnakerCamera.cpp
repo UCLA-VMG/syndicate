@@ -25,21 +25,17 @@ SpinnakerCamera::SpinnakerCamera(std::unordered_map<std::string, std::any>& samp
     INodeMap& nodeMap = flir_cam->GetNodeMap();
     INodeMap& nodeMapTLDevice = flir_cam->GetTLDeviceNodeMap();
 
+    // Configure camera with specified fps/height/width
     try {
-        // Configure camera
-        double fps_correction{0};
-        if(sample_config.find("FPS Correction") != sample_config.end()){
-            fps_correction = std::any_cast<int>(sample_config["FPS Correction"]);
-            std::cout << "FPS Correction Enabled\n";
-        }
         std::cout << "I am the " << sensorName << "\n";
-        if (!configure(flir_cam, nodeMap, (fps+fps_correction), height, width, cameraType)) {
+        if (!configure(flir_cam, nodeMap, fps, height, width, cameraType)) {
             std::cout << "Camera configuration for device " << cameraID << " unsuccessful, aborting...";
         }
     }
     catch (Spinnaker::Exception& e) {
         std::cout << "Error: " << e.what() << "\n";
     }
+    // Enable Hardware Synchronization if asked for
     if(hardwareSync)
     {
         if(primary)
@@ -53,7 +49,6 @@ SpinnakerCamera::SpinnakerCamera(std::unordered_map<std::string, std::any>& samp
     }
 
     this->setHealthCode(HealthCode::ONLINE);
-
 }
 
 SpinnakerCamera::~SpinnakerCamera()
@@ -64,33 +59,39 @@ SpinnakerCamera::~SpinnakerCamera()
 
 void SpinnakerCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
 {
+    // 0. Initialize Starting Variables
+    this->setHealthCode(HealthCode::RUNNING);
     int result = 0;
-    const string deviceSerialNumber = GetDeviceSerial(flir_cam);
     int num_frames(seconds*fps);
-    std::cout << endl << endl << "*** IMAGE ACQUISITION ***" << endl << endl;
-    auto start = std::chrono::steady_clock::now();
     ImagePtr convertedImage = nullptr;
-
-    // Begin acquiring images
-    flir_cam->BeginAcquisition();
-    std::cout << "Acquiring images..." << endl << endl;
-    // Retrieve, convert, and save images
-    const unsigned int k_numImages = num_frames;
     
+    // 1. Wait Until all other sensors have reached here
     startBarrier.wait();
-    for (unsigned int imageCnt = 0; imageCnt < k_numImages; imageCnt++) {
-        try {
-            // Retrieve next received image
+
+    auto start = std::chrono::steady_clock::now();
+    // 2.0 Begin acquiring images
+    flir_cam->BeginAcquisition();
+    const unsigned int k_numImages = num_frames;
+    for (unsigned int imageCnt = 0; imageCnt < k_numImages; imageCnt++) 
+    {
+        try 
+        {
+            // 2.1 Retrieve next received image
             ImagePtr pResultImage = flir_cam->GetNextImage(1000);
+            // 2.2 Save Software System Timestamp
             RecordTimeStamp();
-            // Ensure image completion
-            if (pResultImage->IsIncomplete()) {
+            // 2.3 Ensure image completion:
+            if (pResultImage->IsIncomplete()) 
+            {
                 // Retrieve and print the image status description
-                std::cout << "Image incomplete: " << Image::GetImageStatusDescription(pResultImage->GetImageStatus())
+                logFile << "Image incomplete: " 
+                        << Image::GetImageStatusDescription(pResultImage->GetImageStatus())
                         << "..." << endl
                         << endl;
             }
-            else {
+            // 2.4 If Image is Complete:
+            else 
+            {
                 if(pixelFormat == "Mono"){
                     convertedImage = pResultImage->Convert(PixelFormat_Mono8, NO_COLOR_PROCESSING);
                 }
@@ -99,8 +100,11 @@ void SpinnakerCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
                 }
                 else
                     std::cout << "Error: Pixel Format Invalid. \n";
-                runningBuffer.push(convertedImage);
-                logFile << sensorName << pResultImage->GetFrameID() << "\n";
+                // runningBuffer.push(convertedImage);
+                ostringstream filename;
+                filename << rootPath << sensorName << "_" << imageCnt;
+                convertedImage->Save(filename.str().c_str(),  Spinnaker::ImageFileFormat::BMP);
+                logFile << sensorName << " " << pResultImage->GetFrameID() << std::endl;
             }
             // Release image
             pResultImage->Release();
@@ -115,18 +119,9 @@ void SpinnakerCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
     flir_cam->EndAcquisition();
     auto end = std::chrono::steady_clock::now();
     std::cout <<"Time Taken for acquistion " << sensorName << " " << static_cast<double>((end-start).count())/1'000'000'000 << "\n";
+    logFile << "Time Taken for acquistion " << sensorName << " " << static_cast<double>((end-start).count())/1'000'000'000 << "\n";
     SaveTimeStamps();
-    
-    start = std::chrono::steady_clock::now();
-    for (unsigned int imageCnt = 0; imageCnt < k_numImages; imageCnt++) {
-            // Create a unique filename
-        ostringstream filename;
-        filename << rootPath << sensorName << "_" << imageCnt;
-        std::any_cast<ImagePtr>(runningBuffer.front())->Save(filename.str().c_str(),  Spinnaker::ImageFileFormat::BMP);
-        runningBuffer.pop();
-    }
-    end = std::chrono::steady_clock::now();
-    std::cout <<"Time Taken for Saving " << sensorName << " " << (end-start).count()/1'000'000'000 << "\n";
+
     this->setHealthCode(HealthCode::ONLINE);
 }
 

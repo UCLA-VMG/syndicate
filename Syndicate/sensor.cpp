@@ -46,7 +46,7 @@ void Sensor::SaveTimeStamps()
     while(!timeStamps.empty())
     { 
         // Write to the file
-        timeStampEpochFile << timeStamps.front().time_since_epoch().count() << "\n";  
+        timeStampEpochFile << timeStamps.front().time_since_epoch().count() << std::endl;  
         // Write in human readable format
         std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(timeStamps.front().time_since_epoch());
         std::chrono::seconds s = std::chrono::duration_cast<std::chrono::seconds>(ms);
@@ -55,7 +55,7 @@ void Sensor::SaveTimeStamps()
         std::tm time_struct = *localtime(&t);
         timeStampFile << std::put_time(&time_struct, "%Y%m%d_%H_%M_%S_")
                       << std::string(3 - std::min(static_cast<size_t>(3), fractional_seconds.length()), '0') 
-                      << fractional_seconds << "\n"; 
+                      << fractional_seconds << std::endl; 
 
         timeStamps.pop();      
     }

@@ -20,9 +20,9 @@ MX800::MX800(std::unordered_map<std::string, std::any>& sample_config)
 
 void MX800::AcquireSave(double seconds, boost::barrier& startBarrier) {
     _in << " " << std::endl;
-    std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(1)));
+    std::this_thread::sleep_for(std::chrono::seconds(3));
     startBarrier.wait();
-    std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(seconds+1)));
+    std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(seconds+3)));
     child_process_executable.terminate();
     std::cout << "MX800 Execution Complete!\n";
 

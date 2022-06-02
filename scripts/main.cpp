@@ -60,7 +60,7 @@ int main(int, char**) {
     };
     std::unordered_map<std::string, std::any> rgb_config = {
         {"Camera ID", std::string("21502645")}, {"Camera Type", std::string("BackflyS")},
-        {"FPS", 30},{"FPS Correction", 0}, 
+        {"FPS", 30},
         {"Height", 1100}, {"Width", 1600},
         {"Sensor Name", std::string("RGB_Camera")},
         {"Root Path", rootPath}, {"Pixel Format", std::string("RGB")},
@@ -102,7 +102,7 @@ int main(int, char**) {
     // sensor_list.emplace_back(makeSensor<RFEthernet>);
     // sensor_list.emplace_back(makeSensor<MiniDSPMic>);
     // sensor_list.emplace_back(makeSensor<MX800>);
-    std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config};//, mx800_config};
+    std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config};// mx800_config};
     // std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config, thermal_config, radar_config, mic_config, mx800_config};
     
     
@@ -113,7 +113,7 @@ int main(int, char**) {
 
     //4.1 Asynchronously Acquire Data
     std::cout << "\n\n\nAsyn Capture \n";
-    mainStack.Acquire(10);
+    mainStack.Acquire(30);
 
     // 4.2 Barrier Sync Acquire Data
     // std::cout << "\n\n\n Barrier Sync Capture\n";
