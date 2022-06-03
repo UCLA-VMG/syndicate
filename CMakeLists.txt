@@ -31,6 +31,7 @@ message(STATUS "${CMAKE_MODULE_PATH}")
 find_package(Spinnaker REQUIRED)
 find_package(Npcap REQUIRED)
 find_package(OpenCV REQUIRED)
+# find_package(realsense2 REQUIRED)
 
 # set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_STATIC_LIBS        ON)
@@ -38,6 +39,7 @@ set(Boost_USE_MULTITHREADED      ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
 # set(BOOST_ROOT "C:/Program Files/boost/boost_1_78_0")
 find_package(Boost COMPONENTS thread filesystem REQUIRED)
+find_package(realsense2 CONFIG REQUIRED)
 
 #Include Path Libraries
 include_directories("${PROJECT_SOURCE_DIR}/include"
@@ -46,11 +48,12 @@ include_directories("${PROJECT_SOURCE_DIR}/include"
                     ${Boost_INCLUDE_DIR}
                     ${Npcap_INCLUDE_DIRS}
                     ${OpenCV_INCLUDE_DIRS}
+                    ${realsense2_INCLUDE_DIRS}
                     )
 
 #Include Libraries
 add_subdirectory(Syndicate)
-set (LIBS ${Spinnaker_LIBRARIES} ${Boost_LIBRARIES} ${Npcap_LIBRARIES} ${OpenCV_LIBRARIES} syndicate )
+set (LIBS ${Spinnaker_LIBRARIES} ${Boost_LIBRARIES} ${Npcap_LIBRARIES} ${OpenCV_LIBRARIES}  realsense2::realsense2 syndicate )
 
 #Generate Execs
 add_executable(capture ${PROJECT_SOURCE_DIR}/scripts/main.cpp)

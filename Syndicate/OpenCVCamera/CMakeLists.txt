@@ -1,11 +1,10 @@
-
-set(OpenCVSOURCE 
+set(OpenCVCameraSOURCE 
         OpenCVCamera.cpp)
 
-set(OpenCVHEADER
+set(OpenCVCameraHEADER
         OpenCVCamera.h)
 
-add_library(OpenCVCamera ${OpenCVSOURCE} ${OpenCVHEADER})
+add_library(OpenCVCamera ${OpenCVCameraSOURCE} ${OpenCVCameraHEADER})
 
 target_include_directories(OpenCVCamera
   PUBLIC

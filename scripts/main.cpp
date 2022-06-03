@@ -13,6 +13,7 @@
 #include "RFEthernet.h"
 #include "MiniDSPMic.h"
 #include "MX800.h"
+#include "RealSenseCamera.h"
 
 boost::mutex io_mutex;
 
@@ -90,19 +91,27 @@ int main(int, char**) {
         {"Sensor Name", std::string("MX800")},
         {"Root Path", rootPath}
     };
+    std::unordered_map<std::string, std::any> real_sense_sr300_config = {
+        {"Camera ID", 0}, {"Camera Type", std::string("SR300")},
+        {"FPS", 30}, 
+        {"Height", 480}, {"Width", 640},
+        {"Sensor Name", std::string("Coded_Light_Depth_Camera")},
+        {"Root Path", rootPath}
+    };
     
     //2. Add Configurations and Factory Generator Functions into std::vectors
     std::vector<std::unique_ptr<Sensor>(*)(std::unordered_map<std::string, std::any>&)> sensor_list;
     // sensor_list.emplace_back(makeSensor<SimpleSensor>);
     // sensor_list.emplace_back(makeSensor<SimpleSensor>);
-    sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
-    sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
-    sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
     // sensor_list.emplace_back(makeSensor<OpenCVCamera>);
     // sensor_list.emplace_back(makeSensor<RFEthernet>);
     // sensor_list.emplace_back(makeSensor<MiniDSPMic>);
     // sensor_list.emplace_back(makeSensor<MX800>);
-    std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config};// mx800_config};
+    sensor_list.emplace_back(makeSensor<RealSenseCamera>);
+    std::vector<std::unordered_map<std::string, std::any>> configs{real_sense_sr300_config};
     // std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config, thermal_config, radar_config, mic_config, mx800_config};
     
     
@@ -113,7 +122,7 @@ int main(int, char**) {
 
     //4.1 Asynchronously Acquire Data
     std::cout << "\n\n\nAsyn Capture \n";
-    mainStack.Acquire(30);
+    mainStack.Acquire(10);
 
     // 4.2 Barrier Sync Acquire Data
     // std::cout << "\n\n\n Barrier Sync Capture\n";
