@@ -27,6 +27,7 @@ void OpenCVCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
     try {
         for (int i = 0; i < num_frames; i++)
         {
+            cv::Mat frame;
             // Wait for a new frame from camera and store it into 'frame'
             cap.read(frame);
             RecordTimeStamp();
@@ -50,7 +51,7 @@ void OpenCVCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
         // Create a unique filename
         std::ostringstream filename;
         filename << rootPath << sensorName << "_" << i << ".png";
-        imwrite(filename.str().c_str(), frame);
+        imwrite(filename.str().c_str(), save_frame);
         runningBuffer.pop();
         // sprintf_s(filename, filename.str().c_str()); // select your folder - filename is "Frame_n"
         // std::cout << sensorName <<"_Frame_" << i << std::endl;
@@ -71,6 +72,7 @@ void OpenCVCamera::AcquireSaveBarrier(double seconds, boost::barrier& frameBarri
         {
             frameBarrier.wait();
             // wait for a new frame from camera and store it into 'frame'
+            cv::Mat frame;
             cap.read(frame);
             std::cout << "currentDateTime()=" << currentDateTime() << std::endl;
 
@@ -147,6 +149,7 @@ bool OpenCVCamera::AcquireImages(VideoCapture cap, int num_frames) {
         for (int i = 0; i < num_frames; i++)
         {
             // wait for a new frame from camera and store it into 'frame'
+            cv::Mat frame;
             cap.read(frame);
             std::cout << "currentDateTime()=" << currentDateTime() << std::endl;
 

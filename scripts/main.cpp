@@ -9,22 +9,12 @@
 #include "simpleSensor.h"
 #include "sensorStack.h"
 #include "SpinnakerCamera.h"
-// #include "VimbaCamera.h"
+#include "VimbaCamera.h"
 #include "SerialPort.h"
 #include "OpenCVCamera.h"
 #include "RFEthernet.h"
 #include "MiniDSPMic.h"
 #include "MX800.h"
-
-// boost::mutex io_mutex;
-
-// void thread_fun(boost::barrier& cur_barier, boost::atomic<int>& current)
-// {
-//     ++current;
-//     cur_barier.wait();
-//     boost::lock_guard<boost::mutex> locker(io_mutex);
-//     std::cout << current << std::endl;
-// }
 
 int main(int, char**) {
     std::cout << "Hello, world!\n";
@@ -75,23 +65,26 @@ int main(int, char**) {
         {"Root Path", rootPath}
     };
     std::unordered_map<std::string, std::any> serial_config = {
-        {"Port Name", std::string("COM3")},
+        {"Port Name", std::string("\\\\.\\COM14")},
         {"Pulse Time", 1}, {"Total Time", 20},
-        {"Sensor Name", std::string("Arduino Serial")},
+        {"Sensor Name", std::string("Arduino_Serial")},
         {"Root Path", rootPath}
     };
     
     //2. Add Configurations and Factory Generator Functions into std::vectors
     std::vector<std::unique_ptr<Sensor>(*)(std::unordered_map<std::string, std::any>&)> sensor_list;
-    // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
-    // sensor_list.emplace_back(makeSensor<VimbaCamera>);
+    sensor_list.emplace_back(makeSensor<VimbaCamera>);
+    sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
     sensor_list.emplace_back(makeSensor<OpenCVCamera>);
     // sensor_list.emplace_back(makeSensor<RFEthernet>);
+    sensor_list.emplace_back(makeSensor<SerialPort>);
     // std::vector<std::unordered_map<std::string, std::any>> configs{nir_config};
     // std::vector<std::unordered_map<std::string, std::any>> configs{nir_vimba_config};
-    std::vector<std::unordered_map<std::string, std::any>> configs{thermal_config};
+    // std::vector<std::unordered_map<std::string, std::any>> configs{thermal_config};
     // std::vector<std::unordered_map<std::string, std::any>> configs{radar_config};
-    // std::vector<std::unordered_map<std::string, std::any>> configs{nir_config, nir_vimba_config, thermal_config, radar_config};
+    // std::vector<std::unordered_map<std::string, std::any>> configs{serial_config};
+    std::vector<std::unordered_map<std::string, std::any>> configs{nir_vimba_config, nir_config, thermal_config, serial_config};
+    // std::vector<std::unordered_map<std::string, std::any>> configs{nir_vimba_config, nir_config, thermal_config, radar_config, serial_config};
     
     
     //3. Initialize Sensor Stack

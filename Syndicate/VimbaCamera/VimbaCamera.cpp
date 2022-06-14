@@ -35,13 +35,13 @@ VimbaCamera::VimbaCamera(std::unordered_map<std::string, std::any>& sample_confi
         }
 
         // get camera ID
-        string strCameraID = GetCameraID();
+        // string strCameraID = GetCameraID();
         // open camera
-        CameraPtr m_pCamera = openCam(strCameraID);
+        CameraPtr m_pCamera = openCam(cameraID);
         // Configure camera
         err = configure(m_pCamera, fps, height, width);
         if (err != VmbErrorSuccess) {
-            std::cout << "Camera configuration for device " << strCameraID << " unsuccessful, aborting...";
+            std::cout << "Camera configuration for device " << cameraID << " unsuccessful, aborting...";
         }
     }
     catch (exception& e) {
@@ -119,6 +119,7 @@ void VimbaCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
         cout << "Error: " << e.what() << endl;
     }
     auto end = chrono::steady_clock::now();
+    SaveTimeStamps();
     cout <<"Time Taken for " << sensorName << (end-start).count() << "\n";
 }
 

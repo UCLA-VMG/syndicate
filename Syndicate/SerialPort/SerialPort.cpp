@@ -56,25 +56,10 @@ SerialPort::SerialPort(std::unordered_map<std::string, std::any>& sample_config)
         }
     }
 
-    // while(1) {
-    //     // ui - searching
-    //     std::cout << "Searching in progress";
-    //     logFile << "Searching in progress";
-    //     // wait connection
-    //     while (!isConnected()) {
-    //         std::this_thread::sleep_for(std::chrono::seconds(remainingTime));
-    //         std::cout << ".";
-    //         logFile << ".";
-    //         arduino = new SerialPort(portName);
-    //     }
-
-    //     //Checking if arduino is connected or not
     if (isConnected()) {
         std::cout  << std::endl << "Connection established at port " << portName << std::endl;
         logFile  << std::endl << "Connection established at port " << portName << std::endl;
     }
-
-    // }
 }
 
 // Reading bytes from serial port to buffer;
@@ -141,7 +126,8 @@ void SerialPort::runBarker13()
     // Add assertion (2 * 13 * pulseTime) < totalTime
     int idx = 0;
     int seq[] = {1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1};
-    while(isConnected()) {
+    RecordTimeStamp();
+    for(int idx=0; idx < 13 ; idx++) {
         if (seq[idx] == 1)
         {
             str_cmd = "<ON>";
@@ -152,13 +138,10 @@ void SerialPort::runBarker13()
             str_cmd = "<OFF>";
             signalWriteRead(pulseTime, str_cmd);
         }
-        idx = (idx + 1) % 13;
-        if (!idx) {
-            str_cmd = "<OFF>";
-            signalWriteRead(0, str_cmd);
-            std::this_thread::sleep_for(std::chrono::seconds(remainingTime));
-        }
     }    
+    str_cmd = "<OFF>";
+    signalWriteRead(0, str_cmd);
+    std::this_thread::sleep_for(std::chrono::seconds(remainingTime));
 }
 
 void SerialPort::signalWriteRead(unsigned int dealyTime, std::string command)
@@ -182,9 +165,10 @@ void SerialPort::AcquireSave(double seconds, boost::barrier& startBarrier) {
     {
         startBarrier.wait();
         runBarker13();
-        std::cout << "" << std::endl;
         end = std::chrono::steady_clock::now();
     }
+    SaveTimeStamps();
+    std::cout << "Serial execution complete" << std::endl;
 }
 
 void SerialPort::AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier) {
