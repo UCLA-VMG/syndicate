@@ -4,13 +4,13 @@ import matplotlib.pyplot as plt
 height = 480
 width = 640
 
-byte_string = open("D:/syndicate_tests/Coded_Light_Depth_Camera/Coded_Light_Depth_Camera_RGB_100.raw", "rb").read()
+byte_string = open("D:\syndicate_tests_pc_32\Coded_Light_Depth_Camera/Coded_Light_Depth_Camera_RGB_0.raw", "rb").read()
 decoded_data = np.frombuffer(byte_string, dtype=np.uint8).reshape(1080, 1920, 3)
 plt.imshow(decoded_data)
 plt.show()
 
 
-byte_string = open("D:/syndicate_tests/Coded_Light_Depth_Camera/Coded_Light_Depth_Camera_Depth_100.raw", "rb").read()
+byte_string = open("D:\syndicate_tests_pc_32\Coded_Light_Depth_Camera/Coded_Light_Depth_Camera_Depth_0.raw", "rb").read()
 X = np.arange(width)
 Y = np.arange(height)
 X, Y = np.meshgrid(X, Y)

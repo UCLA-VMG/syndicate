@@ -103,7 +103,7 @@ class PcapReader:
             return [None,None]
 
         rechdr = [
-                float("%s.%s"%(rechdrtmp[0],rechdrtmp[1])), 
+                float("%s.%s"%(rechdrtmp[0],"0"*(6-len(str(rechdrtmp[1]))) + str(rechdrtmp[1]))), 
                 rechdrtmp[2], 
                 rechdrtmp[3]
                 ]
@@ -195,19 +195,39 @@ class PcapDumper:
         self.__fh.close()
 
 if __name__ == '__main__':
-    reader = PcapReader("D:\syndicate_tests\Radar.bin")
-    a = reader.pnext()
-    data_=a[1]
-    data = data_[42:]
-    
-    packet_num = struct.unpack('<1l', data[:4])[0]
-    byte_count = struct.unpack('>Q', b'\x00\x00' + data[4:10][::-1])[0]
-    print(packet_num)
-    print(byte_count)
-    a = reader.pnext()
-    data_=a[1]
-    data = data_[42:]
-    packet_num = struct.unpack('<1l', data[:4])[0]
-    byte_count = struct.unpack('>Q', b'\x00\x00' + data[4:10][::-1])[0]
-    print(packet_num)
-    print(byte_count)
+    reader = PcapReader("D:\syndicate_tests\FMCW_Radar\FMCW_Radar.raw")
+    next_packet = reader.pnext()
+    count = 1
+    prev_time = 0
+    packet_list = [0]
+    while next_packet[0] is not None:
+        print(count)
+        curr_time = next_packet[0][0]
+        print(next_packet[0])
+        print(curr_time - prev_time)    
+        data_=next_packet[1]
+        data = data_[42:]
+        try:
+            if (curr_time - prev_time) > 0.008:
+                print("--Marker--")
+            print(len(data))
+            packet_num = struct.unpack('<1l', data[:4])[0]
+            byte_count = struct.unpack('>Q', b'\x00\x00' + data[4:10][::-1])[0]
+            print(packet_num)
+            print(byte_count)
+            if (packet_list[-1] != packet_num - 1) and count != 1:
+                print("--Why???--")
+            else:
+                packet_list.append(packet_num)
+        except:
+            print(count, "Fails")
+        print()
+        next_packet = reader.pnext()
+        count+=1
+        prev_time = curr_time
+    packet_list.pop(0)
+    packet_list = np.array(packet_list)
+    print("Count:", count)
+    print(len(packet_list[1:] - packet_list[:-1]))
+    print(np.sum((packet_list[1:] - packet_list[:-1])==1))
+
