@@ -30,15 +30,19 @@ struct VimbaCamera : public Syndicate::Camera
     ~VimbaCamera();
 
     // void AcquireSave(AVT::VmbAPI::CameraPtr m_pCamera, double seconds, std::string filename_prefix);
-    void VimbaCamera::AcquireSave(double seconds);
+    void AcquireSave(double seconds, boost::barrier& startBarrier);
     // void AcquireSaveBarrier(AVT::VmbAPI::CameraPtr m_pCamera, double seconds, std::string filename_prefix, boost::barrier& frameBarrier);
-    void VimbaCamera::AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier);
+    void AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier);
+    void ConcurrentAcquire(double seconds, boost::barrier& frameBarrier);
+    void ConcurrentSave();
 
     VmbErrorType setPixelFormatMono8(AVT::VmbAPI::CameraPtr m_pCamera);
     VmbErrorType setContinuousAcquisitonMode(AVT::VmbAPI::CameraPtr m_pCamera);
-    VmbErrorType setFps(AVT::VmbAPI::CameraPtr m_pCamera, float fps);
+    VmbErrorType setFps(AVT::VmbAPI::CameraPtr m_pCamera, double fps);
     VmbErrorType setHeight(AVT::VmbAPI::CameraPtr m_pCamera, int height);
     VmbErrorType setWidth(AVT::VmbAPI::CameraPtr m_pCamera, int width);
+    VmbErrorType setExposure(AVT::VmbAPI::CameraPtr m_pCamera, double exposure_time_abs);
+    VmbErrorType setGamma(AVT::VmbAPI::CameraPtr m_pCamera, double gamma);
 
     AVT::VmbAPI::CameraPtrVector GetCameraList();
     std::string GetCameraID();

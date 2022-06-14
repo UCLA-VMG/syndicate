@@ -19,3 +19,4 @@ add_subdirectory(MX800)
 add_subdirectory(VimbaCamera)
 
 target_link_libraries (syndicate SimpleSensor SpinnakerCamera VimbaCamera OpenCVCamera RFEthernet MiniDSPMic MX800)
+# target_link_libraries (syndicate SimpleSensor SpinnakerCamera VimbaCamera OpenCVCamera MiniDSPMic MX800)

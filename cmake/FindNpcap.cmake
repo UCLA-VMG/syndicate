@@ -13,7 +13,7 @@ set(Npcap_DIR "C:/Program\ Files/npcap-sdk-1.12")
 find_path(Npcap_INCLUDE_DIRS NAMES
   pcap.h
   PATHS
-  "${Npcap_DIR}/Include"
+  "${Npcap_DIR}/Include" 
   "${Npcap_DIR}/Include/pcap"
   )
 

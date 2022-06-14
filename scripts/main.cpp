@@ -9,6 +9,7 @@
 #include "simpleSensor.h"
 #include "sensorStack.h"
 #include "SpinnakerCamera.h"
+#include "VimbaCamera.h"
 #include "OpenCVCamera.h"
 #include "RFEthernet.h"
 #include "MiniDSPMic.h"
@@ -28,7 +29,7 @@ int main(int, char**) {
     std::cout << "Hello, world!\n";
     
     //0. Set Root Path
-    std::string rootPath("D:/syndicate_tests/");
+    std::string rootPath("C:/Users/Adnan/Downloads/syndicate_test");
     bool h_sync(true);
 
     //1. Create Configurations
@@ -57,6 +58,14 @@ int main(int, char**) {
         {"Sensor Name", std::string("Polarized_Camera")},
         {"Root Path", rootPath}, {"Pixel Format", std::string("Mono")},
         {"Hardware Sync", h_sync}, {"Primary", false}
+    };
+    std::unordered_map<std::string, std::any> nir_vimba_config = {
+        {"Camera ID", std::string("DEV_1AB22C012B3D")}, {"Camera Type", std::string("Vimba")},
+        {"FPS", 30},
+        {"Height", 1944}, {"Width", 2592},
+        {"Sensor Name", std::string("NIR_Vimba_Camera")},
+        {"Root Path", rootPath}, {"Pixel Format", std::string("Mono")},
+        // {"Hardware Sync", h_sync}, {"Primary", false}
     };
     std::unordered_map<std::string, std::any> rgb_config = {
         {"Camera ID", std::string("21502645")}, {"Camera Type", std::string("BackflyS")},
@@ -95,14 +104,16 @@ int main(int, char**) {
     std::vector<std::unique_ptr<Sensor>(*)(std::unordered_map<std::string, std::any>&)> sensor_list;
     // sensor_list.emplace_back(makeSensor<SimpleSensor>);
     // sensor_list.emplace_back(makeSensor<SimpleSensor>);
-    sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
-    sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
-    sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    sensor_list.emplace_back(makeSensor<VimbaCamera>);
     // sensor_list.emplace_back(makeSensor<OpenCVCamera>);
     // sensor_list.emplace_back(makeSensor<RFEthernet>);
     // sensor_list.emplace_back(makeSensor<MiniDSPMic>);
     // sensor_list.emplace_back(makeSensor<MX800>);
-    std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config};// mx800_config};
+    std::vector<std::unordered_map<std::string, std::any>> configs{nir_vimba_config};
+    // std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config};// mx800_config};
     // std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config, thermal_config, radar_config, mic_config, mx800_config};
     
     
@@ -113,7 +124,7 @@ int main(int, char**) {
 
     //4.1 Asynchronously Acquire Data
     std::cout << "\n\n\nAsyn Capture \n";
-    mainStack.Acquire(30);
+    mainStack.Acquire(10);
 
     // 4.2 Barrier Sync Acquire Data
     // std::cout << "\n\n\n Barrier Sync Capture\n";

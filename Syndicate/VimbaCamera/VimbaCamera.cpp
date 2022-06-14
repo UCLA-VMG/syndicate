@@ -12,14 +12,18 @@ using namespace Syndicate;
 using namespace AVT;
 using namespace VmbAPI;
 
+// check vimba C++ manual page 43 for hardware trigger
+
 //================================================ Constructor and Destructor =================================================
 
 VimbaCamera::VimbaCamera(std::unordered_map<std::string, std::any>& sample_config)
-    : Syndicate::Camera(sample_config), cameraID(any_cast<string>(sample_config["Camera ID"])),
+    : Syndicate::Camera(sample_config),
+    cameraID(any_cast<string>(sample_config["Camera ID"])),
     m_system( VimbaSystem::GetInstance() )
 {
     VmbErrorType err;
     try {
+        std::cout << "I am the " << sensorName << "\n";
         // Start Vimba
         err = m_system.Startup();
         if( VmbErrorSuccess == err )
@@ -35,11 +39,16 @@ VimbaCamera::VimbaCamera(std::unordered_map<std::string, std::any>& sample_confi
         // open camera
         CameraPtr m_pCamera = openCam(strCameraID);
         // Configure camera
-        err = configure(m_pCamera, 30.0, 1200, 1200);
+        err = configure(m_pCamera, fps, height, width);
+        if (err != VmbErrorSuccess) {
+            std::cout << "Camera configuration for device " << strCameraID << " unsuccessful, aborting...";
+        }
     }
     catch (exception& e) {
         cout << "Error: " << e.what() << "\n";
     }
+
+    this->setHealthCode(HealthCode::ONLINE);
 }
 
 VimbaCamera::~VimbaCamera()
@@ -51,35 +60,43 @@ VimbaCamera::~VimbaCamera()
 //================================================ Acquire and Save Functions ======================================
 
 // void VimbaCamera::AcquireSave(double seconds, string filename_prefix)
-void VimbaCamera::AcquireSave(double seconds)
+void VimbaCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
 {
+    // 0. Initialize Starting Variables
+    this->setHealthCode(HealthCode::RUNNING);
+    int imageCnt = 0;
     int num_frames(seconds*int(fps));
-    cout << endl << endl << "*** IMAGE ACQUISITION ***" << endl << endl;
+    VmbErrorType    res = VmbErrorSuccess;
+    string file_ext = ".bmp";
+    VmbFrameStatusType status = VmbFrameStatusIncomplete;
+    // Create a frame observer for this camera (This will be wrapped in a shared_ptr so we don't delete it)
+    SP_SET( m_pFrameObserver, new FrameObserver( m_pCamera ) );
+
+    // 1. Wait Until all other sensors have reached here
+    startBarrier.wait();
     auto start = chrono::steady_clock::now();
-    try {
-        VmbErrorType    res = VmbErrorSuccess;
-        string filename_prefix = "nir2_";
-        string file_ext = ".bmp";
-        VmbFrameStatusType status = VmbFrameStatusIncomplete;
-        // Create a frame observer for this camera (This will be wrapped in a shared_ptr so we don't delete it)
-        SP_SET( m_pFrameObserver, new FrameObserver( m_pCamera ) );
+
+    // 2.0 Begin acquiring images
+    try {        
         // Start streaming
         // auto start = chrono::high_resolution_clock::now();
         res = SP_ACCESS( m_pCamera )->StartContinuousImageAcquisition( num_frames,  m_pFrameObserver );
-        int count = 0;
         // begin recording
-        while (VmbErrorSuccess == res && count < num_frames) //  && VimbaCamera::FrameAvailable() )
+        while (VmbErrorSuccess == res && imageCnt < num_frames) //  && VimbaCamera::FrameAvailable() )
         {
             while(!(VimbaCamera::FrameAvailable()));
-            // Get Frame
+            // 2.1 Retrieve next received image
             FramePtr pFrame = VimbaCamera::GetFrame();
+            // 2.2 Save Software System Timestamp
+            RecordTimeStamp();
+            // 2.3 Ensure image completion:
             res = pFrame->GetReceiveStatus( status );
-            // if frame is received, save
+            // 2.4 If Image is Complete:
             if (VmbErrorSuccess == res)
             {
                 // create filename
-                string idx = to_string(count);
-                string file = filename_prefix + idx + file_ext;
+                string idx = to_string(imageCnt);
+                string file = rootPath + sensorName + idx + file_ext;
                 const char* pFileName = file.c_str();
                 // save bitmap
                 if (VmbErrorSuccess == res)
@@ -87,8 +104,7 @@ void VimbaCamera::AcquireSave(double seconds)
                     res = saveBitMap(pFrame, pFileName);
                     if (VmbErrorSuccess == res)
                     {
-                        // exit if can't save bitmaps
-                        count++;
+                        imageCnt++;
                     }
                 }
             }
@@ -109,45 +125,38 @@ void VimbaCamera::AcquireSave(double seconds)
 // void VimbaCamera::AcquireSaveBarrier(CameraPtr m_pCamera, double seconds, string filename_prefix, boost::barrier& frameBarrier)
 void VimbaCamera::AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier)
 {
+    // 0. Initialize Starting Variables
+    this->setHealthCode(HealthCode::RUNNING);
+    int imageCnt = 0;
     int num_frames(seconds*int(fps));
-    cout << endl << endl << "*** IMAGE ACQUISITION ***" << endl << endl;
+    VmbErrorType    res = VmbErrorSuccess;
+    string file_ext = ".bmp";
+    VmbFrameStatusType status = VmbFrameStatusIncomplete;
+    // Create a frame observer for this camera (This will be wrapped in a shared_ptr so we don't delete it)
+    SP_SET( m_pFrameObserver, new FrameObserver( m_pCamera ) );
     auto start = chrono::steady_clock::now();
-    try {
-        VmbErrorType    res = VmbErrorSuccess;
-        string filename_prefix = "nir2_";
-        string file_ext = ".bmp";
-        VmbFrameStatusType status = VmbFrameStatusIncomplete;
-        // Create a frame observer for this camera (This will be wrapped in a shared_ptr so we don't delete it)
-        SP_SET( m_pFrameObserver, new FrameObserver( m_pCamera ) );
+
+    // 1.0 Begin acquiring images
+    try {        
         // Start streaming
         // auto start = chrono::high_resolution_clock::now();
-        res = SP_ACCESS( m_pCamera )->StartContinuousImageAcquisition(num_frames, m_pFrameObserver);
-        int count = 0;
+        res = SP_ACCESS( m_pCamera )->StartContinuousImageAcquisition( num_frames,  m_pFrameObserver );
         // begin recording
-        while (VmbErrorSuccess == res && count < num_frames) //  && VimbaCamera::FrameAvailable() )
+        while (VmbErrorSuccess == res && imageCnt < num_frames) //  && VimbaCamera::FrameAvailable() )
         {
             frameBarrier.wait();
             while(!(VimbaCamera::FrameAvailable()));
-            // Get Frame
+            // 1.1 Retrieve next received image
             FramePtr pFrame = VimbaCamera::GetFrame();
+            // 1.2 Save Software System Timestamp
+            RecordTimeStamp();
+            // 1.3 Ensure image completion:
             res = pFrame->GetReceiveStatus( status );
-            // if frame is received, save
+            // 1.4 If Image is Complete:
             if (VmbErrorSuccess == res)
             {
-                // create filename
-                string idx = to_string(count);
-                string file = filename_prefix + idx + file_ext;
-                const char* pFileName = file.c_str();
-                // save bitmap
-                if (VmbErrorSuccess == res)
-                {
-                    res = saveBitMap(pFrame, pFileName);
-                    if (VmbErrorSuccess == res)
-                    {
-                        // exit if can't save bitmaps
-                        count++;
-                    }
-                }
+                runningBuffer.push(pFrame);
+                imageCnt++;
             }
         }
         res = VimbaCamera::StopContinuousImageAcquisition();
@@ -160,7 +169,135 @@ void VimbaCamera::AcquireSaveBarrier(double seconds, boost::barrier& frameBarrie
         cout << "Error: " << e.what() << endl;
     }
     auto end = chrono::steady_clock::now();
-    cout <<"Time Taken for " << sensorName << (end-start).count() << "\n";
+    std::cout <<"Time Taken for acquistion " << sensorName << " " << (end-start).count()/1'000'000'000 << "\n";
+
+    start = std::chrono::steady_clock::now();
+    for (unsigned int imageCnt = 0; imageCnt < num_frames; imageCnt++) {
+        // create filename
+        string idx = to_string(imageCnt);
+        string file = rootPath + sensorName + idx + file_ext;
+        const char* pFileName = file.c_str();
+
+        // save bitmap
+        res = saveBitMap(std::any_cast<FramePtr&>(runningBuffer.front()), pFileName);
+        if (!VmbErrorSuccess == res)
+        {
+            std::cout << "Error Saving " << sensorName << "Frame Number " << imageCnt << "\n";
+        }
+        runningBuffer.pop();
+    }
+    end = std::chrono::steady_clock::now();
+    std::cout <<"Time Taken for Saving " << sensorName << (end-start).count()/1'000'000'000 << "\n";
+    this->setHealthCode(HealthCode::ONLINE);
+}
+
+void VimbaCamera::ConcurrentAcquire(double seconds, boost::barrier& frameBarrier)
+{
+    // 0. Initialize Starting Variables
+    this->setHealthCode(HealthCode::RUNNING);
+    int imageCnt = 0;
+    int num_frames(seconds*int(fps));
+    VmbErrorType    res = VmbErrorSuccess;
+    string file_ext = ".bmp";
+    VmbFrameStatusType status = VmbFrameStatusIncomplete;
+    // Create a frame observer for this camera (This will be wrapped in a shared_ptr so we don't delete it)
+    SP_SET( m_pFrameObserver, new FrameObserver( m_pCamera ) );
+    auto start = chrono::steady_clock::now();
+
+    // 1.0 Begin acquiring images
+    try {        
+        // Start streaming
+        // auto start = chrono::high_resolution_clock::now();
+        res = SP_ACCESS( m_pCamera )->StartContinuousImageAcquisition( num_frames,  m_pFrameObserver );
+        // begin recording
+        while (VmbErrorSuccess == res && imageCnt < num_frames) //  && VimbaCamera::FrameAvailable() )
+        {
+            frameBarrier.wait();
+            while(!(VimbaCamera::FrameAvailable()));
+            // 1.1 Retrieve next received image
+            FramePtr pFrame = VimbaCamera::GetFrame();
+            // 1.2 Save Software System Timestamp
+            RecordTimeStamp();
+            // 1.3 Ensure image completion:
+            res = pFrame->GetReceiveStatus( status );
+            // 1.4 If Image is Complete:
+            if (VmbErrorSuccess == res)
+            {
+                runningBuffer.push(pFrame);
+                imageCnt++;
+            }
+        }
+        res = VimbaCamera::StopContinuousImageAcquisition();
+        if (VmbErrorSuccess == res)
+        {
+            VimbaCamera::closeCam(m_pCamera);
+        }
+    }
+    catch (exception& e) {
+        cout << "Error: " << e.what() << endl;
+    }
+    auto end = chrono::steady_clock::now();
+    std::cout <<"Time Taken for acquistion " << sensorName << " " << (end-start).count()/1'000'000'000 << "\n";
+    this->setHealthCode(HealthCode::ONLINE);
+}
+
+void VimbaCamera::ConcurrentSave()
+{
+    bool started(false);
+    int imgCount = 0;
+    VmbErrorType    res = VmbErrorSuccess;
+    string file_ext = ".bmp";
+    auto start = std::chrono::steady_clock::now();
+    for(;;)
+    {
+        if(this->checkHealthCode() == HealthCode::RUNNING || !runningBuffer.empty())
+        {
+            started=true;
+            // mtx_.lock();
+            if(runningBuffer.empty())
+            {
+                // mtx_.unlock();
+                std::cout << sensorName << ": I am empty!\n";
+                std::this_thread::sleep_for(std::chrono::milliseconds(10*static_cast<int>(1000/fps)));
+            }
+            else
+            {
+                // Create a unique filename
+                string idx = to_string(imgCount);
+                string file = rootPath + sensorName + idx + file_ext;
+                const char* pFileName = file.c_str();
+
+                // save bitmap
+                res = saveBitMap(std::any_cast<FramePtr&>(runningBuffer.front()), pFileName);
+                if (!VmbErrorSuccess == res)
+                {
+                    std::cout << "Error Saving " << sensorName << "Frame Number " << imgCount << "\n";
+                }
+                runningBuffer.pop();
+                // std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(1000/fps/30)));
+                // mtx_.unlock();
+                ++imgCount;
+            }
+
+        }
+        else if(!started && this->checkHealthCode() == HealthCode::ONLINE) 
+        {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+        else if(started && this->checkHealthCode() == HealthCode::ONLINE)
+        {
+            break;
+        }
+        else
+        {
+            std::cout << "Something is very wrong!\n";
+            std::this_thread::sleep_for (std::chrono::seconds(1));
+        }
+    }
+    auto end = std::chrono::steady_clock::now();
+    std::cout <<"Time Taken for Saving " << sensorName << " " << static_cast<float>((end-start).count())/1'000'000'000 << "\n";
+
+
 }
 
 //================================================ Set Functions ====================================================
@@ -189,7 +326,7 @@ VmbErrorType setContinuousAcquisitonMode(CameraPtr m_pCamera)
    return res;
 }
 
-VmbErrorType VimbaCamera::setFps(CameraPtr m_pCamera, float fps)
+VmbErrorType VimbaCamera::setFps(CameraPtr m_pCamera, double fps)
 {
    // set AcquisitionFrameRateEnable to true
    FeaturePtr pFormatFeature;
@@ -210,7 +347,7 @@ VmbErrorType VimbaCamera::setFps(CameraPtr m_pCamera, float fps)
    return res;
 }
 
-VmbErrorType setHeight(CameraPtr m_pCamera, int height)
+VmbErrorType VimbaCamera::setHeight(CameraPtr m_pCamera, int height)
 {
    // Try to set Height
    FeaturePtr pFormatFeature;
@@ -224,7 +361,7 @@ VmbErrorType setHeight(CameraPtr m_pCamera, int height)
    return res;
 }
 
-VmbErrorType setWidth(CameraPtr m_pCamera, int width)
+VmbErrorType VimbaCamera::setWidth(CameraPtr m_pCamera, int width)
 {
    // Try to set Width
    FeaturePtr pFormatFeature;
@@ -232,6 +369,30 @@ VmbErrorType setWidth(CameraPtr m_pCamera, int width)
    if (VmbErrorSuccess == res)
    {
        res = pFormatFeature->SetValue(width);
+   }
+   return res;
+}
+
+VmbErrorType VimbaCamera::setExposure(CameraPtr m_pCamera, double exposure_time_abs)
+{
+   // Try to set Width
+   FeaturePtr pFormatFeature;
+   VmbErrorType res = m_pCamera->GetFeatureByName("ExposureTime", pFormatFeature);
+   if (VmbErrorSuccess == res)
+   {
+       res = pFormatFeature->SetValue(exposure_time_abs);
+   }
+   return res;
+}
+
+VmbErrorType VimbaCamera::setGamma(CameraPtr m_pCamera, double gamma)
+{
+   // Try to set Width
+   FeaturePtr pFormatFeature;
+   VmbErrorType res = m_pCamera->GetFeatureByName("Gamma", pFormatFeature);
+   if (VmbErrorSuccess == res)
+   {
+       res = pFormatFeature->SetValue(gamma);
    }
    return res;
 }
@@ -347,8 +508,8 @@ VmbErrorType VimbaCamera::saveBitMap(FramePtr& rpFrame, const char* pFileName)
                     else
                     {
                         // Save the bitmap
-                        // if (0 == AVTWriteBitmapToFile(&bitmap, pFileName))
-                        if (0 == SaveCVMat(&bitmap, pFileName))
+                        if (0 == AVTWriteBitmapToFile(&bitmap, pFileName))
+                        // if (0 == SaveCVMat(&bitmap, pFileName))
                         {
                             cout << "Could not write bitmap to file.\n";
                             err = VmbErrorOther;
@@ -431,13 +592,21 @@ VmbErrorType VimbaCamera::configure(CameraPtr m_pCamera, double fps, int height,
     VmbErrorType err = this->VimbaCamera::setPixelFormatMono8(m_pCamera);
     if (VmbErrorSuccess == err)
     {
-        err = setFps(m_pCamera, 30.0);
+        err = setFps(m_pCamera, fps);
         if (VmbErrorSuccess == err)
         {
-            // err = setHeight(m_pCamera, 640);
+            err = setHeight(m_pCamera, height);
             if (VmbErrorSuccess == err)
             {
-                // err = setWidth(m_pCamera, 640);
+                err = setWidth(m_pCamera, width);
+                if (VmbErrorSuccess == err)
+                {
+                    err = setExposure(m_pCamera, 33000.0);
+                    if (VmbErrorSuccess == err)
+                    {
+                        err = setGamma(m_pCamera, 0.45);
+                    }
+                }
             }
         }
     }
