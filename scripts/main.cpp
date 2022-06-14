@@ -9,7 +9,8 @@
 #include "simpleSensor.h"
 #include "sensorStack.h"
 #include "SpinnakerCamera.h"
-#include "VimbaCamera.h"
+// #include "VimbaCamera.h"
+#include "SerialPort.h"
 #include "OpenCVCamera.h"
 #include "RFEthernet.h"
 #include "MiniDSPMic.h"
@@ -29,7 +30,7 @@ int main(int, char**) {
     std::cout << "Hello, world!\n";
     
     //0. Set Root Path
-    std::string rootPath("C:/Users/Adnan/Downloads/syndicate_test");
+    std::string rootPath("D:/syndicate_test_serial");
     bool h_sync(true);
 
     //1. Create Configurations
@@ -99,6 +100,12 @@ int main(int, char**) {
         {"Sensor Name", std::string("MX800")},
         {"Root Path", rootPath}
     };
+    std::unordered_map<std::string, std::any> serial_config = {
+        {"Port Name", std::string("COM3")},
+        {"Pulse Time", 1}, {"Total Time", 20},
+        {"Sensor Name", std::string("Arduino Serial")},
+        {"Root Path", rootPath}
+    };
     
     //2. Add Configurations and Factory Generator Functions into std::vectors
     std::vector<std::unique_ptr<Sensor>(*)(std::unordered_map<std::string, std::any>&)> sensor_list;
@@ -107,12 +114,13 @@ int main(int, char**) {
     // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
     // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
     // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
-    sensor_list.emplace_back(makeSensor<VimbaCamera>);
+    // sensor_list.emplace_back(makeSensor<VimbaCamera>);
+    sensor_list.emplace_back(makeSensor<SerialPort>);
     // sensor_list.emplace_back(makeSensor<OpenCVCamera>);
     // sensor_list.emplace_back(makeSensor<RFEthernet>);
     // sensor_list.emplace_back(makeSensor<MiniDSPMic>);
     // sensor_list.emplace_back(makeSensor<MX800>);
-    std::vector<std::unordered_map<std::string, std::any>> configs{nir_vimba_config};
+    std::vector<std::unordered_map<std::string, std::any>> configs{serial_config};
     // std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config};// mx800_config};
     // std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config, thermal_config, radar_config, mic_config, mx800_config};
     
