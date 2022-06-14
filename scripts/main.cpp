@@ -25,11 +25,19 @@ void thread_fun(boost::barrier& cur_barier, boost::atomic<int>& current)
     std::cout << current << std::endl;
 }
 
-int main(int, char**) {
+int main(int argc, char *argv[]) {
     std::cout << "Hello, world!\n";
     
     //0. Set Root Path
-    std::string rootPath("D:/syndicate_tests/");
+    std::string rootPath("D:/syndicate_tests");
+    if (argc > 1){
+        rootPath = rootPath + std::string(argv[1]) + std::string("/");
+    }
+    else {
+        rootPath = rootPath + std::string("/");
+    }
+
+    std::cout << rootPath << std::endl << std::endl; 
     bool h_sync(true);
 
     //1. Create Configurations
@@ -68,8 +76,8 @@ int main(int, char**) {
         {"Hardware Sync", h_sync}, {"Primary", true}
     };
     std::unordered_map<std::string, std::any> thermal_config = {
-        {"Camera ID", 0}, {"Camera Type", "Boson"},
-        {"FPS", 30}, 
+        {"Camera ID", 0}, {"Camera Type", std::string("Boson")},
+        {"FPS", 30}, {"Bit Depth", 16},
         {"Height", 512}, {"Width", 640},
         {"Sensor Name", std::string("Thermal_Camera")},
         {"Root Path", rootPath}
@@ -107,13 +115,15 @@ int main(int, char**) {
     // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
     // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
     // sensor_list.emplace_back(makeSensor<OpenCVCamera>);
-    // sensor_list.emplace_back(makeSensor<RFEthernet>);
     // sensor_list.emplace_back(makeSensor<MiniDSPMic>);
+    // sensor_list.emplace_back(makeSensor<RealSenseCamera>);
+    sensor_list.emplace_back(makeSensor<RFEthernet>);
     // sensor_list.emplace_back(makeSensor<MX800>);
-    sensor_list.emplace_back(makeSensor<RealSenseCamera>);
-    std::vector<std::unordered_map<std::string, std::any>> configs{real_sense_sr300_config};
-    // std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config, thermal_config, radar_config, mic_config, mx800_config};
-    
+    std::vector<std::unordered_map<std::string, std::any>> configs{radar_config};
+    // std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config};
+    // std::vector<std::unordered_map<std::string, std::any>> configs{mic_config, real_sense_sr300_config, radar_config, mx800_config};
+    // std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config, real_sense_sr300_config}; //thermal_config
+    // std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config, mic_config, real_sense_sr300_config, radar_config, mx800_config}; //thermal_config
     
     //3. Initialize Sensor Stack
     SensorStack mainStack(sensor_list, configs);

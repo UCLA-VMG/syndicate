@@ -17,10 +17,7 @@ RealSenseCamera::~RealSenseCamera()
 
 void RealSenseCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
 {
-    int num_frames = static_cast<int>(seconds)*30;
-    // Capture 30 frames to give autoexposure, etc. a chance to settle
-    for (auto i = 0; i < 30; ++i) rs_pipe.wait_for_frames();
-
+    int num_frames = static_cast<int>(seconds*fps);
     startBarrier.wait();
     auto start = std::chrono::steady_clock::now();
     for(int i = 0 ; i < num_frames ; i++) {
@@ -34,7 +31,7 @@ void RealSenseCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
         auto image = depth.as<rs2::video_frame>();
         if (image) {
             std::ofstream outfile(rootPath + sensorName + "_Depth_" + std::to_string(i) + ".raw", std::ofstream::binary);
-            outfile.write(static_cast<const char*>(image.get_data()), image.get_height()*image.get_stride_in_bytes());
+            outfile.write(static_cast<const char*>(image.get_data()), image.get_height()*image.get_width()*image.get_bytes_per_pixel());
             outfile.close();
             logFile << "Depth Frame" << image.get_frame_number();
             std::stringstream csv_file_depth;
@@ -45,7 +42,7 @@ void RealSenseCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
         auto color_image = color.as<rs2::video_frame>();
         if (color_image) {
             std::ofstream outfile(rootPath + sensorName + "_RGB_" + std::to_string(i) + ".raw", std::ofstream::binary);
-            outfile.write(static_cast<const char*>(color_image.get_data()), color_image.get_height()*color_image.get_stride_in_bytes());
+            outfile.write(static_cast<const char*>(color_image.get_data()), color_image.get_height()*color_image.get_width()*color_image.get_bytes_per_pixel());
             outfile.close();
             logFile << "RGB Frame" << image.get_frame_number();
             std::stringstream csv_file_rgb;
