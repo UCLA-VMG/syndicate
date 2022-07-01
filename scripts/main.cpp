@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
     }
 
     std::cout << rootPath << std::endl << std::endl; 
-    bool h_sync(true);
+    bool h_sync(false);
 
     //1. Create Configurations
     std::unordered_map<std::string, std::any> sample_config = {
@@ -120,8 +120,9 @@ int main(int argc, char *argv[]) {
     sensor_list.emplace_back(makeSensor<RFEthernet>);
     // sensor_list.emplace_back(makeSensor<MX800>);
     std::vector<std::unordered_map<std::string, std::any>> configs{radar_config};
-    // std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config};
-    // std::vector<std::unordered_map<std::string, std::any>> configs{mic_config, real_sense_sr300_config, radar_config, mx800_config};
+    // std::vector<std::unordered_map<std::string, std::any>> configs{nir_config, polarized_config, mic_config};
+    // std::vector<std::unordered_map<std::string, std::any>> configs{mic_config , real_sense_sr300_config, radar_config, mx800_config};
+    //std::vector<std::unordered_map<std::string, std::any>> configs{mic_config};
     // std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config, real_sense_sr300_config}; //thermal_config
     // std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config, mic_config, real_sense_sr300_config, radar_config, mx800_config}; //thermal_config
     
