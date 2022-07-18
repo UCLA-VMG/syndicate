@@ -31,6 +31,7 @@ message(STATUS "${CMAKE_MODULE_PATH}")
 find_package(Spinnaker REQUIRED)
 find_package(Npcap REQUIRED)
 find_package(OpenCV REQUIRED)
+find_library(WINDOWS_SDK Strmiids.lib) #required for Dshow functionality
 # find_package(realsense2 REQUIRED)
 
 # set(Boost_USE_STATIC_LIBS ON)
@@ -53,13 +54,15 @@ include_directories("${PROJECT_SOURCE_DIR}/include"
 
 #Include Libraries
 add_subdirectory(Syndicate)
-set (LIBS ${Spinnaker_LIBRARIES} ${Boost_LIBRARIES} ${Npcap_LIBRARIES} ${OpenCV_LIBRARIES}  realsense2::realsense2 syndicate )
+set (LIBS ${Spinnaker_LIBRARIES} ${Boost_LIBRARIES} ${Npcap_LIBRARIES} ${OpenCV_LIBRARIES} ${WINDOWS_SDK} realsense2::realsense2 syndicate)
 
 #Generate Execs
 add_executable(capture ${PROJECT_SOURCE_DIR}/scripts/main.cpp)
+add_executable(dshow_test ${PROJECT_SOURCE_DIR}/scripts/dshow_test.cpp)
 add_executable(acq ${PROJECT_SOURCE_DIR}/scripts/acq.cpp)
 add_executable(packets_acq ${PROJECT_SOURCE_DIR}/scripts/packets_acq.cpp)
 target_link_libraries(capture ${LIBS})
+target_link_libraries(dshow_test ${LIBS})
 target_link_libraries(acq ${LIBS})
 target_link_libraries(packets_acq ${LIBS})
 

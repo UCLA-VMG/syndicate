@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
         {"Root Path", rootPath}
     };
     std::unordered_map<std::string, std::any> mic_config = {
-        {"FS", 44100}, {"Channels", 8}, {"Frames per Buffer", 512},
+        {"FS", 44100}, {"Channels", 2}, {"Frames per Buffer", 512},
         {"Sensor Name", std::string("Microphone")},
         {"Root Path", rootPath}
     };
@@ -112,17 +112,17 @@ int main(int argc, char *argv[]) {
     // sensor_list.emplace_back(makeSensor<SimpleSensor>);
     // sensor_list.emplace_back(makeSensor<SimpleSensor>);
     // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
-    // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
-    // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    //sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+   //sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
     // sensor_list.emplace_back(makeSensor<OpenCVCamera>);
-    // sensor_list.emplace_back(makeSensor<MiniDSPMic>);
+    sensor_list.emplace_back(makeSensor<MiniDSPMic>);
     // sensor_list.emplace_back(makeSensor<RealSenseCamera>);
-    sensor_list.emplace_back(makeSensor<RFEthernet>);
+    //sensor_list.emplace_back(makeSensor<RFEthernet>);
     // sensor_list.emplace_back(makeSensor<MX800>);
-    std::vector<std::unordered_map<std::string, std::any>> configs{radar_config};
-    // std::vector<std::unordered_map<std::string, std::any>> configs{nir_config, polarized_config, mic_config};
+    //std::vector<std::unordered_map<std::string, std::any>> configs{radar_config};
+    //std::vector<std::unordered_map<std::string, std::any>> configs{nir_config, polarized_config, mic_config};
     // std::vector<std::unordered_map<std::string, std::any>> configs{mic_config , real_sense_sr300_config, radar_config, mx800_config};
-    //std::vector<std::unordered_map<std::string, std::any>> configs{mic_config};
+    std::vector<std::unordered_map<std::string, std::any>> configs{mic_config};
     // std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config, real_sense_sr300_config}; //thermal_config
     // std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config, mic_config, real_sense_sr300_config, radar_config, mx800_config}; //thermal_config
     

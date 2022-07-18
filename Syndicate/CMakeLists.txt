@@ -17,5 +17,6 @@ add_subdirectory(RealSenseCamera)
 add_subdirectory(RFEthernet)
 add_subdirectory(MiniDSPMic)
 add_subdirectory(MX800)
+add_subdirectory(BosonThermal)
 
-target_link_libraries (syndicate SimpleSensor SpinnakerCamera OpenCVCamera RFEthernet MiniDSPMic MX800 RealSenseCamera)
+target_link_libraries (syndicate SimpleSensor SpinnakerCamera OpenCVCamera RFEthernet MiniDSPMic MX800 RealSenseCamera BosonThermal)

@@ -52,7 +52,7 @@ class Fmcw_Data_Processor:
         return velocities
 
     def get_angle_resolution(self):
-        omega = np.fft.fftfreq(self.theta_bins.shape[1])*2
+        omega = np.fft.fftfreq(self.theta_bins.shape[2])*2
         angle_bin_vals = np.arcsin(omega)
         return angle_bin_vals
 
@@ -62,9 +62,18 @@ class Fmcw_Data_Processor:
         ranges = self.get_range_resolution()
 
         if(convert):
-            plt.imshow(np.log(np.fft.fftshift(np.abs(self.theta_bins), axes=2)[frame].sum(0).T), extent=[angles.min(), angles.max(), ranges.max(), ranges.min()])
-            plt.xlabel('Angle (Rad)')
-            plt.ylabel('Range (meters)')
+            polar_grid = np.log((np.abs(self.theta_bins))[frame].sum(0).T)
+            # print(angles*180/np.pi)
+            fig = plt.figure(figsize=[5,5])
+            ax = fig.add_axes([0.1,0.1,0.8,0.8],polar=True)
+            ax.set_xlim(-3.14159/2, 3.14159/2)
+            ax.pcolormesh(angles,ranges,polar_grid,edgecolors='face')
+            
+            #ec='face' to avoid annoying gridding in pdf
+            # plt.savefig('polar.png')
+            # plt.imshow(, extent=[angles.min(), angles.max(), ranges.max(), ranges.min()])
+            # plt.xlabel('Angle (Rad)')
+            # plt.ylabel('Range (meters)')
             plt.title('Range and Angle')
             plt.show()
         else: 
