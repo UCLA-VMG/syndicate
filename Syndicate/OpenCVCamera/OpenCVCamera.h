@@ -31,8 +31,9 @@ struct OpenCVCamera : public Syndicate::Camera
     bool AcquireImages(cv::VideoCapture cap, int num_frames);
     bool getResolution(cv::VideoCapture cap);
     bool getFps(cv::VideoCapture cap);
+    bool setBitDepth(cv::VideoCapture cap, int bit_depth);
 
-    cv::VideoCapture openCap(int cameraID);
+    cv::VideoCapture& openCap(int cameraID);
     bool configure(cv::VideoCapture cap, int deviceID, double fps, double height, double width);
 
     int cameraID;
@@ -42,6 +43,7 @@ struct OpenCVCamera : public Syndicate::Camera
     // double height;
     // double width;
 
+    std::string type2str(int type);
 };
 
 // std::unique_ptr<Sensor> makeSimpleSensor(std::unordered_map<std::string, std::any>& sample_config);

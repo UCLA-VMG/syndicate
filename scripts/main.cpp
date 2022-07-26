@@ -15,6 +15,7 @@
 #include "RFEthernet.h"
 #include "MiniDSPMic.h"
 #include "MX800.h"
+#include "RealSenseCamera.h"
 
 int main(int argc, char *argv[]) {
     std::cout << "Hello, world!\n";
@@ -22,14 +23,20 @@ int main(int argc, char *argv[]) {
     std::string current_exec_name = argv[0]; // Name of the current exec program
     std::vector<std::string> all_args;
 
-    if (argc > 1) {
-        all_args.assign(argv + 1, argv + argc);
-    }
+int main(int argc, char *argv[]) {
+    std::cout << "Hello, world!\n";
     
     //0. Set Root Path
-    std::string rootPath("C:/Users/Adnan/Downloads/syndicate_test/");
-    if(all_args.size()>0){rootPath = rootPath + all_args[0] + "/";}
-    bool h_sync(true);
+    std::string rootPath("D:/syndicate_tests");
+    if (argc > 1){
+        rootPath = rootPath + std::string(argv[1]) + std::string("/");
+    }
+    else {
+        rootPath = rootPath + std::string("/");
+    }
+
+    std::cout << rootPath << std::endl << std::endl; 
+    bool h_sync(false);
 
     //1. Create Configurations
     std::unordered_map<std::string, std::any> nir_config = {
@@ -50,7 +57,7 @@ int main(int argc, char *argv[]) {
     };
     std::unordered_map<std::string, std::any> thermal_config = {
         {"Camera ID", 0}, {"Camera Type", std::string("Boson")},
-        {"FPS", 30}, 
+        {"FPS", 30}, {"Bit Depth", 16},
         {"Height", 512}, {"Width", 640},
         {"Sensor Name", std::string("Thermal_Camera")},
         {"Root Path", rootPath}
@@ -70,7 +77,7 @@ int main(int argc, char *argv[]) {
         {"Root Path", rootPath}
     };
     std::unordered_map<std::string, std::any> mic_config = {
-        {"FS", 44100}, {"Channels", 8}, {"Frames per Buffer", 512},
+        {"FS", 44100}, {"Channels", 2}, {"Frames per Buffer", 512},
         {"Sensor Name", std::string("Microphone")},
         {"Root Path", rootPath}
     };
@@ -79,6 +86,11 @@ int main(int argc, char *argv[]) {
         {"Sensor Name", std::string("MX800")},
         {"Root Path", rootPath}
     };
+    std::unordered_map<std::string, std::any> real_sense_sr300_config = {
+        {"Camera ID", 0}, {"Camera Type", std::string("SR300")},
+        {"FPS", 30}, 
+        {"Height", 480}, {"Width", 640},
+        {"Sensor Name", std::string("Coded_Light_Depth_Camera")},
     std::unordered_map<std::string, std::any> serial_config = {
         {"Port Name", std::string("\\\\.\\COM14")},
         {"Pulse Time", 1}, {"Total Time", 20},
@@ -88,9 +100,27 @@ int main(int argc, char *argv[]) {
     
     //2. Add Configurations and Factory Generator Functions into std::vectors
     std::vector<std::unique_ptr<Sensor>(*)(std::unordered_map<std::string, std::any>&)> sensor_list;
-    sensor_list.emplace_back(makeSensor<VimbaCamera>);
-    sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
-    sensor_list.emplace_back(makeSensor<OpenCVCamera>);
+    // sensor_list.emplace_back(makeSensor<SimpleSensor>);
+    // sensor_list.emplace_back(makeSensor<SimpleSensor>);
+    // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    //sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+   //sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    // sensor_list.emplace_back(makeSensor<OpenCVCamera>);
+    sensor_list.emplace_back(makeSensor<MiniDSPMic>);
+    // sensor_list.emplace_back(makeSensor<RealSenseCamera>);
+    //sensor_list.emplace_back(makeSensor<RFEthernet>);
+    // sensor_list.emplace_back(makeSensor<MX800>);
+    //std::vector<std::unordered_map<std::string, std::any>> configs{radar_config};
+    //std::vector<std::unordered_map<std::string, std::any>> configs{nir_config, polarized_config, mic_config};
+    // std::vector<std::unordered_map<std::string, std::any>> configs{mic_config , real_sense_sr300_config, radar_config, mx800_config};
+    std::vector<std::unordered_map<std::string, std::any>> configs{mic_config};
+    // std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config, real_sense_sr300_config}; //thermal_config
+    // std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_config, polarized_config, mic_config, real_sense_sr300_config, radar_config, mx800_config}; //thermal_config
+    
+    // # Adnan, your stuff
+    // sensor_list.emplace_back(makeSensor<VimbaCamera>);
+    // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    // sensor_list.emplace_back(makeSensor<OpenCVCamera>);
     // sensor_list.emplace_back(makeSensor<RFEthernet>);
     // sensor_list.emplace_back(makeSensor<SerialPort>);
     // std::vector<std::unordered_map<std::string, std::any>> configs{nir_config};
@@ -100,9 +130,8 @@ int main(int argc, char *argv[]) {
     // std::vector<std::unordered_map<std::string, std::any>> configs{serial_config};
     // std::vector<std::unordered_map<std::string, std::any>> configs{nir_vimba_config, nir_config, thermal_config, serial_config};
     // std::vector<std::unordered_map<std::string, std::any>> configs{nir_vimba_config, nir_config, thermal_config, radar_config};
-    std::vector<std::unordered_map<std::string, std::any>> configs{nir_vimba_config, nir_config, rgb_config};
+    // std::vector<std::unordered_map<std::string, std::any>> configs{nir_vimba_config, nir_config, rgb_config};
 
-    
     
     //3. Initialize Sensor Stack
     SensorStack mainStack(sensor_list, configs);
@@ -112,7 +141,8 @@ int main(int argc, char *argv[]) {
 
     //4.1 Asynchronously Acquire Data
     std::cout << "\n\n\nAsyn Capture \n";
-    mainStack.Acquire(20);
+    mainStack.Acquire(10);
+
 
     // 4.2 Barrier Sync Acquire Data
     // std::cout << "\n\n\n Barrier Sync Capture\n";

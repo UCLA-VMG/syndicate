@@ -1,7 +1,5 @@
 #include "OpenCVCamera.h"
 
-using namespace cv;
-
 using namespace Syndicate;
 
 OpenCVCamera::OpenCVCamera(std::unordered_map<std::string, std::any>& sample_config)
@@ -9,7 +7,24 @@ OpenCVCamera::OpenCVCamera(std::unordered_map<std::string, std::any>& sample_con
 {
     std::cout << "opencv Camera Cstr\n";
     //--- OPEN CAP
-    cap = openCap(cameraID);
+    cap.open(0, cv::CAP_ANY);
+    if(!cap.isOpened())
+    {
+        std::cerr << "ERROR! Unable to open camera\n";
+    }
+
+    // Print true, that is ok, default expected behavior.
+    std::cout << "CAP_PROP_CONVERT_RGB: " << cap.get(cv::CAP_PROP_CONVERT_RGB) << std::endl; 
+
+    cap.set(cv::CAP_PROP_FRAME_WIDTH, 320);
+    cap.set(cv::CAP_PROP_FRAME_HEIGHT, 256);
+
+    cap.set(cv::CAP_PROP_CONVERT_RGB, false);
+    cap.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('Y', '1', '6', ' '));
+    std::cout << "hi\n";
+    // cap.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('Y','1','6',' '));
+    // cap.set(cv::CAP_PROP_CONVERT_RGB, 0);
+    setBitDepth(cap, std::any_cast<int>(sample_config["Bit Depth"]));
 }
 
 OpenCVCamera::~OpenCVCamera()
@@ -23,6 +38,10 @@ void OpenCVCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
     int num_frames(int(seconds)*int(fps));
     std::cout << std::endl << std::endl << "*** IMAGE ACQUISITION ***" << std::endl << std::endl;
     auto start = std::chrono::steady_clock::now();
+
+    double width = cap.get(cv::CAP_PROP_FRAME_WIDTH);
+    double height = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
+
     startBarrier.wait();
     try {
         for (int i = 0; i < num_frames; i++)
@@ -30,6 +49,8 @@ void OpenCVCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
             cv::Mat frame;
             cv::Mat save_frame;
             // Wait for a new frame from camera and store it into 'frame'
+            cv::Mat frame(height, width, CV_16U);
+            std::cout << type2str(frame.type()) << " ";
             cap.read(frame);
             RecordTimeStamp();
             // if(!frame.empty() ) {
@@ -67,6 +88,29 @@ void OpenCVCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
     this->setHealthCode(HealthCode::ONLINE);
 }
 
+std::string OpenCVCamera::type2str(int type) {
+  std::string r;
+
+  uchar depth = type & CV_MAT_DEPTH_MASK;
+  uchar chans = 1 + (type >> CV_CN_SHIFT);
+
+  switch ( depth ) {
+    case CV_8U:  r = "8U"; break;
+    case CV_8S:  r = "8S"; break;
+    case CV_16U: r = "16U"; break;
+    case CV_16S: r = "16S"; break;
+    case CV_32S: r = "32S"; break;
+    case CV_32F: r = "32F"; break;
+    case CV_64F: r = "64F"; break;
+    default:     r = "User"; break;
+  }
+
+  r += "C";
+  r += (chans+'0');
+
+  return r;
+}
+
 void OpenCVCamera::AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier)
 {
     int num_frames(int(seconds)*int(fps));
@@ -76,6 +120,7 @@ void OpenCVCamera::AcquireSaveBarrier(double seconds, boost::barrier& frameBarri
     try {
         for (int i = 0; i < num_frames; i++)
         {
+            cv::Mat frame;
             frameBarrier.wait();
             // wait for a new frame from camera and store it into 'frame'
             cv::Mat frame;
@@ -89,42 +134,56 @@ void OpenCVCamera::AcquireSaveBarrier(double seconds, boost::barrier& frameBarri
             }
         }
     }
-    catch (Exception& e) {
+    catch (cv::Exception& e) {
         std::cout << "Error: " << e.what() << std::endl;
     }
     auto end = std::chrono::steady_clock::now();
     std::cout << "Time Taken for " << sensorName << (end-start).count() << "\n";
 }
 
-bool setResolution(VideoCapture cap, double width, double height) {
+bool OpenCVCamera::setResolution(cv::VideoCapture cap, double width, double height) {
     bool result = true;
     try {
-        cap.set(CAP_PROP_FRAME_WIDTH, width);
-        std::cout << "Width after using video.set(CAP_PROP_FRAME_WIDTH) : " << cap.get(CAP_PROP_FRAME_WIDTH) << std::endl;
-        cap.set(CAP_PROP_FRAME_HEIGHT, height);
-        std::cout << "Height after using video.set(CAP_PROP_FRAME_HEIGHT) : " << cap.get(CAP_PROP_FRAME_HEIGHT) << std::endl;
+        cap.set(cv::CAP_PROP_FRAME_WIDTH, width);
+        std::cout << "Width after using video.set(CAP_PROP_FRAME_WIDTH) : " << cap.get(cv::CAP_PROP_FRAME_WIDTH) << std::endl;
+        cap.set(cv::CAP_PROP_FRAME_HEIGHT, height);
+        std::cout << "Height after using video.set(CAP_PROP_FRAME_HEIGHT) : " << cap.get(cv::CAP_PROP_FRAME_HEIGHT) << std::endl;
     }
-    catch (Exception& e) {
+    catch (cv::Exception& e) {
         std::cout << "Error configuring resolution: " << e.what() << std::endl;
         result = false;
     }
     return result;
 }
 
-bool setFps(VideoCapture cap, double fps) {
+bool OpenCVCamera::setBitDepth(cv::VideoCapture cap, int bit_depth) {
     bool result = true;
     try {
-        cap.set(CAP_PROP_FPS, fps);
+        std::cout << "Bit Depth : " << cap.get(cv::CAP_PROP_FORMAT) << std::endl;
+        cap.set(cv::CAP_PROP_FORMAT, CV_16U);
+        std::cout << "Bit Depth : " << cap.get(cv::CAP_PROP_FORMAT) << std::endl;
+    }
+    catch (cv::Exception& e) {
+        std::cout << "Error configuring bit depth: " << e.what() << std::endl;
+        result = false;
+    }
+    return result;
+}
+
+bool OpenCVCamera::setFps(cv::VideoCapture cap, double fps) {
+    bool result = true;
+    try {
+        cap.set(cv::CAP_PROP_FPS, fps);
         std::cout << "Frames per second using video.get(CAP_PROP_FPS) : " << fps << std::endl;
     }
-    catch (Exception& e) {
+    catch (cv::Exception& e) {
         std::cout << "Error configuring fps: " << e.what() << std::endl;
         result = false;
     }
     return result;
 }
 
-bool configure(VideoCapture cap, int cameraID, double fps = 30.0, double height = 640, double width = 640) {
+bool OpenCVCamera::configure(cv::VideoCapture cap, int cameraID, double fps = 30.0, double height = 640, double width = 640) {
     bool result = true;
     try {
         // Print the device serial number
@@ -139,7 +198,7 @@ bool configure(VideoCapture cap, int cameraID, double fps = 30.0, double height 
             return false;
         }
     }
-    catch (Exception& e) {
+    catch (cv::Exception& e) {
         std::cout << "Error configuring camera: " << e.what() << std::endl;
         result = false;
     }
@@ -147,13 +206,14 @@ bool configure(VideoCapture cap, int cameraID, double fps = 30.0, double height 
 }
 
 // This function acquires and saves 10 images from a device.
-bool OpenCVCamera::AcquireImages(VideoCapture cap, int num_frames) {
+bool OpenCVCamera::AcquireImages(cv::VideoCapture cap, int num_frames) {
     bool result = true;
     char filename[100];
     std::cout << std::endl << std::endl << "*** IMAGE ACQUISITION ***" << std::endl << std::endl;
     try {
         for (int i = 0; i < num_frames; i++)
         {
+            cv::Mat frame;
             // wait for a new frame from camera and store it into 'frame'
             cv::Mat frame;
             cap.read(frame);
@@ -166,55 +226,75 @@ bool OpenCVCamera::AcquireImages(VideoCapture cap, int num_frames) {
             }
         }
     }
-    catch (Exception& e) {
+    catch (cv::Exception& e) {
         std::cout << "Error: " << e.what() << std::endl;
         return false;
     }
     return result;
 }
 
-bool getResolution(VideoCapture cap) {
+bool OpenCVCamera::getResolution(cv::VideoCapture cap) {
     bool result = true;
     try {
-        double width = cap.get(CAP_PROP_FRAME_WIDTH);
+        double width = cap.get(cv::CAP_PROP_FRAME_WIDTH);
         std::cout << "Width using video.get(CAP_PROP_FRAME_WIDTH) : " << width << std::endl;
-        double height = cap.get(CAP_PROP_FRAME_HEIGHT);
+        double height = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
         std::cout << "Height using video.get(CAP_PROP_FRAME_HEIGHT) : " << height << std::endl;
     }
-    catch (Exception& e) {
+    catch (cv::Exception& e) {
         std::cout << "Error configuring resolution: " << e.what() << std::endl;
         result = false;
     }
     return result;
 }
 
-bool getFps(VideoCapture cap) {
+bool OpenCVCamera::getFps(cv::VideoCapture cap) {
     bool result = true;
     try {
-        double fps = cap.get(CAP_PROP_FPS);
+        double fps = cap.get(cv::CAP_PROP_FPS);
         std::cout << "Frames per second using video.get(CAP_PROP_FPS) : " << fps << std::endl;
     }
-    catch (Exception& e) {
+    catch (cv::Exception& e) {
         std::cout << "Error configuring fps: " << e.what() << std::endl;
         result = false;
     }
     return result;
 }
 
-VideoCapture OpenCVCamera::openCap(int cameraID) {
-    //--- INITIALIZE CAP
-    VideoCapture cap;
-    // open the default camera using default API
-    // cap.open(0);
-    // // OR advance usage: select any API backend 
-    int apiID = cv::CAP_ANY;      // 0 = autodetect default API
-                                  // open selected camera using selected API
-    cap.open(cameraID + apiID);
-    // check if we succeeded
-    if (!cap.isOpened()) {
+cv::VideoCapture& OpenCVCamera::openCap(int cameraID) {
+    // //--- INITIALIZE CAP
+    // cv::VideoCapture cap;
+    // // open the default camera using default API
+    // // cap.open(0);
+    // // // OR advance usage: select any API backend 
+    // int apiID = cv::CAP_ANY;      // 0 = autodetect default API
+    //                               // open selected camera using selected API
+    // cap.open(cameraID, apiID);
+    std::cout << cv::getBuildInformation() << std::endl; 
+
+    cv::VideoCapture capVid;
+    capVid.open(0, cv::CAP_ANY);
+    if(!capVid.isOpened())
+    {
         std::cerr << "ERROR! Unable to open camera\n";
     }
-    return cap;
+
+    // Print true, that is ok, default expected behavior.
+    std::cout << "CAP_PROP_CONVERT_RGB: " << capVid.get(cv::CAP_PROP_CONVERT_RGB) << std::endl; 
+
+    capVid.set(cv::CAP_PROP_CONVERT_RGB, false);
+    capVid.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('Y', '1', '6', ' '));
+    
+    // int apiID = cv::CAP_ANY;      // 0 = autodetect default API
+    //                               // open selected camera using selected API
+    // capVid.open(cameraID + apiID);
+    // check if we succeeded
+    // std::cout << std::endl << apiID << std::endl;
+    if (!capVid.isOpened()) {
+        std::cerr << "ERROR! Unable to open camera\n";
+    }
+    std::cout << "hi\n";
+    return capVid;
 }
 
 void OpenCVCamera::ConcurrentAcquire(double seconds, boost::barrier& frameBarrier)
