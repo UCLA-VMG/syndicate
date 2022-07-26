@@ -96,7 +96,7 @@ void VimbaCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
             {
                 // create filename
                 string idx = to_string(imageCnt);
-                string file = rootPath + sensorName + idx + file_ext;
+                string file = rootPath + sensorName + std::string("_") + idx + file_ext;
                 const char* pFileName = file.c_str();
                 // save bitmap
                 if (VmbErrorSuccess == res)
@@ -176,7 +176,7 @@ void VimbaCamera::AcquireSaveBarrier(double seconds, boost::barrier& frameBarrie
     for (unsigned int imageCnt = 0; imageCnt < num_frames; imageCnt++) {
         // create filename
         string idx = to_string(imageCnt);
-        string file = rootPath + sensorName + idx + file_ext;
+        string file = rootPath + sensorName + std::string("_") + idx + file_ext;
         const char* pFileName = file.c_str();
 
         // save bitmap

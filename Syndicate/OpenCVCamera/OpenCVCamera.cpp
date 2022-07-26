@@ -28,15 +28,21 @@ void OpenCVCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
         for (int i = 0; i < num_frames; i++)
         {
             cv::Mat frame;
+            cv::Mat save_frame;
             // Wait for a new frame from camera and store it into 'frame'
             cap.read(frame);
             RecordTimeStamp();
-            if(!frame.empty() ) {
-                runningBuffer.push(frame);
-            }
+            // if(!frame.empty() ) {
+            //     runningBuffer.push(frame);
+
+            save_frame = std::any_cast<cv::Mat>(frame);
+            // Create a unique filename
+            std::ostringstream filename;
+            filename << rootPath << sensorName << "_" << i << ".png";
+            imwrite(filename.str().c_str(), save_frame);
+        }
             
         }
-    }
     catch (Exception& e) {
         std::cout << "Error: " << e.what() << std::endl;
     }
@@ -45,19 +51,19 @@ void OpenCVCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
     SaveTimeStamps();
 
     start = std::chrono::steady_clock::now();
-    cv::Mat save_frame;
-    for (int i = 0; i < num_frames; i++) {
-        save_frame = std::any_cast<cv::Mat>(runningBuffer.front());
-        // Create a unique filename
-        std::ostringstream filename;
-        filename << rootPath << sensorName << "_" << i << ".png";
-        imwrite(filename.str().c_str(), save_frame);
-        runningBuffer.pop();
-        // sprintf_s(filename, filename.str().c_str()); // select your folder - filename is "Frame_n"
-        // std::cout << sensorName <<"_Frame_" << i << std::endl;
-    }
+    // cv::Mat save_frame;
+    // for (int i = 0; i < num_frames; i++) {
+    //     save_frame = std::any_cast<cv::Mat>(runningBuffer.front());
+    //     // Create a unique filename
+    //     std::ostringstream filename;
+    //     filename << rootPath << sensorName << "_" << i << ".png";
+    //     imwrite(filename.str().c_str(), save_frame);
+    //     runningBuffer.pop();
+    //     // sprintf_s(filename, filename.str().c_str()); // select your folder - filename is "Frame_n"
+    //     // std::cout << sensorName <<"_Frame_" << i << std::endl;
+    // }
     end = std::chrono::steady_clock::now();
-    std::cout <<"Time Taken for Saving " << sensorName << " " << float((end-start).count())/1'000'000'000 << "\n";
+    // std::cout <<"Time Taken for Saving " << sensorName << " " << float((end-start).count())/1'000'000'000 << "\n";
     this->setHealthCode(HealthCode::ONLINE);
 }
 

@@ -16,11 +16,19 @@
 #include "MiniDSPMic.h"
 #include "MX800.h"
 
-int main(int, char**) {
+int main(int argc, char *argv[]) {
     std::cout << "Hello, world!\n";
+
+    std::string current_exec_name = argv[0]; // Name of the current exec program
+    std::vector<std::string> all_args;
+
+    if (argc > 1) {
+        all_args.assign(argv + 1, argv + argc);
+    }
     
     //0. Set Root Path
     std::string rootPath("C:/Users/Adnan/Downloads/syndicate_test/");
+    if(all_args.size()>0){rootPath = rootPath + all_args[0] + "/";}
     bool h_sync(true);
 
     //1. Create Configurations
@@ -45,6 +53,13 @@ int main(int, char**) {
         {"FPS", 30}, 
         {"Height", 512}, {"Width", 640},
         {"Sensor Name", std::string("Thermal_Camera")},
+        {"Root Path", rootPath}
+    };
+    std::unordered_map<std::string, std::any> rgb_config = {
+        {"Camera ID", 0}, {"Camera Type", std::string("RGB")},
+        {"FPS", 30}, 
+        {"Height", 1280}, {"Width", 720},
+        {"Sensor Name", std::string("RGB")},
         {"Root Path", rootPath}
     };
     std::unordered_map<std::string, std::any> radar_config = {
@@ -77,24 +92,27 @@ int main(int, char**) {
     sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
     sensor_list.emplace_back(makeSensor<OpenCVCamera>);
     // sensor_list.emplace_back(makeSensor<RFEthernet>);
-    sensor_list.emplace_back(makeSensor<SerialPort>);
+    // sensor_list.emplace_back(makeSensor<SerialPort>);
     // std::vector<std::unordered_map<std::string, std::any>> configs{nir_config};
     // std::vector<std::unordered_map<std::string, std::any>> configs{nir_vimba_config};
     // std::vector<std::unordered_map<std::string, std::any>> configs{thermal_config};
     // std::vector<std::unordered_map<std::string, std::any>> configs{radar_config};
     // std::vector<std::unordered_map<std::string, std::any>> configs{serial_config};
-    std::vector<std::unordered_map<std::string, std::any>> configs{nir_vimba_config, nir_config, thermal_config, serial_config};
-    // std::vector<std::unordered_map<std::string, std::any>> configs{nir_vimba_config, nir_config, thermal_config, radar_config, serial_config};
+    // std::vector<std::unordered_map<std::string, std::any>> configs{nir_vimba_config, nir_config, thermal_config, serial_config};
+    // std::vector<std::unordered_map<std::string, std::any>> configs{nir_vimba_config, nir_config, thermal_config, radar_config};
+    std::vector<std::unordered_map<std::string, std::any>> configs{nir_vimba_config, nir_config, rgb_config};
+
     
     
     //3. Initialize Sensor Stack
     SensorStack mainStack(sensor_list, configs);
     
     //4. Acquire Data
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
     //4.1 Asynchronously Acquire Data
     std::cout << "\n\n\nAsyn Capture \n";
-    mainStack.Acquire(10);
+    mainStack.Acquire(20);
 
     // 4.2 Barrier Sync Acquire Data
     // std::cout << "\n\n\n Barrier Sync Capture\n";
