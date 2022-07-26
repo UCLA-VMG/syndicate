@@ -16,5 +16,7 @@ add_subdirectory(SimpleSensor)
 add_subdirectory(RFEthernet)
 add_subdirectory(MiniDSPMic)
 add_subdirectory(MX800)
+add_subdirectory(SerialPort)
+add_subdirectory(VimbaCamera)
 
-target_link_libraries (syndicate SimpleSensor SpinnakerCamera OpenCVCamera RFEthernet MiniDSPMic MX800)
+target_link_libraries (syndicate SimpleSensor SpinnakerCamera VimbaCamera OpenCVCamera RFEthernet MiniDSPMic MX800 SerialPort)

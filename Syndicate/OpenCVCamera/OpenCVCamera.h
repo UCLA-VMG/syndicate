@@ -37,7 +37,6 @@ struct OpenCVCamera : public Syndicate::Camera
 
     int cameraID;
     cv::VideoCapture cap;
-    cv::Mat frame;
     // string filename;
     // double fps;
     // double height;
