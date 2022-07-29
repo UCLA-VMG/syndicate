@@ -54,7 +54,9 @@ VimbaCamera::VimbaCamera(std::unordered_map<std::string, std::any>& sample_confi
 VimbaCamera::~VimbaCamera()
 {
     // Deinitialize camera
+    std::cout << "hi";
     m_system.Shutdown();
+    std::cout << "hi";
 }
 
 //================================================ Acquire and Save Functions ======================================

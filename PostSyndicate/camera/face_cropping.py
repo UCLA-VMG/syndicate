@@ -10,6 +10,8 @@ import os
 import matplotlib.pyplot as plt
 import torch
 
+from utils import get_video
+
 class Single_Face_Cropper:
     def __init__(self):
         device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -39,6 +41,10 @@ class Single_Face_Cropper:
         elif image.shape[2] != 3:
             raise Exception("Image must have 1 or 3 channels")
 
+        # plt.figure()
+        # plt.imshow(image)
+        # plt.show()
+        # print(np.max(image), np.min(image), image.dtype)
         face = self.mtcnn.detect(image)
 
         center = {
@@ -74,7 +80,7 @@ class Single_Face_Cropper:
 
 
 
-    def crop_video(self, source, destination="", evaluation_freq=-1, height=128, width=128, format=""):
+    def crop_video(self, video_input, destination="", evaluation_freq=-1, height=128, width=128, format=""):
         # Inputs:
         #     source: a path to a video
         #     destination: path to send the video too
@@ -82,10 +88,14 @@ class Single_Face_Cropper:
         #     hieght/width: dimensions of output video
         # Returns:
         #     cropped video as an array
-        cap = cv.VideoCapture(source)
-        frame_num = int(cap.get(cv.CAP_PROP_FRAME_COUNT))
+        
+        # cap = cv.VideoCapture(source)
+        # frame_num = int(cap.get(cv.CAP_PROP_FRAME_COUNT))
 
-        ret, frame = cap.read()
+        # ret, frame = cap.read()
+
+        frame = video_input[0]
+        frame_num = video_input.shape[0]
 
         if(len(frame.shape) == 3):
             channels=frame.shape[2]
@@ -108,7 +118,7 @@ class Single_Face_Cropper:
                 _, box, _ = self.crop_image_array(frame, ratio=width/height)
                 since_last_mtcnn = 0
             since_last_mtcnn += 1
-            ret, frame = cap.read()
+            frame = video_input[i]
 
             cropped = frame[box["y_top"]:box["y_bottom"], box["x_left"]:box["x_right"]]
             video[i] = cv.resize(cropped, (width, height))
@@ -123,11 +133,32 @@ class Single_Face_Cropper:
 
 
 
+if __name__ == "__main__":
+    det = Single_Face_Cropper()
+    source = r'D:\syndicate_tests\d1\NIR_Vimba_Camera'
+    destination = r'D:\syndicate_tests\d1\NIR_Vimba_Camera'
 
+    # video_input = get_video(source, file_type=".bmp")
+    # print(video_input.shape)
+    # det.crop_video(video_input=video_input, destination=destination, evaluation_freq=-1)
 
-det = Single_Face_Cropper()
-cap = cv.VideoCapture('D:\mmhealth_volunteer_data/vid.avi')
-source = 'D:\mmhealth_volunteer_data/vid.avi'
-destination = 'D:\mmhealth_volunteer_data/vid_cropped'
+    min_id = 11
+    max_id = 11
+    prefix_id = 'r'
 
-det.crop_video(source=source, destination=destination, evaluation_freq=100)
+    for i in range(min_id, max_id+1):
+        print(i)
+
+        source0 = os.path.join("D:\syndicate_tests", prefix_id+str(i), "RGB")
+        video_input0 = get_video(source0, file_type=".bmp")
+        det.crop_video(video_input=video_input0, destination=source0, evaluation_freq=-1)
+
+        source1 = os.path.join("D:\syndicate_tests", prefix_id+str(i), "NIR_Camera")
+        video_input1 = get_video(source1, file_type=".bmp")
+        det.crop_video(video_input=video_input1, destination=source1, evaluation_freq=-1)
+
+        source2 = os.path.join("D:\syndicate_tests", prefix_id+str(i), "NIR_Vimba_Camera")
+        video_input2 = get_video(source2, file_type=".bmp")
+        det.crop_video(video_input=video_input2, destination=source2, evaluation_freq=-1)
+        
+

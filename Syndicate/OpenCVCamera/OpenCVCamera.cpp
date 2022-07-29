@@ -7,7 +7,7 @@ OpenCVCamera::OpenCVCamera(std::unordered_map<std::string, std::any>& sample_con
 {
     std::cout << "opencv Camera Cstr\n";
     //--- OPEN CAP
-    cap.open(0, cv::CAP_ANY);
+    cap.open(0, cv::CAP_DSHOW);
     if(!cap.isOpened())
     {
         std::cerr << "ERROR! Unable to open camera\n";
@@ -16,15 +16,15 @@ OpenCVCamera::OpenCVCamera(std::unordered_map<std::string, std::any>& sample_con
     // Print true, that is ok, default expected behavior.
     std::cout << "CAP_PROP_CONVERT_RGB: " << cap.get(cv::CAP_PROP_CONVERT_RGB) << std::endl; 
 
-    cap.set(cv::CAP_PROP_FRAME_WIDTH, 320);
-    cap.set(cv::CAP_PROP_FRAME_HEIGHT, 256);
+    cap.set(cv::CAP_PROP_FRAME_WIDTH, std::any_cast<int>(sample_config["Width"]));
+    cap.set(cv::CAP_PROP_FRAME_HEIGHT, std::any_cast<int>(sample_config["Height"]));
 
-    cap.set(cv::CAP_PROP_CONVERT_RGB, false);
-    cap.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('Y', '1', '6', ' '));
+    // cap.set(cv::CAP_PROP_CONVERT_RGB, false);
+    // cap.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('Y', '1', '6', ' '));
     std::cout << "hi\n";
     // cap.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('Y','1','6',' '));
     // cap.set(cv::CAP_PROP_CONVERT_RGB, 0);
-    setBitDepth(cap, std::any_cast<int>(sample_config["Bit Depth"]));
+    // setBitDepth(cap, std::any_cast<int>(sample_config["Bit Depth"]));
 }
 
 OpenCVCamera::~OpenCVCamera()
@@ -43,47 +43,42 @@ void OpenCVCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
     double height = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
 
     startBarrier.wait();
-    try {
-        for (int i = 0; i < num_frames; i++)
-        {
-            cv::Mat frame;
-            cv::Mat save_frame;
-            // Wait for a new frame from camera and store it into 'frame'
-            cv::Mat frame(height, width, CV_16U);
-            std::cout << type2str(frame.type()) << " ";
-            cap.read(frame);
-            RecordTimeStamp();
-            // if(!frame.empty() ) {
-            //     runningBuffer.push(frame);
+    for (int i = 0; i < num_frames; i++)
+    {
+        cv::Mat frame;
+        cv::Mat save_frame;
+        // Wait for a new frame from camera and store it into 'frame'
+        // cv::Mat frame(height, width, CV_16U); #TODO
+        std::cout << type2str(frame.type()) << " ";
+        cap.read(frame);
+        RecordTimeStamp();
+        // if(!frame.empty() ) {
+        //     runningBuffer.push(frame);
+        // }
 
-            save_frame = std::any_cast<cv::Mat>(frame);
-            // Create a unique filename
-            std::ostringstream filename;
-            filename << rootPath << sensorName << "_" << i << ".png";
-            imwrite(filename.str().c_str(), save_frame);
-        }
-            
-        }
-    catch (Exception& e) {
-        std::cout << "Error: " << e.what() << std::endl;
+        save_frame = std::any_cast<cv::Mat>(frame);
+        // Create a unique filename
+        std::ostringstream filename;
+        filename << rootPath << sensorName << "_" << i << ".bmp";
+        imwrite(filename.str().c_str(), save_frame);
     }
     auto end = std::chrono::steady_clock::now();
     std::cout << "Time Taken for " << sensorName  << " " << float((end-start).count())/1'000'000'000 << "\n";
     SaveTimeStamps();
 
-    start = std::chrono::steady_clock::now();
+    // start = std::chrono::steady_clock::now();
     // cv::Mat save_frame;
     // for (int i = 0; i < num_frames; i++) {
     //     save_frame = std::any_cast<cv::Mat>(runningBuffer.front());
     //     // Create a unique filename
     //     std::ostringstream filename;
-    //     filename << rootPath << sensorName << "_" << i << ".png";
+    //     filename << rootPath << sensorName << "_" << i << ".bmp";
     //     imwrite(filename.str().c_str(), save_frame);
     //     runningBuffer.pop();
     //     // sprintf_s(filename, filename.str().c_str()); // select your folder - filename is "Frame_n"
     //     // std::cout << sensorName <<"_Frame_" << i << std::endl;
     // }
-    end = std::chrono::steady_clock::now();
+    // end = std::chrono::steady_clock::now();
     // std::cout <<"Time Taken for Saving " << sensorName << " " << float((end-start).count())/1'000'000'000 << "\n";
     this->setHealthCode(HealthCode::ONLINE);
 }
@@ -120,7 +115,6 @@ void OpenCVCamera::AcquireSaveBarrier(double seconds, boost::barrier& frameBarri
     try {
         for (int i = 0; i < num_frames; i++)
         {
-            cv::Mat frame;
             frameBarrier.wait();
             // wait for a new frame from camera and store it into 'frame'
             cv::Mat frame;
@@ -213,7 +207,6 @@ bool OpenCVCamera::AcquireImages(cv::VideoCapture cap, int num_frames) {
     try {
         for (int i = 0; i < num_frames; i++)
         {
-            cv::Mat frame;
             // wait for a new frame from camera and store it into 'frame'
             cv::Mat frame;
             cap.read(frame);
