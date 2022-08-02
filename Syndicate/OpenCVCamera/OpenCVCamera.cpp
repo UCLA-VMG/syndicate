@@ -38,7 +38,7 @@ void OpenCVCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
     int num_frames(int(seconds)*int(fps));
     std::cout << std::endl << std::endl << "*** IMAGE ACQUISITION ***" << std::endl << std::endl;
     auto start = std::chrono::steady_clock::now();
-
+    cap.set(cv::CAP_PROP_FPS, 30);
     double width = cap.get(cv::CAP_PROP_FRAME_WIDTH);
     double height = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
 

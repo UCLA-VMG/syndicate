@@ -112,17 +112,17 @@ int main(int argc, char *argv[]) {
     // sensor_list.emplace_back(makeSensor<SimpleSensor>);
     // sensor_list.emplace_back(makeSensor<SimpleSensor>);
     sensor_list.emplace_back(makeSensor<OpenCVCamera>);
-    sensor_list.emplace_back(makeSensor<VimbaCamera>);
-    sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    // sensor_list.emplace_back(makeSensor<VimbaCamera>);
+    // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
     //sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
    //sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
     // sensor_list.emplace_back(makeSensor<MiniDSPMic>);
     // sensor_list.emplace_back(makeSensor<RealSenseCamera>);
     //sensor_list.emplace_back(makeSensor<RFEthernet>);
-    sensor_list.emplace_back(makeSensor<MX800>);
+    // sensor_list.emplace_back(makeSensor<MX800>);
 
-    // std::vector<std::unordered_map<std::string, std::any>> configs{nir_vimba_config, nir_config, mx800_config};
-    std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_vimba_config, nir_config, mx800_config};
+    std::vector<std::unordered_map<std::string, std::any>> configs{thermal_config};
+    // std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_vimba_config, nir_config, mx800_config};
     // std::vector<std::unordered_map<std::string, std::any>> configs{polarized_config};
     //std::vector<std::unordered_map<std::string, std::any>> configs{nir_config, polarized_config, mic_config};
     // std::vector<std::unordered_map<std::string, std::any>> configs{mic_config , real_sense_sr300_config, radar_config, mx800_config};
@@ -156,7 +156,7 @@ int main(int argc, char *argv[]) {
 
     //4.1 Asynchronously Acquire Data
     std::cout << "\n\n\nAsyn Capture \n";
-    mainStack.Acquire(45);
+    mainStack.Acquire(10);
 
 
     // 4.2 Barrier Sync Acquire Data
