@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
     }
 
     std::cout << rootPath << std::endl << std::endl; 
-    bool h_sync(false);
+    bool h_sync(true);
 
     //1. Create Configurations
     std::unordered_map<std::string, std::any> nir_config = {
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
         {"Height", 2048}, {"Width", 2448},
         {"Sensor Name", std::string("Polarized_Camera")},
         {"Root Path", rootPath}, {"Pixel Format", std::string("Mono")},
-        {"Hardware Sync", h_sync}, {"Primary", false}
+        {"Hardware Sync", h_sync}, {"Primary", true}
     };
     std::unordered_map<std::string, std::any> thermal_config = {
         {"Camera ID", 0}, {"Camera Type", std::string("Boson")},
@@ -111,17 +111,17 @@ int main(int argc, char *argv[]) {
     std::vector<std::unique_ptr<Sensor>(*)(std::unordered_map<std::string, std::any>&)> sensor_list;
     // sensor_list.emplace_back(makeSensor<SimpleSensor>);
     // sensor_list.emplace_back(makeSensor<SimpleSensor>);
-    sensor_list.emplace_back(makeSensor<OpenCVCamera>);
+    // sensor_list.emplace_back(makeSensor<OpenCVCamera>);
     // sensor_list.emplace_back(makeSensor<VimbaCamera>);
-    // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
     //sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
    //sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
     // sensor_list.emplace_back(makeSensor<MiniDSPMic>);
     // sensor_list.emplace_back(makeSensor<RealSenseCamera>);
-    //sensor_list.emplace_back(makeSensor<RFEthernet>);
+    sensor_list.emplace_back(makeSensor<RFEthernet>);
     // sensor_list.emplace_back(makeSensor<MX800>);
 
-    std::vector<std::unordered_map<std::string, std::any>> configs{thermal_config};
+    std::vector<std::unordered_map<std::string, std::any>> configs{polarized_config, radar_config};
     // std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_vimba_config, nir_config, mx800_config};
     // std::vector<std::unordered_map<std::string, std::any>> configs{polarized_config};
     //std::vector<std::unordered_map<std::string, std::any>> configs{nir_config, polarized_config, mic_config};

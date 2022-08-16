@@ -12,7 +12,7 @@
 
 struct MX800 : public Sensor
 {
-    MX800(std::unordered_map<std::string, std::any>& sample_config);
+    MX800(ptree::value_type& tree, std::string& savePath);
     ~MX800();
 
     void AcquireSave(double seconds, boost::barrier& startBarrier);

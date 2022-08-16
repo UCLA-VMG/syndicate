@@ -1,7 +1,7 @@
 #include "MX800.h"
 
-MX800::MX800(std::unordered_map<std::string, std::any>& sample_config)
-    : Sensor(sample_config), exe_path(std::any_cast<std::string>(sample_config["Exe Path"])),
+MX800::MX800(ptree::value_type& tree, std::string& savePath)
+    : Sensor(tree, savePath), exe_path(tree.second.get<std::string>("exe_path")),
     child_process_executable(exe_path, boost::process::std_out > _out, boost::process::std_in < _in),
     list_of_files({
                     "NOM_ECG_ELEC_POTL_AVRWaveExport.csv",

@@ -15,6 +15,12 @@
 #include <boost/bind.hpp>
 #include <boost/atomic.hpp>
 #include <boost/thread/mutex.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
+#include <boost/foreach.hpp>
+
+using boost::property_tree::ptree;
+
 
 enum HealthCode
 {
@@ -74,7 +80,7 @@ struct Sensor
     std::ofstream logFile;
 
     //-------- General Functions -------------------------------------------------------
-    Sensor(std::unordered_map<std::string, std::any>& sample_config);
+    Sensor(ptree::value_type& tree, std::string& savePath);
 
     Sensor(int buffer_size);
 
@@ -108,7 +114,7 @@ struct Sensor
 };
 
 template<class T>
-std::unique_ptr<Sensor> makeSensor(std::unordered_map<std::string, std::any>& sample_config)
+std::unique_ptr<Sensor> makeSensor(ptree::value_type& tree, std::string& savePath)
 {
-    return std::make_unique<T>(sample_config);
+    return std::make_unique<T>(tree, savePath);
 }
