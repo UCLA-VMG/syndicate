@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
     std::cout << "Hello, world!\n";
     
     //0. Set Root Path
-    std::string rootPath("D:/syndicate_tests");
+    std::string rootPath("D:/BP_RF_CAM");
     if (argc > 1){
         rootPath = rootPath + std::string("/") + std::string(argv[1]) + std::string("/");
     }
@@ -111,17 +111,17 @@ int main(int argc, char *argv[]) {
     std::vector<std::unique_ptr<Sensor>(*)(std::unordered_map<std::string, std::any>&)> sensor_list;
     // sensor_list.emplace_back(makeSensor<SimpleSensor>);
     // sensor_list.emplace_back(makeSensor<SimpleSensor>);
-    sensor_list.emplace_back(makeSensor<OpenCVCamera>);
+    // sensor_list.emplace_back(makeSensor<OpenCVCamera>);
     // sensor_list.emplace_back(makeSensor<VimbaCamera>);
-    // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
     //sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
    //sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
     // sensor_list.emplace_back(makeSensor<MiniDSPMic>);
     // sensor_list.emplace_back(makeSensor<RealSenseCamera>);
-    //sensor_list.emplace_back(makeSensor<RFEthernet>);
-    // sensor_list.emplace_back(makeSensor<MX800>);
+    sensor_list.emplace_back(makeSensor<RFEthernet>);
+    sensor_list.emplace_back(makeSensor<MX800>);
 
-    std::vector<std::unordered_map<std::string, std::any>> configs{thermal_config};
+    std::vector<std::unordered_map<std::string, std::any>> configs{polarized_config, radar_config, mx800_config};
     // std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_vimba_config, nir_config, mx800_config};
     // std::vector<std::unordered_map<std::string, std::any>> configs{polarized_config};
     //std::vector<std::unordered_map<std::string, std::any>> configs{nir_config, polarized_config, mic_config};
@@ -156,7 +156,7 @@ int main(int argc, char *argv[]) {
 
     //4.1 Asynchronously Acquire Data
     std::cout << "\n\n\nAsyn Capture \n";
-    mainStack.Acquire(10);
+    mainStack.Acquire(60);
 
 
     // 4.2 Barrier Sync Acquire Data
