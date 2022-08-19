@@ -14,7 +14,7 @@ from datetime import datetime
 
 import pickle 
 
-from mx800_config import mx800_MPDataExport
+from PostSyndicate.mx800.mx800_config import mx800_MPDataExport
 
 def extract_data(input_filepath, vital_sign):
     file = open(input_filepath, 'r', encoding='utf-8-sig')
@@ -51,6 +51,31 @@ def extract_data(input_filepath, vital_sign):
             data.append(float(stamp_list[j][col_idx]))
         except:
             data.append(-1)
+    #Code for interpolating unknown values that were zeroed 
+    zero_flag = 0
+    start_flag = 0
+    start, start_idx, finish, finish_idx = 0,0,0,0
+    for i in range(len(data)):
+        if(data[i] == -1 and zero_flag==0):
+            start = data[i-1]
+            start_idx = i 
+            zero_flag = 1
+        if(data[i] != -1 and zero_flag==1):
+            delta_step = (data[i]-start)/(i+1-start_idx)
+            for j in range(start_idx, i):
+                data[j] = start + delta_step*(j+1-start_idx)
+            zero_flag = 0
+        if(data[i] == -1 and zero_flag==0 and i == 0):
+            start_flag = 1
+        if(data[i] != -1 and zero_flag==1 and start_flag):
+            for j in range(0, i):
+                data[j] = data[i]
+            start_flag = 0
+    if(zero_flag == 1):
+        for j in range(start_idx, len(data)):
+            data[j] = start
+
+        
 
     return mx_stamps, sys_stamps, data
   

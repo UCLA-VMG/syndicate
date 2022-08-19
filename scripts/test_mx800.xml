@@ -3,7 +3,7 @@
 <sensor_stack>
     
     <settings>
-        <save_path>D:/syndicate_tests</save_path>
+        <save_path>D:/syndicate_tests/</save_path>
     </settings>
 
     <sensor>
@@ -11,6 +11,18 @@
         <type>mx800</type>
         <exe_path>C:/Users/111/Desktop/repos/mmhealth_2/sensors/VSCaptureMP-master-copy/VSCaptureMP/VSCaptureMP/bin/Debug/VSCaptureMP.exe</exe_path>
         <level>5</level>
+    </sensor>
+
+    <sensor>
+        <name>Polarized Cam</name>
+        <type>flir</type>
+        <fps>30</fps>
+        <height>2048</height>
+        <width>2448</width>
+        <pixel_format>Mono</pixel_format>
+        <hardware_sync>1</hardware_sync>
+        <primary>1</primary>
+        <camera_id>19224369</camera_id>
     </sensor>
 
 </sensor_stack>

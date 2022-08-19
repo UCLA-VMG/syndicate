@@ -1,7 +1,7 @@
 #include "RFEthernet.h"
 
-RFEthernet::RFEthernet(std::unordered_map<std::string, std::any>& sample_config)
-    : Sensor(sample_config), _timeout(std::any_cast<int>(sample_config["Timeout"]))
+RFEthernet::RFEthernet(ptree::value_type& tree, std::string& savePath)
+    : Sensor(tree, savePath), _timeout(tree.second.get<int>("timeout"))
 {
 	int interface_id;
 	int total_interfaces=0;

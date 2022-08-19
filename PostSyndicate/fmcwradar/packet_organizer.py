@@ -1,6 +1,6 @@
 import numpy as np
 import struct
-from pcapreader import PcapReader
+from PostSyndicate.fmcwradar.pcapreader import PcapReader
 
 
 MAX_PACKET_SIZE = 4096

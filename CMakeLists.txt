@@ -36,7 +36,7 @@ find_package(Npcap REQUIRED)
 # set(OpenCV_DIR ${CMAKE_SOURCE_DIR}/build)
 # message(STATUS "${OpenCV_DIR}")
 find_package(OpenCV REQUIRED)
-find_library(WINDOWS_SDK Strmiids.lib) #required for Dshow functionality
+# find_library(WINDOWS_SDK Strmiids.lib) #required for Dshow functionality
 # find_package(realsense2 REQUIRED)
 
 # set(Boost_USE_STATIC_LIBS ON)
@@ -67,7 +67,7 @@ add_subdirectory(Syndicate)
 set (LIBS ${Spinnaker_LIBRARIES} ${VimbaCPP_LIBRARIES} ${VimbaC_LIBRARIES} ${VimbaImageTransform_LIBRARIES} ${Boost_LIBRARIES} ${Npcap_LIBRARIES} ${OpenCV_LIBRARIES} ${WINDOWS_SDK} realsense2::realsense2 syndicate )
 
 #Generate Execs
-add_executable(capture ${PROJECT_SOURCE_DIR}/scripts/main.cpp)
+# add_executable(capture ${PROJECT_SOURCE_DIR}/scripts/main.cpp)
 add_executable(capture_config ${PROJECT_SOURCE_DIR}/scripts/main_config.cpp)
 add_executable(config_test  ${PROJECT_SOURCE_DIR}/scripts/test_config.cpp)
 # add_executable(dshow_test ${PROJECT_SOURCE_DIR}/scripts/dshow_test.cpp)
@@ -82,7 +82,7 @@ target_link_libraries(capture_config ${LIBS})
 
 #Targets
 ADD_CUSTOM_TARGET(build_all)
-ADD_DEPENDENCIES(build_all config_test capture_config)
+ADD_DEPENDENCIES(build_all capture_config config_test)
 
 #Library Linking
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

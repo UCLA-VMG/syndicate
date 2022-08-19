@@ -1,10 +1,11 @@
+#include <WinSock2.h>
 #include <sensor.h>
 // #include "simpleSensor.h"
-// #include "SpinnakerCamera.h"
+#include "SpinnakerCamera.h"
 // #include "VimbaCamera.h"
 // #include "SerialPort.h"
 // #include "OpenCVCamera.h"
-// #include "RFEthernet.h"
+#include "RFEthernet.h"
 // #include "MiniDSPMic.h"
 #include "MX800.h"
 // #include "RealSenseCamera.h"

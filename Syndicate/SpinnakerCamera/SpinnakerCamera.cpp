@@ -7,10 +7,10 @@ using namespace std;
 
 using namespace Syndicate;
 
-SpinnakerCamera::SpinnakerCamera(std::unordered_map<std::string, std::any>& sample_config)
-    : Syndicate::Camera(sample_config), 
-    cameraID(std::any_cast<std::string>(sample_config["Camera ID"])),
-    pixelFormat(std::any_cast<std::string>(sample_config["Pixel Format"]))
+SpinnakerCamera::SpinnakerCamera(ptree::value_type& tree, std::string& savePath)
+    : Syndicate::Camera(tree, savePath), 
+    cameraID(tree.second.get<std::string>("camera_id")),
+    pixelFormat(tree.second.get<std::string>("pixel_format"))
 {
     // Retrieve singleton reference to system object
     system = System::GetInstance();

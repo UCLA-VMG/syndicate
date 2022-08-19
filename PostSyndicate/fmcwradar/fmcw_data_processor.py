@@ -1,8 +1,8 @@
-from pcapreader import PcapReader
+from PostSyndicate.fmcwradar.pcapreader import PcapReader
 import numpy as np 
 import struct
 import matplotlib.pyplot as plt
-import packet_organizer as po
+import PostSyndicate.fmcwradar.packet_organizer as po
 
 class Fmcw_Data_Processor:
 
@@ -10,11 +10,11 @@ class Fmcw_Data_Processor:
         orgi = po.Organizer(path, radar_config=radar_config)
         self.data = orgi.organize()
 
-        range_bins = np.fft.fft(self.data, axis=3)
-        self.range_doppler = np.fft.fft(range_bins, axis=1)
+        self.range_bins = np.fft.fft(self.data, axis=3)
+        self.range_doppler = np.fft.fft(self.range_bins, axis=1)
 
         angle_granularity = 128
-        padding = ((0,0), (0,0), (0,angle_granularity-range_bins.shape[2]), (0,0))
+        padding = ((0,0), (0,0), (0,angle_granularity-self.range_bins.shape[2]), (0,0))
         self.theta_bins=np.fft.fft( np.pad(self.range_doppler, padding), axis=2)
 
     def get_data(self):

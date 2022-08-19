@@ -1,5 +1,5 @@
 #pragma once
-
+#include <WinSock2.h>
 #include "camera.h"
 #include "Spinnaker.h"
 #include "SpinGenApi/SpinnakerGenApi.h"
@@ -15,7 +15,7 @@
 
 struct SpinnakerCamera : public Syndicate::Camera 
 {
-    SpinnakerCamera(std::unordered_map<std::string, std::any>& sample_config);
+    SpinnakerCamera(ptree::value_type& tree, std::string& savePath);
     ~SpinnakerCamera();
 
     void AcquireSave(double seconds, boost::barrier& startBarrier);

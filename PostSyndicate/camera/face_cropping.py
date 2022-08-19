@@ -10,7 +10,7 @@ import os
 import matplotlib.pyplot as plt
 import torch
 
-from utils import get_video
+from PostSyndicate.camera.utils import get_video
 
 class Single_Face_Cropper:
     def __init__(self):
@@ -135,30 +135,25 @@ class Single_Face_Cropper:
 
 if __name__ == "__main__":
     det = Single_Face_Cropper()
-    source = r'D:\syndicate_tests\d1\NIR_Vimba_Camera'
-    destination = r'D:\syndicate_tests\d1\NIR_Vimba_Camera'
+    source = r'D:\BP_RF_CAM'
 
-    # video_input = get_video(source, file_type=".bmp")
-    # print(video_input.shape)
-    # det.crop_video(video_input=video_input, destination=destination, evaluation_freq=-1)
-
-    min_id = 11
-    max_id = 11
-    prefix_id = 'r'
+    min_id = 1
+    max_id = 20
+    prefix_id = ''
 
     for i in range(min_id, max_id+1):
         print(i)
 
-        source0 = os.path.join("D:\syndicate_tests", prefix_id+str(i), "RGB")
+        source0 = os.path.join(source, prefix_id+str(i), "Polarized_Camera")
         video_input0 = get_video(source0, file_type=".bmp")
         det.crop_video(video_input=video_input0, destination=source0, evaluation_freq=-1)
 
-        source1 = os.path.join("D:\syndicate_tests", prefix_id+str(i), "NIR_Camera")
-        video_input1 = get_video(source1, file_type=".bmp")
-        det.crop_video(video_input=video_input1, destination=source1, evaluation_freq=-1)
+        # source1 = os.path.join("D:\syndicate_tests", prefix_id+str(i), "NIR_Camera")
+        # video_input1 = get_video(source1, file_type=".bmp")
+        # det.crop_video(video_input=video_input1, destination=source1, evaluation_freq=-1)
 
-        source2 = os.path.join("D:\syndicate_tests", prefix_id+str(i), "NIR_Vimba_Camera")
-        video_input2 = get_video(source2, file_type=".bmp")
-        det.crop_video(video_input=video_input2, destination=source2, evaluation_freq=-1)
+        # source2 = os.path.join("D:\syndicate_tests", prefix_id+str(i), "NIR_Vimba_Camera")
+        # video_input2 = get_video(source2, file_type=".bmp")
+        # det.crop_video(video_input=video_input2, destination=source2, evaluation_freq=-1)
         
 
