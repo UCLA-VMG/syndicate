@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
     //0. Set Root Path
     // std::string rootPath_C("C:/Users/Adnan/Downloads/patient_3/");
     // std::string rootPath_D("D:/patient_3/");
-    std::string rootPath_E("E:/patient_5/");
+    std::string rootPath_E("E:/patient_6/");
     // if(all_args.size()>0){rootPath_C = rootPath_C + all_args[0] + "/";}
     // if(all_args.size()>0){rootPath_D = rootPath_D + all_args[0] + "/";}
     if(all_args.size()>0){rootPath_E = rootPath_E + all_args[0] + "/";}
@@ -119,7 +119,6 @@ int main(int argc, char *argv[]) {
     sensor_list.emplace_back(makeSensor<SerialPort>);
 
     std::vector<std::unordered_map<std::string, std::any>> configs{nir_config, nir_config_mm, thermal_config, radar_config, serial_config};
-
     
     //3. Initialize Sensor Stack
     SensorStack mainStack(sensor_list, configs);
@@ -129,7 +128,7 @@ int main(int argc, char *argv[]) {
 
     //4.1 Asynchronously Acquire Data
     std::cout << "\n\n\nAsyn Capture \n";
-    mainStack.Acquire(18000); // 10,800 [3 hrs] & 14,400 [4 hrs] & 21,600 [6 hrs]
+    mainStack.Acquire(21600); // 10,800 [3 hrs] & 14,400 [4 hrs] & 21,600 [6 hrs]
 
     // 4.2 Barrier Sync Acquire Data
     // std::cout << "\n\n\n Barrier Sync Capture\n";

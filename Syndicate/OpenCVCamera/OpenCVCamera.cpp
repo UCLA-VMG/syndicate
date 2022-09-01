@@ -20,7 +20,8 @@ OpenCVCamera::~OpenCVCamera()
 
 void OpenCVCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
 {
-    int num_frames(int(seconds)*int(fps));
+    int num_frames(int(seconds)*int(fps)*2);
+    // int num_frames(int(seconds)*int(fps));
     std::cout << std::endl << std::endl << "*** IMAGE ACQUISITION ***" << std::endl << std::endl;
     auto start = std::chrono::steady_clock::now();
     startBarrier.wait();
@@ -31,16 +32,24 @@ void OpenCVCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
             cv::Mat save_frame;
             // Wait for a new frame from camera and store it into 'frame'
             cap.read(frame);
-            RecordTimeStamp();
-            // if(!frame.empty() ) {
-            //     runningBuffer.push(frame);
+            
+            if (i % 2 == 0) {
+                RecordTimeStamp();
+                save_frame = std::any_cast<cv::Mat>(frame);
+                // Create a unique filename
+                std::ostringstream filename;
+                filename << rootPath << sensorName << "_" << int(i/2) << ".tiff";
+                std::vector<int> tags = {TIFFTAG_COMPRESSION, COMPRESSION_NONE};
+                imwrite(filename.str().c_str(), save_frame,tags);
+            }
 
-            save_frame = std::any_cast<cv::Mat>(frame);
-            // Create a unique filename
-            std::ostringstream filename;
-            filename << rootPath << sensorName << "_" << i << ".tiff";
-            std::vector<int> tags = {TIFFTAG_COMPRESSION, COMPRESSION_NONE};
-            imwrite(filename.str().c_str(), save_frame,tags);
+            // RecordTimeStamp();
+            // save_frame = std::any_cast<cv::Mat>(frame);
+            // // Create a unique filename
+            // std::ostringstream filename;
+            // filename << rootPath << sensorName << "_" << i << ".tiff";
+            // std::vector<int> tags = {TIFFTAG_COMPRESSION, COMPRESSION_NONE};
+            // imwrite(filename.str().c_str(), save_frame,tags);
         }
             
         }
@@ -70,7 +79,7 @@ void OpenCVCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
 
 void OpenCVCamera::AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier)
 {
-    int num_frames(int(seconds)*int(fps)*2);
+    int num_frames(int(seconds)*int(fps));
     char filename[100];
     std::cout << std::endl << std::endl << "*** IMAGE ACQUISITION ***" << std::endl << std::endl;
     auto start = std::chrono::steady_clock::now();
@@ -223,6 +232,11 @@ VideoCapture OpenCVCamera::openCap(int cameraID) {
     cap.set(CAP_PROP_FRAME_HEIGHT, 512);
     std::cout << "Height after using video.set(CAP_PROP_FRAME_HEIGHT) : " << cap.get(CAP_PROP_FRAME_HEIGHT) << std::endl;
 
+    // // Doesn't work because boson does not support setting FPS via OpenCV, and by default is set to 60 fps
+    // // therefore to get 30 fps, simply discard every other frame @ 60 fps
+    // cap.set(CAP_PROP_FPS, 30 );
+    // std::cout << "FPS after using video.set(CAP_PROP_FPS) : " << cap.get(CAP_PROP_FPS) << std::endl;
+
     cap.set(CAP_PROP_CONVERT_RGB, FALSE);
     std::cout << "CAP_PROP_CONVERT_RGB : " << cap.get(CAP_PROP_CONVERT_RGB) << std::endl;
 
@@ -231,9 +245,7 @@ VideoCapture OpenCVCamera::openCap(int cameraID) {
     std::string fourcc_str = format("%c%c%c%c", fourcc & 255, (fourcc >> 8) & 255, (fourcc >> 16) & 255, (fourcc >> 24) & 255);
     std::cout << "CAP_PROP_FOURCC: " << fourcc_str << std::endl;
 
-    // double fps_try = 30;
-    // cap.set(CAP_PROP_FPS, fps_try );
-    // std::cout << "FPS after using video.set(CAP_PROP_FPS) : " << cap.get(CAP_PROP_FPS) << std::endl;
+    
 
     return cap;
 }
