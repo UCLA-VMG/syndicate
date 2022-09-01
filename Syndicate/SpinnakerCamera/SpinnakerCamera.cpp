@@ -25,10 +25,13 @@ SpinnakerCamera::SpinnakerCamera(std::unordered_map<std::string, std::any>& samp
     INodeMap& nodeMap = flir_cam->GetNodeMap();
     INodeMap& nodeMapTLDevice = flir_cam->GetTLDeviceNodeMap();
 
+    int height_bin = std::any_cast<int>(sample_config["Vertical Bin"]);
+    int width_bin = std::any_cast<int>(sample_config["Horizontal Bin"]);
+
     // Configure camera with specified fps/height/width
     try {
         std::cout << "I am the " << sensorName << "\n";
-        if (!configure(flir_cam, nodeMap, fps, height, width, cameraType)) {
+        if (!configure(flir_cam, nodeMap, fps, height, width, height_bin, width_bin, cameraType)) {
             std::cout << "Camera configuration for device " << cameraID << " unsuccessful, aborting...";
         }
     }
@@ -399,6 +402,37 @@ bool setResolution(INodeMap& nodeMap, int height, int width) {
     return result;
 }
 
+bool setBinning(INodeMap& nodeMap, int height_bin, int width_bin) {
+    bool result = true;
+    try {
+        // Set height_bin
+        CIntegerPtr ptrHeightBin = nodeMap.GetNode("BinningVertical");
+        if(!IsWritable(ptrHeightBin->GetAccessMode()) || !IsReadable(ptrHeightBin->GetAccessMode()) || ptrHeightBin->GetInc() == 0 || ptrHeightBin->GetMax() == 0) {
+            std::cout << "Unable to read or write to Binning Vertical. Aborting..." << endl;
+            return false;
+        }
+        ptrHeightBin->SetValue(height_bin);
+        int heightBinToSet = static_cast<int>(ptrHeightBin->GetValue());
+        std::cout << "Height: " << heightBinToSet << endl << endl;
+
+        // Set width_bin
+        CIntegerPtr ptrWidthBin = nodeMap.GetNode("BinningHorizontal");
+        if(!IsWritable(ptrWidthBin->GetAccessMode()) || !IsReadable(ptrWidthBin->GetAccessMode()) || ptrWidthBin->GetInc() == 0 || ptrWidthBin->GetMax() == 0) {
+            std::cout << "Unable to read or write to Binning Horizontal. Aborting..." << endl;
+            return false;
+        }
+        ptrWidthBin->SetValue(width_bin);
+        int widthBinToSet = static_cast<int>(ptrWidthBin->GetValue());
+        std::cout << "Width: " << widthBinToSet << endl << endl;
+    }
+    catch (Exception& e) {
+        std::cout << "Error configuring resolution: " << e.what() << endl;
+        result = false;
+    }
+    return result;
+}
+
+
 bool setFps(INodeMap& nodeMap, float fps) {
     bool result = true;
 
@@ -478,7 +512,7 @@ bool setContinuousAcquisitionMode(INodeMap& nodeMap) {
     return result;
 }
 
-bool configure(CameraPtr pCam, INodeMap& nodeMap, float fps = 30.0, int height = 640, int width = 640, std::string cameraType = "None") {
+bool configure(CameraPtr pCam, INodeMap& nodeMap, float fps = 30.0, int height = 2048, int width = 2048, int height_bin = 2, int width_bin = 2, std::string cameraType = "None") {
     bool result = true;
     try {
         // Get the device serial number
@@ -495,7 +529,12 @@ bool configure(CameraPtr pCam, INodeMap& nodeMap, float fps = 30.0, int height =
             return false;
         }
         // set resolution
+
         if (!setResolution(nodeMap, height, width)) {
+            return false;
+        }
+        // set binning
+        if (!setBinning(nodeMap, height_bin, width_bin)) {
             return false;
         }
     }

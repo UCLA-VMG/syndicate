@@ -38,8 +38,9 @@ void OpenCVCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
             save_frame = std::any_cast<cv::Mat>(frame);
             // Create a unique filename
             std::ostringstream filename;
-            filename << rootPath << sensorName << "_" << i << ".png";
-            imwrite(filename.str().c_str(), save_frame);
+            filename << rootPath << sensorName << "_" << i << ".tiff";
+            std::vector<int> tags = {TIFFTAG_COMPRESSION, COMPRESSION_NONE};
+            imwrite(filename.str().c_str(), save_frame,tags);
         }
             
         }
@@ -69,7 +70,7 @@ void OpenCVCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
 
 void OpenCVCamera::AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier)
 {
-    int num_frames(int(seconds)*int(fps));
+    int num_frames(int(seconds)*int(fps)*2);
     char filename[100];
     std::cout << std::endl << std::endl << "*** IMAGE ACQUISITION ***" << std::endl << std::endl;
     auto start = std::chrono::steady_clock::now();
@@ -96,7 +97,7 @@ void OpenCVCamera::AcquireSaveBarrier(double seconds, boost::barrier& frameBarri
     std::cout << "Time Taken for " << sensorName << (end-start).count() << "\n";
 }
 
-bool setResolution(VideoCapture cap, double width, double height) {
+bool setResolution(VideoCapture cap, double width = 640, double height = 512) {
     bool result = true;
     try {
         cap.set(CAP_PROP_FRAME_WIDTH, width);
@@ -124,7 +125,7 @@ bool setFps(VideoCapture cap, double fps) {
     return result;
 }
 
-bool configure(VideoCapture cap, int cameraID, double fps = 30.0, double height = 640, double width = 640) {
+bool configure(VideoCapture cap, int cameraID, double fps = 30.0, double height = 512, double width = 640) {
     bool result = true;
     try {
         // Print the device serial number
@@ -136,6 +137,7 @@ bool configure(VideoCapture cap, int cameraID, double fps = 30.0, double height 
         }
         // set resolution
         if (!setResolution(cap, height, width)) {
+            std::cout << "Couldn't set resolution to height " << height << " and width " << width << std::endl;
             return false;
         }
     }
@@ -207,13 +209,32 @@ VideoCapture OpenCVCamera::openCap(int cameraID) {
     // open the default camera using default API
     // cap.open(0);
     // // OR advance usage: select any API backend 
-    int apiID = cv::CAP_ANY;      // 0 = autodetect default API
+    int apiID = cv::CAP_DSHOW;      // 0 = autodetect default API
                                   // open selected camera using selected API
     cap.open(cameraID + apiID);
     // check if we succeeded
     if (!cap.isOpened()) {
         std::cerr << "ERROR! Unable to open camera\n";
     }
+
+    cap.set(CAP_PROP_FRAME_WIDTH, 640);
+    std::cout << "Width after using video.set(CAP_PROP_FRAME_WIDTH) : " << cap.get(CAP_PROP_FRAME_WIDTH) << std::endl;
+    
+    cap.set(CAP_PROP_FRAME_HEIGHT, 512);
+    std::cout << "Height after using video.set(CAP_PROP_FRAME_HEIGHT) : " << cap.get(CAP_PROP_FRAME_HEIGHT) << std::endl;
+
+    cap.set(CAP_PROP_CONVERT_RGB, FALSE);
+    std::cout << "CAP_PROP_CONVERT_RGB : " << cap.get(CAP_PROP_CONVERT_RGB) << std::endl;
+
+    cap.set(CAP_PROP_FOURCC, cv::VideoWriter::fourcc('Y','1','6',' '));
+    int fourcc = cap.get(CAP_PROP_FOURCC);
+    std::string fourcc_str = format("%c%c%c%c", fourcc & 255, (fourcc >> 8) & 255, (fourcc >> 16) & 255, (fourcc >> 24) & 255);
+    std::cout << "CAP_PROP_FOURCC: " << fourcc_str << std::endl;
+
+    // double fps_try = 30;
+    // cap.set(CAP_PROP_FPS, fps_try );
+    // std::cout << "FPS after using video.set(CAP_PROP_FPS) : " << cap.get(CAP_PROP_FPS) << std::endl;
+
     return cap;
 }
 

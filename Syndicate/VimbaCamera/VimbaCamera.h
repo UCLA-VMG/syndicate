@@ -39,6 +39,10 @@ struct VimbaCamera : public Syndicate::Camera
     VmbErrorType setPixelFormatMono8(AVT::VmbAPI::CameraPtr m_pCamera);
     VmbErrorType setContinuousAcquisitonMode(AVT::VmbAPI::CameraPtr m_pCamera);
     VmbErrorType setFps(AVT::VmbAPI::CameraPtr m_pCamera, double fps);
+    VmbErrorType setHorizontalBinningMethod(AVT::VmbAPI::CameraPtr m_pCamera);
+    VmbErrorType setVerticalBinningMethod(AVT::VmbAPI::CameraPtr m_pCamera);
+    VmbErrorType setHorizontalBinningValue(AVT::VmbAPI::CameraPtr m_pCamera, int binning_value);
+    VmbErrorType setVerticalBinningValue(AVT::VmbAPI::CameraPtr m_pCamera, int binning_value);
     VmbErrorType setHeight(AVT::VmbAPI::CameraPtr m_pCamera, int height);
     VmbErrorType setWidth(AVT::VmbAPI::CameraPtr m_pCamera, int width);
     VmbErrorType setExposure(AVT::VmbAPI::CameraPtr m_pCamera, double exposure_time_abs);

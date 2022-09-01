@@ -7,6 +7,11 @@
 #include <windows.h>
 #include <ctime>
 
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <tiff.h>
+#include <tiffio.h>
+
 #include <chrono>
 #include <thread>
 #include <string>

@@ -348,6 +348,63 @@ VmbErrorType VimbaCamera::setFps(CameraPtr m_pCamera, double fps)
    return res;
 }
 
+VmbErrorType VimbaCamera::setHorizontalBinningMethod(CameraPtr m_pCamera)
+{
+   // Try to set Height
+   FeaturePtr pFormatFeature;
+   VmbErrorType res = m_pCamera->GetFeatureByName("BinningHorizontalMode", pFormatFeature);
+   if (VmbErrorSuccess == res)
+   {
+       
+       res = pFormatFeature->SetValue("Average");
+    //    pFormatFeature->GetValue(height); // this should be continuous
+   }
+   return res;
+}
+
+VmbErrorType VimbaCamera::setVerticalBinningMethod(CameraPtr m_pCamera)
+{
+   // Try to set Height
+   FeaturePtr pFormatFeature;
+   VmbErrorType res = m_pCamera->GetFeatureByName("BinningVerticalMode", pFormatFeature);
+   if (VmbErrorSuccess == res)
+   {
+       
+       res = pFormatFeature->SetValue("Average");
+    //    pFormatFeature->GetValue(height); // this should be continuous
+   }
+   return res;
+}
+
+VmbErrorType VimbaCamera::setHorizontalBinningValue(CameraPtr m_pCamera, int binning_value)
+{
+   // Try to set binning_value
+   FeaturePtr pFormatFeature;
+   VmbErrorType res = m_pCamera->GetFeatureByName("BinningHorizontal", pFormatFeature);
+   if (VmbErrorSuccess == res)
+   {
+       
+       res = pFormatFeature->SetValue(binning_value);
+    //    pFormatFeature->GetValue(binning_value); // this should be continuous
+   }
+   return res;
+}
+
+VmbErrorType VimbaCamera::setVerticalBinningValue(CameraPtr m_pCamera, int binning_value)
+{
+   // Try to set binning_value
+   FeaturePtr pFormatFeature;
+   VmbErrorType res = m_pCamera->GetFeatureByName("BinningVertical", pFormatFeature);
+   if (VmbErrorSuccess == res)
+   {
+       
+       res = pFormatFeature->SetValue(binning_value);
+    //    pFormatFeature->GetValue(binning_value); // this should be continuous
+   }
+   return res;
+}
+
+
 VmbErrorType VimbaCamera::setHeight(CameraPtr m_pCamera, int height)
 {
    // Try to set Height
@@ -589,6 +646,31 @@ bool VimbaCamera::AcquireImages(CameraPtr m_pCamera, const int num_frames)
     return result;
 }
 
+// VmbErrorType VimbaCamera::configure(CameraPtr m_pCamera, double fps, int height, int width) {
+//     VmbErrorType err = this->VimbaCamera::setPixelFormatMono8(m_pCamera);
+//     if (VmbErrorSuccess == err)
+//     {
+//         err = setFps(m_pCamera, fps);
+//         if (VmbErrorSuccess == err)
+//         {
+//             err = setHeight(m_pCamera, height);
+//             if (VmbErrorSuccess == err)
+//             {
+//                 err = setWidth(m_pCamera, width);
+//                 if (VmbErrorSuccess == err)
+//                 {
+//                     err = setExposure(m_pCamera, 33000.0);
+//                     if (VmbErrorSuccess == err)
+//                     {
+//                         err = setGamma(m_pCamera, 0.45);
+//                     }
+//                 }
+//             }
+//         }
+//     }
+//     return err;
+// }
+
 VmbErrorType VimbaCamera::configure(CameraPtr m_pCamera, double fps, int height, int width) {
     VmbErrorType err = this->VimbaCamera::setPixelFormatMono8(m_pCamera);
     if (VmbErrorSuccess == err)
@@ -596,16 +678,24 @@ VmbErrorType VimbaCamera::configure(CameraPtr m_pCamera, double fps, int height,
         err = setFps(m_pCamera, fps);
         if (VmbErrorSuccess == err)
         {
-            err = setHeight(m_pCamera, height);
+            err = setHorizontalBinningMethod(m_pCamera);
             if (VmbErrorSuccess == err)
             {
-                err = setWidth(m_pCamera, width);
+                err = setVerticalBinningMethod(m_pCamera);
                 if (VmbErrorSuccess == err)
                 {
-                    err = setExposure(m_pCamera, 33000.0);
+                    err = setHorizontalBinningValue(m_pCamera, 4);
                     if (VmbErrorSuccess == err)
                     {
-                        err = setGamma(m_pCamera, 0.45);
+                        err = setVerticalBinningValue(m_pCamera, 4);
+                        if (VmbErrorSuccess == err)
+                        {
+                            err = setExposure(m_pCamera, 33000.0);
+                            if (VmbErrorSuccess == err)
+                            {
+                                err = setGamma(m_pCamera, 0.45);
+                            }
+                        }
                     }
                 }
             }

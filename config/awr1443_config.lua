@@ -22,7 +22,7 @@ os.execute("sleep 10")
 -------- SET THESE CONSTANTS PLEASE --------
 -- "C:\ti\mmwave_studio_02_01_01_00\rf_eval_firmware\radarss\xwr12xx_xwr14xx_radarss.bin"
 -- "C:\ti\mmwave_studio_02_01_01_00\rf_eval_firmware\masterss\xwr12xx_xwr14xx_masterss.bin"
-COM_PORT = 5
+COM_PORT = 9
 RADARSS_PATH = "C:\\ti\\mmwave_studio_02_01_01_00\\rf_eval_firmware\\radarss\\xwr12xx_xwr14xx_radarss.bin"
 MASTERSS_PATH = "C:\\ti\\mmwave_studio_02_01_01_00\\rf_eval_firmware\\masterss\\xwr12xx_xwr14xx_masterss.bin"
 -- SAVE_DATA_PATH = "C:\\ti\\mmwave_studio_02_00_00_02\\mmWaveStudio\\PostProc\\adc_data.bin"
