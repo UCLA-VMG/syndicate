@@ -93,7 +93,7 @@ def timestamp_process(ts):
 
         return temp
 
-def interpolate_timestamp(vital_sign_dictionary, vid_ts, offset = 25/30):
+def interpolate_timestamp(vital_sign_dictionary, vid_ts, offset = 25/30, visualize=False):
         #constucting arrays for the data
         vital_interpolated_dict = {}
         for key in vital_sign_dictionary.keys():
@@ -128,9 +128,20 @@ def interpolate_timestamp(vital_sign_dictionary, vid_ts, offset = 25/30):
             output = np.array(reinterp_data)
             vital_interpolated_dict[key] = output
 
-            if(unroll_flag):
+        if(visualize != False):
+            if(isinstance(visualize, str)):
                 plt.figure()
-                plt.plot(output)
+                plt.plot(vital_interpolated_dict[visualize])
+                plt.title(visualize)
+                plt.show()
+            elif hasattr(visualize, '__iter__'):
+                for i in visualize:
+                    plt.figure()
+                    plt.plot(vital_interpolated_dict[i])
+                    plt.title(i)
+                    plt.show()
+            else:
+                print("failed to visualize.")
         
         # plt.show()
 
@@ -154,7 +165,7 @@ def aslist(value, flatten=True):
         result.extend(subvalues)
     return result
 
-def get_interpolated_vital_dict(vital_dict_path, timestamp_path, save_folder_path, offset = 25/30):
+def get_interpolated_vital_dict(vital_dict_path, timestamp_path, save_folder_path, offset = 25/30, visualize=False):
     
     fileObj = open(os.path.join(vital_dict_path), 'rb')
     vital_dict = pickle.load(fileObj)
@@ -162,7 +173,7 @@ def get_interpolated_vital_dict(vital_dict_path, timestamp_path, save_folder_pat
 
     vid_ts = extract_timestamps(timestamp_path)
 
-    interpolated_vital_dict = interpolate_timestamp(vital_dict, vid_ts, offset)
+    interpolated_vital_dict = interpolate_timestamp(vital_dict, vid_ts, offset, visualize=visualize)
     if(save_folder_path is not None):
         save_path = os.path.join(save_folder_path, "vital_interpolated_dictionary.pkl")
         filehandler = open(save_path, 'wb') 
