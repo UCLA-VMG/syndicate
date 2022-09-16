@@ -314,8 +314,7 @@ std::string GetDeviceSerial(Spinnaker::CameraPtr pCam) {
 
 bool setPrimary(INodeMap& nodeMap, std::string& cameraName)
 {
-    if(cameraName == "BackflyS")
-    {
+    if(cameraName == "BackflyS") {
         std::cout << "***********\n";
         CEnumerationPtr ptrLine = nodeMap.GetNode("LineSelector");
         CEnumEntryPtr ptrLine1 = ptrLine->GetEntryByName("Line1");
@@ -331,11 +330,21 @@ bool setPrimary(INodeMap& nodeMap, std::string& cameraName)
         CBooleanPtr ptr3_3V = nodeMap.GetNode("V3_3Enable");
         ptr3_3V->SetValue(true);
         std::cout << "****done*******\n";
+        return true;
+    }
+    else if (cameraName == "Grasshopper3") {
+        std::cout << "***********\n";
+        CEnumerationPtr ptrLine = nodeMap.GetNode("LineSelector");
+        CEnumEntryPtr ptrLine1 = ptrLine->GetEntryByName("Line2");
+        ptrLine->SetIntValue(ptrLine1->GetValue());
 
+        CEnumerationPtr ptrLineMode = nodeMap.GetNode("LineMode");
+        CEnumEntryPtr ptrLineModeVal = ptrLineMode->GetEntryByName("Output");
+        ptrLineMode->SetIntValue(ptrLineModeVal->GetValue());
 
-
-
-
+        CEnumerationPtr ptrLineMode = nodeMap.GetNode("LineSource");
+        CEnumEntryPtr ptrLineModeVal = ptrLineMode->GetEntryByName("ExposureActive");
+        ptrLineMode->SetIntValue(ptrLineModeVal->GetValue());
         return true;
     }
     else
@@ -367,8 +376,6 @@ bool setSecondary(INodeMap& nodeMap)
     CEnumEntryPtr ptrTriggerOverlapReadOut = ptrTriggerOverlap->GetEntryByName("ReadOut");
     ptrTriggerOverlap->SetIntValue(ptrTriggerOverlapReadOut->GetValue());
     std::cout << "Setting sec 2\n";
-
-
     return true;
 }
 
@@ -509,6 +516,171 @@ bool setContinuousAcquisitionMode(INodeMap& nodeMap) {
         std::cout << "Error configuring fps: " << e.what() << endl;
         result = false;
     }
+    return result;
+}
+
+// bool setExposureCompensationAuto(INodeMap& nodeMap) {
+//     bool result = true;
+//     try {
+//         // Set acquisition mode to continuous
+//         CEnumerationPtr ptrExposureCompensationAuto = nodeMap.GetNode("ExposureCompensationAuto");
+//         if (!IsWritable(ptrExposureCompensationAuto)) {
+//             std::cout << "Unable to set acquisition mode to continuous (node retrieval). Aborting..." << endl << endl;
+//             return false;
+//         }
+//         CEnumEntryPtr ptrExposureCompensationAutoOff = ptrExposureCompensationAuto->GetEntryByName("Off");
+//         if (!IsReadable(ptrExposureCompensationAutoOff)) {
+//             std::cout << "Unable to set acquisition mode to continuous (enum entry retrieval). Aborting..." << endl << endl;
+//             return false;
+//         }
+//         // const int64_t acquisitionModeContinuous = ptrExposureCompensationAutoOff->GetValue();
+//         ptrExposureCompensationAuto->SetIntValue(ptrExposureCompensationAutoOff->GetValue());
+//         std::cout << "ptrExposureCompensationAuto: "<< ptrExposureCompensationAuto->GetEntryByName("Off") << endl;
+//     }
+//     catch (Exception& e) {
+//         std::cout << "Error configuring exposure continuous auto: " << e.what() << endl;
+//         result = false;
+//     }
+//     return result;
+// }
+
+bool setExposureCompensation(INodeMap& nodeMap, double exposure_compensation) {
+    bool result = true;
+
+    CFloatPtr ptrExposureCompensation = nodeMap.GetNode("ExposureCompensation");
+    double exposureCompensationToSet = exposure_compensation;
+
+    try {
+
+        try {
+            // Set ExposureCompensationAuto_node to false
+            CEnumerationPtr ptrExposureCompensationAuto = nodeMap.GetNode("ExposureCompensationAuto");
+            CEnumEntryPtr ptrExposureCompensationAutoOff = ptrExposureCompensationAuto->GetEntryByName("Off");
+            // ptrExposureCompensationAuto->SetIntValue(ptrExposureCompensationAutoOff->GetValue());
+            ptrExposureCompensationAuto->SetIntValue(static_cast<int64_t>(ptrExposureCompensationAutoOff->GetValue()));
+        }
+        catch (Exception& e) {std::cout << "ExposureCompensationAuto Unable to Turn off. \n";}
+
+        // Set Exposure Compensation
+        CFloatPtr ptrExposureCompensation = nodeMap.GetNode("ExposureCompensation");
+        if(!IsWritable(ptrExposureCompensation->GetAccessMode()) || !IsReadable(ptrExposureCompensation->GetAccessMode()) ) {
+            cout << "Unable to set Exposure Compensation. Aborting..." << endl << endl;
+            return false;
+        }
+        ptrExposureCompensation->SetValue(exposureCompensationToSet);
+        double exposureCompensationToSet = static_cast<double>(ptrExposureCompensation->GetValue());
+        cout << "Frame rate to be set to " << exposureCompensationToSet << "..." << endl;
+    }
+    catch (Exception& e) {
+        cout << "Error configuring fps: " << e.what() << endl;
+        result = false;
+    }
+
+    ptrExposureCompensation = nodeMap.GetNode("ExposureCompensation");
+    exposureCompensationToSet = static_cast<double>(ptrExposureCompensation->GetValue());
+    cout << "Something -  " << exposureCompensationToSet << "..." << endl;
+
+    return result;
+}
+
+bool setExposureMode(INodeMap& nodeMap) {
+    bool result = true;
+    try {
+        // Set acquisition mode to continuous
+        CEnumerationPtr ptrExposureMode = nodeMap.GetNode("ExposureMode");
+        if (!IsWritable(ptrExposureMode)) {
+            std::cout << "Unable to set acquisition mode to continuous (node retrieval). Aborting..." << endl << endl;
+            return false;
+        }
+        CEnumEntryPtr ptrExposureModeTimed = ptrExposureMode->GetEntryByName("Timed");
+        if (!IsReadable(ptrExposureModeTimed)) {
+            std::cout << "Unable to set acquisition mode to continuous (enum entry retrieval). Aborting..." << endl << endl;
+            return false;
+        }
+        // const int64_t acquisitionModeContinuous = ptrExposureModeTimed->GetValue();
+        ptrExposureMode->SetIntValue(ptrExposureModeTimed->GetValue());
+        std::cout << "ptrExposureMode: "<< ptrExposureMode->GetEntryByName("Timed") << endl;
+    }
+    catch (Exception& e) {
+        std::cout << "Error configuring exposure continuous auto: " << e.what() << endl;
+        result = false;
+    }
+    return result;
+}
+
+bool setExposureTime(INodeMap& nodeMap, double exposure) {
+    bool result = true;
+
+    CFloatPtr ptrExposureTime = nodeMap.GetNode("ExposureTime");
+    double exposureTimeToSet = exposure;
+
+    try {
+
+        try {
+            // Set ExposureAuto_node to false
+            CEnumerationPtr ptrExposureAuto = nodeMap.GetNode("ExposureAuto");
+            CEnumEntryPtr ptrExposureAutoOff = ptrExposureAuto->GetEntryByName("Off");
+            ptrExposureAuto->SetIntValue(static_cast<int64_t>(ptrExposureAutoOff->GetValue()));
+        }
+        catch (Exception& e) {std::cout << "ExposureAuto Unable to Turn off. \n";}
+
+        // Set Exposure Time
+        CFloatPtr ptrExposureTime = nodeMap.GetNode("ExposureTime");
+        if(!IsWritable(ptrExposureTime->GetAccessMode()) || !IsReadable(ptrExposureTime->GetAccessMode()) ) {
+            cout << "Unable to set Exposure Time. Aborting..." << endl << endl;
+            return false;
+        }
+        ptrExposureTime->SetValue(exposureTimeToSet);
+        double exposureTimeToSet = static_cast<double>(ptrExposureTime->GetValue());
+        cout << "Frame rate to be set to " << exposureTimeToSet << "..." << endl;
+    }
+    catch (Exception& e) {
+        cout << "Error configuring fps: " << e.what() << endl;
+        result = false;
+    }
+
+    ptrExposureTime = nodeMap.GetNode("ExposureTime");
+    exposureTimeToSet = static_cast<double>(ptrExposureTime->GetValue());
+    cout << "Something -  " << exposureTimeToSet << "..." << endl;
+
+    return result;
+}
+
+bool setGain(INodeMap& nodeMap, double gain) {
+    bool result = true;
+
+    CFloatPtr ptrGain = nodeMap.GetNode("Gain");
+    double gainToSet = gain;
+
+    try {
+
+        try {
+            // Set ExposureAuto_node to false
+            CEnumerationPtr ptrGainAuto = nodeMap.GetNode("GainAuto");
+            CEnumEntryPtr ptrGainAutoOff = ptrGainAuto->GetEntryByName("Off");
+            ptrGainAuto->SetIntValue(static_cast<int64_t>(ptrGainAutoOff->GetValue()));
+        }
+        catch (Exception& e) {std::cout << "GainAuto Unable to Turn off. \n";}
+
+        // Set Exposure Time
+        CFloatPtr ptrGain = nodeMap.GetNode("Gain");
+        if(!IsWritable(ptrGain->GetAccessMode()) || !IsReadable(ptrGain->GetAccessMode()) ) {
+            cout << "Unable to set Exposure Time. Aborting..." << endl << endl;
+            return false;
+        }
+        ptrGain->SetValue(gainToSet);
+        double gainToSet = static_cast<double>(ptrGain->GetValue());
+        cout << "Frame rate to be set to " << gainToSet << "..." << endl;
+    }
+    catch (Exception& e) {
+        cout << "Error configuring fps: " << e.what() << endl;
+        result = false;
+    }
+
+    ptrGain = nodeMap.GetNode("Gain");
+    gainToSet = static_cast<double>(ptrGain->GetValue());
+    cout << "Something -  " << gainToSet << "..." << endl;
+
     return result;
 }
 
