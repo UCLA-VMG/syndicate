@@ -109,7 +109,7 @@ ar1.ChirpConfig(0, 0, 0, 0, 0, 0, 0, 1, 0, 0)
 ar1.ChirpConfig(1, 1, 0, 0, 0, 0, 0, 0, 1, 0)
 ar1.ChirpConfig(2, 2, 0, 0, 0, 0, 0, 0, 0, 1)
 -- ar1.FrameConfig(START_CHIRP_TX, END_CHIRP_TX, NUM_FRAMES, CHIRP_LOOPS, PERIODICITY, 0, 0, 1)
-ar1.FrameConfig(0, 2, 0, 1, 1000, 0, 0, 1)
+ar1.FrameConfig(0, 2, 0, 1, 33, 0, 0, 1)
 -------------------------------------
 
 -------- ETHERNET STUFF --------
