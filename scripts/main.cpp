@@ -108,7 +108,6 @@ int main(int argc, char *argv[]) {
         {"Root Path", rootPath_E}
     };
 
-
     // std::unordered_map<std::string, std::any> thermal_config = {
     //     {"Camera ID", 0}, {"Camera Type", std::string("Boson")},
     //     {"FPS", 30}, 
