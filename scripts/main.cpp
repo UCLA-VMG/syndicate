@@ -51,6 +51,10 @@ int main(int argc, char *argv[]) {
         {"Sensor Name", std::string("NIR_Camera")},
         {"Root Path", rootPath_E}, {"Pixel Format", std::string("Mono")},
         {"Vertical Bin", 2}, {"Horizontal Bin", 2}, // 1024 x 1024
+        {"Exposure Compensation", 0.08},
+        {"Exposure Time", 30000.0},
+        {"Gain", 3.29},
+        {"Black Level", 5.57}
         // {"Hardware Sync", h_sync}, {"Primary", false}
     };
     std::unordered_map<std::string, std::any> nir_config_mm = { // 850 nm
@@ -60,6 +64,10 @@ int main(int argc, char *argv[]) {
         {"Sensor Name", std::string("NIR_Camera_mm")},
         {"Root Path", rootPath_E}, {"Pixel Format", std::string("Mono")},
         {"Vertical Bin", 2}, {"Horizontal Bin", 2}, // 1024 x 1024
+        {"Exposure Compensation", 0.09},
+        {"Exposure Time", 30000.0},
+        {"Gain", 1.8},
+        {"Black Level", 5.08}
         // {"Hardware Sync", h_sync}, {"Primary", false}
     };
     std::unordered_map<std::string, std::any> thermal_config = {

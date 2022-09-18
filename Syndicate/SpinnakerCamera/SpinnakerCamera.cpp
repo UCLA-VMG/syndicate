@@ -10,7 +10,19 @@ using namespace Syndicate;
 SpinnakerCamera::SpinnakerCamera(std::unordered_map<std::string, std::any>& sample_config)
     : Syndicate::Camera(sample_config), 
     cameraID(std::any_cast<std::string>(sample_config["Camera ID"])),
-    pixelFormat(std::any_cast<std::string>(sample_config["Pixel Format"]))
+    cameraType(std::any_cast<std::string>(sample_config["Camera Type"])),
+    
+    fps(std::any_cast<double>(sample_config["FPS"])),
+    height(std::any_cast<int>(sample_config["Height"])),
+    width(std::any_cast<int>(sample_config["Width"])),
+    pixelFormat(std::any_cast<std::string>(sample_config["Pixel Format"])),
+    
+    height_bin(std::any_cast<int>(sample_config["Vertical Bin"])),
+    width_bin(std::any_cast<int>(sample_config["Horizontal Bin"])),
+    exposure_compensation(std::any_cast<double>(sample_config["Exposure Compensation"])),
+    exposure_time(std::any_cast<double>(sample_config["Exposure Time"])),
+    gain(std::any_cast<double>(sample_config["Gain"])),
+    black_level(std::any_cast<double>(sample_config["Black Level"]))
 {
     // Retrieve singleton reference to system object
     system = System::GetInstance();
@@ -25,13 +37,10 @@ SpinnakerCamera::SpinnakerCamera(std::unordered_map<std::string, std::any>& samp
     INodeMap& nodeMap = flir_cam->GetNodeMap();
     INodeMap& nodeMapTLDevice = flir_cam->GetTLDeviceNodeMap();
 
-    int height_bin = std::any_cast<int>(sample_config["Vertical Bin"]);
-    int width_bin = std::any_cast<int>(sample_config["Horizontal Bin"]);
-
     // Configure camera with specified fps/height/width
     try {
         std::cout << "I am the " << sensorName << "\n";
-        if (!configure(flir_cam, nodeMap, fps, height, width, height_bin, width_bin, cameraType)) {
+        if (!configure(flir_cam, nodeMap, cameraType, fps, height, width, pixelFormat, height_bin, width_bin, exposure_compensation, exposure_time, gain, black_level)) {
             std::cout << "Camera configuration for device " << cameraID << " unsuccessful, aborting...";
         }
     }
@@ -403,7 +412,7 @@ bool setResolution(INodeMap& nodeMap, int height, int width) {
         std::cout << "Width: " << widthToSet << endl << endl;
     }
     catch (Exception& e) {
-        std::cout << "Error configuring resolution: " << e.what() << endl;
+        std::cout << "Error Configuring resolution: " << e.what() << endl;
         result = false;
     }
     return result;
@@ -420,7 +429,7 @@ bool setBinning(INodeMap& nodeMap, int height_bin, int width_bin) {
         }
         ptrHeightBin->SetValue(height_bin);
         int heightBinToSet = static_cast<int>(ptrHeightBin->GetValue());
-        std::cout << "Height: " << heightBinToSet << endl << endl;
+        std::cout << "Bin Height: " << heightBinToSet << endl << endl;
 
         // Set width_bin
         CIntegerPtr ptrWidthBin = nodeMap.GetNode("BinningHorizontal");
@@ -430,66 +439,63 @@ bool setBinning(INodeMap& nodeMap, int height_bin, int width_bin) {
         }
         ptrWidthBin->SetValue(width_bin);
         int widthBinToSet = static_cast<int>(ptrWidthBin->GetValue());
-        std::cout << "Width: " << widthBinToSet << endl << endl;
+        std::cout << "Bin Width: " << widthBinToSet << endl << endl;
     }
     catch (Exception& e) {
-        std::cout << "Error configuring resolution: " << e.what() << endl;
+        std::cout << "Error Configuring Bining: " << e.what() << endl;
         result = false;
     }
     return result;
 }
 
-
 bool setFps(INodeMap& nodeMap, float fps) {
+    // Set Default Result Value = True
     bool result = true;
-
-    CFloatPtr acquisition_frame_rate = nodeMap.GetNode("AcquisitionFrameRate");
-    float frameRateToSet = static_cast<float>(acquisition_frame_rate->GetValue());
-    cout << "Something -  " << frameRateToSet << "..." << endl;
-
+    // Get Ptr to Node Acquisition Frame Rate to Check Prev Value
+    CFloatPtr ptrAcquisitionFrameRate = nodeMap.GetNode("AcquisitionFrameRate");
+    double frameRateToSet = static_cast<double>(ptrAcquisitionFrameRate->GetValue());
+    cout << "Prev FPS: " << frameRateToSet << endl;
+    // Try Setting Acquisition Frame Rate
     try {
-
         try {
-            // Set frame_rate_auto_node to false
-            CEnumerationPtr frame_rate_auto_node = nodeMap.GetNode("AcquisitionFrameRateAuto");
-            CEnumEntryPtr node_frame_rate_auto_off = frame_rate_auto_node->GetEntryByName("Off");
+            // Set AcquisitionFrameRateAuto to false
+            CEnumerationPtr ptrAcquisitionFrameRateAuto = nodeMap.GetNode("AcquisitionFrameRateAuto");
+            CEnumEntryPtr node_frame_rate_auto_off = ptrAcquisitionFrameRateAuto->GetEntryByName("Off");
             const int64_t frame_rate_auto_off = node_frame_rate_auto_off->GetValue();
-            frame_rate_auto_node->SetIntValue(frame_rate_auto_off);
+            ptrAcquisitionFrameRateAuto->SetIntValue(frame_rate_auto_off);
         }
-        catch (Exception& e) {std::cout << "AcquisitionFrameRateAuto Unable to Turn off. \n";}
-
-        // Set frame_rate_enable to true
-        CBooleanPtr enable_rate_mode = nodeMap.GetNode("AcquisitionFrameRateEnable");
-        if (!IsWritable(enable_rate_mode)) {
-            cout << "enable_rate_mode not writable. Aborting..." << endl << endl;
+        catch (Exception& e) {std::cout << "Unable to Change Acquisition Frame Rate Auto to Off. \n";}
+        // Set AcquisitionFrameRateEnable to true
+        CBooleanPtr ptrAcquisitionFrameRateEnable = nodeMap.GetNode("AcquisitionFrameRateEnable");
+        if (!IsWritable(ptrAcquisitionFrameRateEnable)) {
+            cout << "ptrAcquisitionFrameRateEnable not writable. Aborting..." << endl << endl;
             // return false;
         }
         try {
-            enable_rate_mode->SetValue(true);
+            ptrAcquisitionFrameRateEnable->SetValue(true);
         }
         catch(Exception& e) {
             std::cerr << e.what() << '\n'; // "Could not enable frame rate: {0}".format(ex)
         }
-        // CBooleanPtr acquisition_frame_rate_enable = nodeMap.GetNode("AcquisitionFrameRateEnable");
-
-        // Set fps
-        CFloatPtr acquisition_frame_rate = nodeMap.GetNode("AcquisitionFrameRate");
-        if(!IsWritable(acquisition_frame_rate->GetAccessMode()) || !IsReadable(acquisition_frame_rate->GetAccessMode()) ) {
-            cout << "Unable to set Frame Rate. Aborting..." << endl << endl;
+        // If AcquisitionFrameRate is Readable and Writable ...
+        CFloatPtr ptrAcquisitionFrameRate = nodeMap.GetNode("AcquisitionFrameRate");
+        if(!IsWritable(ptrAcquisitionFrameRate->GetAccessMode()) || !IsReadable(ptrAcquisitionFrameRate->GetAccessMode()) ) {
+            cout << "Unable to set FPS. Aborting..." << endl << endl;
             return false;
         }
-        acquisition_frame_rate->SetValue(fps);
-        float frameRateToSet = static_cast<float>(acquisition_frame_rate->GetValue());
-        cout << "Frame rate to be set to " << frameRateToSet << "..." << endl;
+        // ... Set FPS
+        ptrAcquisitionFrameRate->SetValue(fps);
+        double frameRateToSet = static_cast<double>(ptrAcquisitionFrameRate->GetValue());
+        cout << "FPS to be set to " << frameRateToSet << "..." << endl;
     }
     catch (Exception& e) {
-        cout << "Error configuring fps: " << e.what() << endl;
+        cout << "Error Configuring FPS: " << e.what() << endl;
         result = false;
     }
-
-    acquisition_frame_rate = nodeMap.GetNode("AcquisitionFrameRate");
-    frameRateToSet = static_cast<float>(acquisition_frame_rate->GetValue());
-    cout << "Something -  " << frameRateToSet << "..." << endl;
+    // Get Ptr to Node Acquisition Frame Rate to Check New Value
+    ptrAcquisitionFrameRate = nodeMap.GetNode("AcquisitionFrameRate");
+    frameRateToSet = static_cast<double>(ptrAcquisitionFrameRate->GetValue());
+    cout << "New FPS: " << frameRateToSet << endl;
 
     return result;
 }
@@ -513,7 +519,7 @@ bool setContinuousAcquisitionMode(INodeMap& nodeMap) {
         std::cout << "ptrAcquisitionMode: "<< ptrAcquisitionMode->GetEntryByName("Continuous") << endl;
     }
     catch (Exception& e) {
-        std::cout << "Error configuring fps: " << e.what() << endl;
+        std::cout << "Error Configuring Acquisition Mode: " << e.what() << endl;
         result = false;
     }
     return result;
@@ -538,153 +544,258 @@ bool setContinuousAcquisitionMode(INodeMap& nodeMap) {
 //         std::cout << "ptrExposureCompensationAuto: "<< ptrExposureCompensationAuto->GetEntryByName("Off") << endl;
 //     }
 //     catch (Exception& e) {
-//         std::cout << "Error configuring exposure continuous auto: " << e.what() << endl;
+//         std::cout << "Error Configuring exposure continuous auto: " << e.what() << endl;
 //         result = false;
 //     }
 //     return result;
 // }
 
 bool setExposureCompensation(INodeMap& nodeMap, double exposure_compensation) {
+    // Set Default Result Value = True
     bool result = true;
-
+    // Get Ptr to Node Exposure Compensation to Check Prev Value
     CFloatPtr ptrExposureCompensation = nodeMap.GetNode("ExposureCompensation");
-    double exposureCompensationToSet = exposure_compensation;
-
+    double exposureCompensationToSet = static_cast<double>(ptrExposureCompensation->GetValue());
+    std::cout << "Prev Exposure Compensation: " << exposureCompensationToSet << endl;
+    // Try Setting Exposure Compensation
     try {
-
+        // Try Setting Exposure Compensation Auto to Off
         try {
-            // Set ExposureCompensationAuto_node to false
             CEnumerationPtr ptrExposureCompensationAuto = nodeMap.GetNode("ExposureCompensationAuto");
             CEnumEntryPtr ptrExposureCompensationAutoOff = ptrExposureCompensationAuto->GetEntryByName("Off");
             // ptrExposureCompensationAuto->SetIntValue(ptrExposureCompensationAutoOff->GetValue());
             ptrExposureCompensationAuto->SetIntValue(static_cast<int64_t>(ptrExposureCompensationAutoOff->GetValue()));
         }
         catch (Exception& e) {std::cout << "ExposureCompensationAuto Unable to Turn off. \n";}
-
-        // Set Exposure Compensation
+        // If ExposureCompensation is Readable and Writable ...
         CFloatPtr ptrExposureCompensation = nodeMap.GetNode("ExposureCompensation");
         if(!IsWritable(ptrExposureCompensation->GetAccessMode()) || !IsReadable(ptrExposureCompensation->GetAccessMode()) ) {
-            cout << "Unable to set Exposure Compensation. Aborting..." << endl << endl;
+            std::cout << "Unable to set Exposure Compensation. Aborting..." << endl << endl;
             return false;
         }
-        ptrExposureCompensation->SetValue(exposureCompensationToSet);
+        // ... Set Exposure Compensation
+        ptrExposureCompensation->SetValue(exposure_compensation);
         double exposureCompensationToSet = static_cast<double>(ptrExposureCompensation->GetValue());
-        cout << "Frame rate to be set to " << exposureCompensationToSet << "..." << endl;
+        std::cout << "Exposure Compensation to be set to " << exposureCompensationToSet << "..." << endl;
     }
     catch (Exception& e) {
-        cout << "Error configuring fps: " << e.what() << endl;
+        std::cout << "Error Configuring Exposure Compensation: " << e.what() << endl;
         result = false;
     }
-
+    // Get Ptr to Node Exposure Compensation to Check New Value
     ptrExposureCompensation = nodeMap.GetNode("ExposureCompensation");
     exposureCompensationToSet = static_cast<double>(ptrExposureCompensation->GetValue());
-    cout << "Something -  " << exposureCompensationToSet << "..." << endl;
+    std::cout << "New Exposure Compensation: " << exposureCompensationToSet << endl;
 
     return result;
 }
 
-bool setExposureMode(INodeMap& nodeMap) {
-    bool result = true;
-    try {
-        // Set acquisition mode to continuous
-        CEnumerationPtr ptrExposureMode = nodeMap.GetNode("ExposureMode");
-        if (!IsWritable(ptrExposureMode)) {
-            std::cout << "Unable to set acquisition mode to continuous (node retrieval). Aborting..." << endl << endl;
-            return false;
-        }
-        CEnumEntryPtr ptrExposureModeTimed = ptrExposureMode->GetEntryByName("Timed");
-        if (!IsReadable(ptrExposureModeTimed)) {
-            std::cout << "Unable to set acquisition mode to continuous (enum entry retrieval). Aborting..." << endl << endl;
-            return false;
-        }
-        // const int64_t acquisitionModeContinuous = ptrExposureModeTimed->GetValue();
-        ptrExposureMode->SetIntValue(ptrExposureModeTimed->GetValue());
-        std::cout << "ptrExposureMode: "<< ptrExposureMode->GetEntryByName("Timed") << endl;
-    }
-    catch (Exception& e) {
-        std::cout << "Error configuring exposure continuous auto: " << e.what() << endl;
-        result = false;
-    }
-    return result;
-}
+// bool setExposureMode(INodeMap& nodeMap) {
+//     bool result = true;
+//     try {
+//         // Set acquisition mode to continuous
+//         CEnumerationPtr ptrExposureMode = nodeMap.GetNode("ExposureMode");
+//         if (!IsWritable(ptrExposureMode)) {
+//             std::cout << "Unable to set acquisition mode to continuous (node retrieval). Aborting..." << endl << endl;
+//             return false;
+//         }
+//         CEnumEntryPtr ptrExposureModeTimed = ptrExposureMode->GetEntryByName("Timed");
+//         if (!IsReadable(ptrExposureModeTimed)) {
+//             std::cout << "Unable to set acquisition mode to continuous (enum entry retrieval). Aborting..." << endl << endl;
+//             return false;
+//         }
+//         // const int64_t acquisitionModeContinuous = ptrExposureModeTimed->GetValue();
+//         ptrExposureMode->SetIntValue(ptrExposureModeTimed->GetValue());
+//         std::cout << "ptrExposureMode: "<< ptrExposureMode->GetEntryByName("Timed") << endl;
+//     }
+//     catch (Exception& e) {
+//         std::cout << "Error Configuring exposure continuous auto: " << e.what() << endl;
+//         result = false;
+//     }
+//     return result;
+// }
 
-bool setExposureTime(INodeMap& nodeMap, double exposure) {
-    bool result = true;
+// bool setExposureTime(INodeMap& nodeMap, double exposure) {
+//     // Set Default Result Value = True
+//     bool result = true;
+//     // Get Ptr to Node Exposure Time to Check Prev Value
+//     CFloatPtr ptrExposureTime = nodeMap.GetNode("ExposureTime");
+//     double exposureTimeToSet = static_cast<double>(ptrExposureTime->GetValue());
+//     std::cout << "Prev Exposure Time: " << exposureTimeToSet << endl;
+//     // Try Setting Exposure Time
+//     try {
+//         try {
+//             // Try Setting Exposure Mode to Timed
+//             CEnumerationPtr ptrExposureMode = nodeMap.GetNode("ExposureMode");
+//             if (!IsWritable(ptrExposureMode)) {
+//                 std::cout << "Unable to set acquisition mode to continuous (node retrieval). Aborting..." << endl << endl;
+//                 return false;
+//             }
+//             // If ExposureCompensation is Readable and Writable ..
+//             CEnumEntryPtr ptrExposureModeTimed = ptrExposureMode->GetEntryByName("Timed");
+//             if (!IsReadable(ptrExposureModeTimed)) {
+//                 std::cout << "Unable to set acquisition mode to continuous (enum entry retrieval). Aborting..." << endl << endl;
+//                 return false;
+//             }
+//             // const int64_t acquisitionModeContinuous = ptrExposureModeTimed->GetValue();
+//             ptrExposureMode->SetIntValue(ptrExposureModeTimed->GetValue());
+//             std::cout << "ptrExposureMode: "<< ptrExposureMode->GetEntryByName("Timed") << endl;
+//         }
+//         catch (Exception& e) {
+//             std::cout << "Error Configuring exposure continuous auto: " << e.what() << endl;
+//             result = false;
+//         }
 
+//         try {
+//             // Set ExposureAuto_node to false
+//             CEnumerationPtr ptrExposureAuto = nodeMap.GetNode("ExposureAuto");
+//             CEnumEntryPtr ptrExposureAutoOff = ptrExposureAuto->GetEntryByName("Off");
+//             ptrExposureAuto->SetIntValue(static_cast<int64_t>(ptrExposureAutoOff->GetValue()));
+//         }
+//         catch (Exception& e) {std::cout << "ExposureAuto Unable to Turn off. \n";}
+
+//         // Set Exposure Time
+//         CFloatPtr ptrExposureTime = nodeMap.GetNode("ExposureTime");
+//         if(!IsWritable(ptrExposureTime->GetAccessMode()) || !IsReadable(ptrExposureTime->GetAccessMode()) ) {
+//             std::cout << "Unable to set Exposure Time. Aborting..." << endl << endl;
+//             return false;
+//         }
+//         ptrExposureTime->SetValue(exposureTimeToSet);
+//         double exposureTimeToSet = static_cast<double>(ptrExposureTime->GetValue());
+//         std::cout << "Frame rate to be set to " << exposureTimeToSet << "..." << endl;
+//     }
+//     catch (Exception& e) {
+//         std::cout << "Error Configuring fps: " << e.what() << endl;
+//         result = false;
+//     }
+
+//     ptrExposureTime = nodeMap.GetNode("ExposureTime");
+//     exposureTimeToSet = static_cast<double>(ptrExposureTime->GetValue());
+//     std::cout << "Something -  " << exposureTimeToSet << "..." << endl;
+
+//     return result;
+// }
+
+bool setExposureTime(INodeMap& nodeMap, double exposure_time) {
+    // Set Default Result Value = True
+    bool result = true;
+    // Get Ptr to Node Exposure Time to Check Prev Value
     CFloatPtr ptrExposureTime = nodeMap.GetNode("ExposureTime");
-    double exposureTimeToSet = exposure;
-
+    double exposureTimeToSet = static_cast<double>(ptrExposureTime->GetValue());
+    std::cout << "Prev Exposure Time: " << exposureTimeToSet << endl;
+    // Try Setting Exposure Time
     try {
-
+        // Try Setting Exposure Time Auto to Off
         try {
-            // Set ExposureAuto_node to false
+            CEnumerationPtr ptrExposureMode = nodeMap.GetNode("ExposureMode");
+            CEnumEntryPtr ptrExposureModeTimed = ptrExposureMode->GetEntryByName("Timed");
+            // ptrExposureMode->SetIntValue(ptrExposureModeTimed->GetValue());
+            ptrExposureMode->SetIntValue(static_cast<int64_t>(ptrExposureModeTimed->GetValue()));
+        }
+        catch (Exception& e) {std::cout << "Unable to change ptrExposureMode to Timed. \n";}
+        // Try Setting Exposure Time Auto to Off
+        try {
             CEnumerationPtr ptrExposureAuto = nodeMap.GetNode("ExposureAuto");
             CEnumEntryPtr ptrExposureAutoOff = ptrExposureAuto->GetEntryByName("Off");
+            // ptrExposureAuto->SetIntValue(ptrExposureAutoOff->GetValue());
             ptrExposureAuto->SetIntValue(static_cast<int64_t>(ptrExposureAutoOff->GetValue()));
         }
-        catch (Exception& e) {std::cout << "ExposureAuto Unable to Turn off. \n";}
-
-        // Set Exposure Time
+        catch (Exception& e) {std::cout << "Unable to change ptrExposureAuto to Off. \n";}
+        // If ExposureTime is Readable and Writable ..
         CFloatPtr ptrExposureTime = nodeMap.GetNode("ExposureTime");
         if(!IsWritable(ptrExposureTime->GetAccessMode()) || !IsReadable(ptrExposureTime->GetAccessMode()) ) {
-            cout << "Unable to set Exposure Time. Aborting..." << endl << endl;
+            std::cout << "Unable to set Exposure Time. Aborting..." << endl << endl;
             return false;
         }
-        ptrExposureTime->SetValue(exposureTimeToSet);
+        // ... Set Exposure Time
+        ptrExposureTime->SetValue(exposure_time);
         double exposureTimeToSet = static_cast<double>(ptrExposureTime->GetValue());
-        cout << "Frame rate to be set to " << exposureTimeToSet << "..." << endl;
+        std::cout << "Exposure Time to be set to " << exposureTimeToSet << "..." << endl;
     }
     catch (Exception& e) {
-        cout << "Error configuring fps: " << e.what() << endl;
+        std::cout << "Error Configuring Exposure Time: " << e.what() << endl;
         result = false;
     }
-
+    // Get Ptr to Node Exposure Time to Check New Value
     ptrExposureTime = nodeMap.GetNode("ExposureTime");
     exposureTimeToSet = static_cast<double>(ptrExposureTime->GetValue());
-    cout << "Something -  " << exposureTimeToSet << "..." << endl;
+    std::cout << "New Exposure Time: " << exposureTimeToSet << endl;
 
     return result;
 }
 
 bool setGain(INodeMap& nodeMap, double gain) {
+    // Set Default Result Value = True
     bool result = true;
-
+    // Get Ptr to Node Gain to Check Prev Value
     CFloatPtr ptrGain = nodeMap.GetNode("Gain");
-    double gainToSet = gain;
-
+    double gainToSet = static_cast<double>(ptrGain->GetValue());
+    std::cout << "Prev Gain: " << gainToSet << endl;
+    // Try Setting Gain
     try {
-
         try {
-            // Set ExposureAuto_node to false
+            // Set GainAuto to false
             CEnumerationPtr ptrGainAuto = nodeMap.GetNode("GainAuto");
             CEnumEntryPtr ptrGainAutoOff = ptrGainAuto->GetEntryByName("Off");
             ptrGainAuto->SetIntValue(static_cast<int64_t>(ptrGainAutoOff->GetValue()));
         }
-        catch (Exception& e) {std::cout << "GainAuto Unable to Turn off. \n";}
-
-        // Set Exposure Time
+        catch (Exception& e) {std::cout << "Unable to change GainAuto to Off. \n";}
+        // If Gain is Readable and Writable ..
         CFloatPtr ptrGain = nodeMap.GetNode("Gain");
         if(!IsWritable(ptrGain->GetAccessMode()) || !IsReadable(ptrGain->GetAccessMode()) ) {
-            cout << "Unable to set Exposure Time. Aborting..." << endl << endl;
+            cout << "Unable to set Gain. Aborting..." << endl << endl;
             return false;
         }
-        ptrGain->SetValue(gainToSet);
+        // ... Set Gain
+        ptrGain->SetValue(gain);
         double gainToSet = static_cast<double>(ptrGain->GetValue());
-        cout << "Frame rate to be set to " << gainToSet << "..." << endl;
+        cout << "Gain to be set to " << gainToSet << "..." << endl;
     }
     catch (Exception& e) {
-        cout << "Error configuring fps: " << e.what() << endl;
+        cout << "Error Configuring Gain: " << e.what() << endl;
         result = false;
     }
-
+    // Get Ptr to Node Gain to Check New Value
     ptrGain = nodeMap.GetNode("Gain");
     gainToSet = static_cast<double>(ptrGain->GetValue());
-    cout << "Something -  " << gainToSet << "..." << endl;
+    cout << "New Gain: " << gainToSet << endl;
 
     return result;
 }
 
-bool configure(CameraPtr pCam, INodeMap& nodeMap, float fps = 30.0, int height = 2048, int width = 2048, int height_bin = 2, int width_bin = 2, std::string cameraType = "None") {
+bool setBlackLevel(INodeMap& nodeMap, double black_level) {
+    // Set Default Result Value = True
+    bool result = true;
+    // Get Ptr to Node Gain to Check Prev Value
+    CFloatPtr ptrBlackLevel = nodeMap.GetNode("BlackLevel");
+    double blackLevelToSet = static_cast<double>(ptrBlackLevel->GetValue());
+    std::cout << "Prev Black Level: " << blackLevelToSet << endl;
+    // Try Setting Black Level
+    try {
+        // If Black Level is Readable and Writable ..
+        CFloatPtr ptrBlackLevel = nodeMap.GetNode("BlackLevel");
+        if(!IsWritable(ptrBlackLevel->GetAccessMode()) || !IsReadable(ptrBlackLevel->GetAccessMode()) ) {
+            cout << "Unable to set Black Level. Aborting..." << endl << endl;
+            return false;
+        }
+        // ... Set Black Level
+        ptrBlackLevel->SetValue(black_level);
+        double blackLevelToSet = static_cast<double>(ptrBlackLevel->GetValue());
+        cout << "Black Level to be set to " << blackLevelToSet << "..." << endl;
+    }
+    catch (Exception& e) {
+        cout << "Error Configuring Black Level: " << e.what() << endl;
+        result = false;
+    }
+    // Get Ptr to Node Black Level to Check New Value
+    ptrBlackLevel = nodeMap.GetNode("BlackLevel");
+    blackLevelToSet = static_cast<double>(ptrBlackLevel->GetValue());
+    cout << "New Black Level: " << blackLevelToSet << endl;
+
+    return result;
+}
+
+bool configure(CameraPtr pCam, INodeMap& nodeMap, std::string cameraType, double fps, int height, int width, std::string pixelFormat, int height_bin, int width_bin, double exposure_compensation, double exposure_time, double gain, double black_level) {
     bool result = true;
     try {
         // Get the device serial number
@@ -701,7 +812,6 @@ bool configure(CameraPtr pCam, INodeMap& nodeMap, float fps = 30.0, int height =
             return false;
         }
         // set resolution
-
         if (!setResolution(nodeMap, height, width)) {
             return false;
         }
@@ -709,9 +819,25 @@ bool configure(CameraPtr pCam, INodeMap& nodeMap, float fps = 30.0, int height =
         if (!setBinning(nodeMap, height_bin, width_bin)) {
             return false;
         }
+        // set exposure compensation
+        if (!setExposureCompensation(nodeMap, exposure_compensation)) {
+            return false;
+        }
+        // set exposure time
+        if (!setExposureTime(nodeMap, exposure_time)) {
+            return false;
+        }
+        // set gain
+        if (!setGain(nodeMap, gain)) {
+            return false;
+        }
+        // set black level
+        if (!setBlackLevel(nodeMap, black_level)) {
+            return false;
+        }
     }
     catch (Exception& e) {
-        std::cout << "Error configuring camera: " << e.what() << endl;
+        std::cout << "Error Configuring camera: " << e.what() << endl;
         result = false;
     }
     return result;
