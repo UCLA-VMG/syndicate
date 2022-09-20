@@ -11,19 +11,28 @@ SpinnakerCamera::SpinnakerCamera(std::unordered_map<std::string, std::any>& samp
     : Syndicate::Camera(sample_config), 
     cameraID(std::any_cast<std::string>(sample_config["Camera ID"])),
     cameraType(std::any_cast<std::string>(sample_config["Camera Type"])),
-    
-    fps(std::any_cast<double>(sample_config["FPS"])),
-    height(std::any_cast<int>(sample_config["Height"])),
-    width(std::any_cast<int>(sample_config["Width"])),
+    // fps(std::any_cast<double>(sample_config["FPS"])),
+    // height(std::any_cast<int>(sample_config["Height"])),
+    // width(std::any_cast<int>(sample_config["Width"])),
     pixelFormat(std::any_cast<std::string>(sample_config["Pixel Format"])),
     
-    height_bin(std::any_cast<int>(sample_config["Vertical Bin"])),
-    width_bin(std::any_cast<int>(sample_config["Horizontal Bin"])),
+    bin_size(std::any_cast<int>(sample_config["Binning Size"])),
     exposure_compensation(std::any_cast<double>(sample_config["Exposure Compensation"])),
     exposure_time(std::any_cast<double>(sample_config["Exposure Time"])),
     gain(std::any_cast<double>(sample_config["Gain"])),
     black_level(std::any_cast<double>(sample_config["Black Level"]))
 {
+    
+    std::cout << "FPS: " << fps << endl;
+    std::cout << "Height: " << height << endl;
+    std::cout << "Width: " << width << endl;
+    std::cout << "Pixel Format: " << pixelFormat << endl;
+    std::cout << "Binning Size: " << bin_size << endl;
+    std::cout << "Exposure Compensation: " << exposure_compensation << endl;
+    std::cout << "Exposure Time: " << exposure_time << endl;
+    std::cout << "Gain: " << gain << endl;
+    std::cout << "Black Level: " << black_level << endl;
+    
     // Retrieve singleton reference to system object
     system = System::GetInstance();
     // Retrieve list of cameras from the system
@@ -40,7 +49,7 @@ SpinnakerCamera::SpinnakerCamera(std::unordered_map<std::string, std::any>& samp
     // Configure camera with specified fps/height/width
     try {
         std::cout << "I am the " << sensorName << "\n";
-        if (!configure(flir_cam, nodeMap, cameraType, fps, height, width, pixelFormat, height_bin, width_bin, exposure_compensation, exposure_time, gain, black_level)) {
+        if (!configure(flir_cam, nodeMap, cameraType, fps, height, width, pixelFormat, bin_size, exposure_compensation, exposure_time, gain, black_level)) {
             std::cout << "Camera configuration for device " << cameraID << " unsuccessful, aborting...";
         }
     }
@@ -76,7 +85,7 @@ void SpinnakerCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
     int result = 0;
     int num_frames(seconds*fps);
     ImagePtr convertedImage = nullptr;
-    
+
     // 1. Wait Until all other sensors have reached here
     startBarrier.wait();
 
@@ -84,6 +93,7 @@ void SpinnakerCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
     // 2.0 Begin acquiring images
     flir_cam->BeginAcquisition();
     const unsigned int k_numImages = num_frames;
+
     for (unsigned int imageCnt = 0; imageCnt < k_numImages; imageCnt++) 
     {
         try 
@@ -351,9 +361,9 @@ bool setPrimary(INodeMap& nodeMap, std::string& cameraName)
         CEnumEntryPtr ptrLineModeVal = ptrLineMode->GetEntryByName("Output");
         ptrLineMode->SetIntValue(ptrLineModeVal->GetValue());
 
-        CEnumerationPtr ptrLineMode = nodeMap.GetNode("LineSource");
-        CEnumEntryPtr ptrLineModeVal = ptrLineMode->GetEntryByName("ExposureActive");
-        ptrLineMode->SetIntValue(ptrLineModeVal->GetValue());
+        CEnumerationPtr ptrLineSource = nodeMap.GetNode("LineSource");
+        CEnumEntryPtr ptrLineSourceVal = ptrLineSource->GetEntryByName("ExposureActive");
+        ptrLineSource->SetIntValue(ptrLineSourceVal->GetValue());
         return true;
     }
     else
@@ -418,7 +428,7 @@ bool setResolution(INodeMap& nodeMap, int height, int width) {
     return result;
 }
 
-bool setBinning(INodeMap& nodeMap, int height_bin, int width_bin) {
+bool setBinning(INodeMap& nodeMap, int bin_size) {
     bool result = true;
     try {
         // Set height_bin
@@ -427,19 +437,19 @@ bool setBinning(INodeMap& nodeMap, int height_bin, int width_bin) {
             std::cout << "Unable to read or write to Binning Vertical. Aborting..." << endl;
             return false;
         }
-        ptrHeightBin->SetValue(height_bin);
+        ptrHeightBin->SetValue(bin_size);
         int heightBinToSet = static_cast<int>(ptrHeightBin->GetValue());
         std::cout << "Bin Height: " << heightBinToSet << endl << endl;
 
-        // Set width_bin
-        CIntegerPtr ptrWidthBin = nodeMap.GetNode("BinningHorizontal");
-        if(!IsWritable(ptrWidthBin->GetAccessMode()) || !IsReadable(ptrWidthBin->GetAccessMode()) || ptrWidthBin->GetInc() == 0 || ptrWidthBin->GetMax() == 0) {
-            std::cout << "Unable to read or write to Binning Horizontal. Aborting..." << endl;
-            return false;
-        }
-        ptrWidthBin->SetValue(width_bin);
-        int widthBinToSet = static_cast<int>(ptrWidthBin->GetValue());
-        std::cout << "Bin Width: " << widthBinToSet << endl << endl;
+        // // Set width_bin
+        // CIntegerPtr ptrWidthBin = nodeMap.GetNode("BinningHorizontal");
+        // if(!IsWritable(ptrWidthBin->GetAccessMode()) || !IsReadable(ptrWidthBin->GetAccessMode()) || ptrWidthBin->GetInc() == 0 || ptrWidthBin->GetMax() == 0) {
+        //     std::cout << "Unable to read or write to Binning Horizontal. Aborting..." << endl;
+        //     return false;
+        // }
+        // ptrWidthBin->SetValue(width_bin);
+        // int widthBinToSet = static_cast<int>(ptrWidthBin->GetValue());
+        // std::cout << "Bin Width: " << widthBinToSet << endl << endl;
     }
     catch (Exception& e) {
         std::cout << "Error Configuring Bining: " << e.what() << endl;
@@ -554,37 +564,52 @@ bool setExposureCompensation(INodeMap& nodeMap, double exposure_compensation) {
     // Set Default Result Value = True
     bool result = true;
     // Get Ptr to Node Exposure Compensation to Check Prev Value
-    CFloatPtr ptrExposureCompensation = nodeMap.GetNode("ExposureCompensation");
-    double exposureCompensationToSet = static_cast<double>(ptrExposureCompensation->GetValue());
-    std::cout << "Prev Exposure Compensation: " << exposureCompensationToSet << endl;
+    // CFloatPtr ptrExposureCompensation = nodeMap.GetNode("ExposureEVCompensation");
+    // double exposureCompensationToSet = static_cast<double>(ptrExposureCompensation->GetValue());
+    // std::cout << "Prev Exposure Compensation: " << exposureCompensationToSet << endl;
     // Try Setting Exposure Compensation
     try {
+        std::cout << "Here! " << endl;
         // Try Setting Exposure Compensation Auto to Off
-        try {
-            CEnumerationPtr ptrExposureCompensationAuto = nodeMap.GetNode("ExposureCompensationAuto");
-            CEnumEntryPtr ptrExposureCompensationAutoOff = ptrExposureCompensationAuto->GetEntryByName("Off");
-            // ptrExposureCompensationAuto->SetIntValue(ptrExposureCompensationAutoOff->GetValue());
-            ptrExposureCompensationAuto->SetIntValue(static_cast<int64_t>(ptrExposureCompensationAutoOff->GetValue()));
-        }
-        catch (Exception& e) {std::cout << "ExposureCompensationAuto Unable to Turn off. \n";}
+        // try {
+        // CEnumerationPtr ptrAcquisitionFrameRateAuto = nodeMap.GetNode("ExposureEVCompensationAuto");
+        // CEnumEntryPtr node_frame_rate_auto_off = ptrAcquisitionFrameRateAuto->GetEntryByName("Off");
+        // const int64_t frame_rate_auto_off = node_frame_rate_auto_off->GetValue();
+        // ptrAcquisitionFrameRateAuto->SetIntValue(frame_rate_auto_off);
+
+
+
+        CEnumerationPtr ptrExposureCompensationAuto = nodeMap.GetNode("ExposureEVCompensationAuto");
+        CEnumEntryPtr ptrExposureCompensationAutoOff = ptrExposureCompensationAuto->GetEntryByName("Off");
+        const int64_t exposureCompensationAuto = ptrExposureCompensationAutoOff->GetValue();
+        ptrExposureCompensationAuto->SetIntValue(exposureCompensationAuto);
+        // ptrExposureCompensationAuto->SetIntValue(ptrExposureCompensationAutoOff->GetValue());
+        // std::cout << "Here! " << endl;
+        // ptrExposureCompensationAuto->SetIntValue(ptrExposureCompensationAutoOff->GetValue());
+        std::cout << "Here! " << endl;
+        // }
+        // catch (Exception& e) {std::cout << "AutoExposureEVCompensation Unable to Turn off. \n";}
         // If ExposureCompensation is Readable and Writable ...
-        CFloatPtr ptrExposureCompensation = nodeMap.GetNode("ExposureCompensation");
+        CFloatPtr ptrExposureCompensation = nodeMap.GetNode("ExposureEVCompensation");
+        std::cout << "Here! " << endl;
         if(!IsWritable(ptrExposureCompensation->GetAccessMode()) || !IsReadable(ptrExposureCompensation->GetAccessMode()) ) {
             std::cout << "Unable to set Exposure Compensation. Aborting..." << endl << endl;
             return false;
         }
+        std::cout << "Here! " << endl;
         // ... Set Exposure Compensation
         ptrExposureCompensation->SetValue(exposure_compensation);
         double exposureCompensationToSet = static_cast<double>(ptrExposureCompensation->GetValue());
         std::cout << "Exposure Compensation to be set to " << exposureCompensationToSet << "..." << endl;
+        std::cout << "Here! " << endl;
     }
     catch (Exception& e) {
         std::cout << "Error Configuring Exposure Compensation: " << e.what() << endl;
         result = false;
     }
     // Get Ptr to Node Exposure Compensation to Check New Value
-    ptrExposureCompensation = nodeMap.GetNode("ExposureCompensation");
-    exposureCompensationToSet = static_cast<double>(ptrExposureCompensation->GetValue());
+    CFloatPtr ptrExposureCompensation = nodeMap.GetNode("ExposureEVCompensation");
+    double exposureCompensationToSet = static_cast<double>(ptrExposureCompensation->GetValue());
     std::cout << "New Exposure Compensation: " << exposureCompensationToSet << endl;
 
     return result;
@@ -795,7 +820,7 @@ bool setBlackLevel(INodeMap& nodeMap, double black_level) {
     return result;
 }
 
-bool configure(CameraPtr pCam, INodeMap& nodeMap, std::string cameraType, double fps, int height, int width, std::string pixelFormat, int height_bin, int width_bin, double exposure_compensation, double exposure_time, double gain, double black_level) {
+bool configure(CameraPtr pCam, INodeMap& nodeMap, std::string cameraType, double fps, int height, int width, std::string pixelFormat, int bin_size, double exposure_compensation, double exposure_time, double gain, double black_level) {
     bool result = true;
     try {
         // Get the device serial number
@@ -812,17 +837,17 @@ bool configure(CameraPtr pCam, INodeMap& nodeMap, std::string cameraType, double
             return false;
         }
         // set resolution
-        if (!setResolution(nodeMap, height, width)) {
-            return false;
-        }
+        // if (!setResolution(nodeMap, height, width)) {
+        //     return false;
+        // }
         // set binning
-        if (!setBinning(nodeMap, height_bin, width_bin)) {
+        if (!setBinning(nodeMap, bin_size)) {
             return false;
         }
         // set exposure compensation
-        if (!setExposureCompensation(nodeMap, exposure_compensation)) {
-            return false;
-        }
+        // if (!setExposureCompensation(nodeMap, exposure_compensation)) {
+        //     return false;
+        // }
         // set exposure time
         if (!setExposureTime(nodeMap, exposure_time)) {
             return false;
