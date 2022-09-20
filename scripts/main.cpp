@@ -54,8 +54,8 @@ int main(int argc, char *argv[]) {
         {"Exposure Compensation", 0.08},
         {"Exposure Time", 30000.0},
         {"Gain", 3.29},
-        {"Black Level", 5.57}
-        // {"Hardware Sync", h_sync}, {"Primary", false}
+        {"Black Level", 5.57},
+        {"Hardware Sync", h_sync}, {"Primary", true}
     };
     std::unordered_map<std::string, std::any> nir_config_mm = { // 850 nm
         {"Camera ID", std::string("21190637")}, {"Camera Type", std::string("Grasshopper3")},
@@ -67,8 +67,8 @@ int main(int argc, char *argv[]) {
         {"Exposure Compensation", 0.09},
         {"Exposure Time", 30000.0},
         {"Gain", 1.8},
-        {"Black Level", 5.08}
-        // {"Hardware Sync", h_sync}, {"Primary", false}
+        {"Black Level", 5.08},
+        {"Hardware Sync", h_sync}, {"Primary", false}
     };
     // std::unordered_map<std::string, std::any> thermal_config = {
     //     {"Camera ID", 0}, {"Camera Type", std::string("Boson")},

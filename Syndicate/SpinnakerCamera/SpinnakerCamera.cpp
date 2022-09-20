@@ -564,54 +564,38 @@ bool setExposureCompensation(INodeMap& nodeMap, double exposure_compensation) {
     // Set Default Result Value = True
     bool result = true;
     // Get Ptr to Node Exposure Compensation to Check Prev Value
-    // CFloatPtr ptrExposureCompensation = nodeMap.GetNode("ExposureEVCompensation");
-    // double exposureCompensationToSet = static_cast<double>(ptrExposureCompensation->GetValue());
-    // std::cout << "Prev Exposure Compensation: " << exposureCompensationToSet << endl;
+    CFloatPtr ptrExposureCompensation = nodeMap.GetNode("pgrExposureCompensation");
+    double exposureCompensationToSet = static_cast<double>(ptrExposureCompensation->GetValue());
+    std::cout << "Prev Exposure Compensation: " << exposureCompensationToSet << endl;
     // Try Setting Exposure Compensation
     try {
-        std::cout << "Here! " << endl;
         // Try Setting Exposure Compensation Auto to Off
-        // try {
-        // CEnumerationPtr ptrAcquisitionFrameRateAuto = nodeMap.GetNode("ExposureEVCompensationAuto");
-        // CEnumEntryPtr node_frame_rate_auto_off = ptrAcquisitionFrameRateAuto->GetEntryByName("Off");
-        // const int64_t frame_rate_auto_off = node_frame_rate_auto_off->GetValue();
-        // ptrAcquisitionFrameRateAuto->SetIntValue(frame_rate_auto_off);
-
-
-
-        CEnumerationPtr ptrExposureCompensationAuto = nodeMap.GetNode("ExposureEVCompensationAuto");
-        CEnumEntryPtr ptrExposureCompensationAutoOff = ptrExposureCompensationAuto->GetEntryByName("Off");
-        const int64_t exposureCompensationAuto = ptrExposureCompensationAutoOff->GetValue();
-        ptrExposureCompensationAuto->SetIntValue(exposureCompensationAuto);
-        // ptrExposureCompensationAuto->SetIntValue(ptrExposureCompensationAutoOff->GetValue());
-        // std::cout << "Here! " << endl;
-        // ptrExposureCompensationAuto->SetIntValue(ptrExposureCompensationAutoOff->GetValue());
-        std::cout << "Here! " << endl;
-        // }
-        // catch (Exception& e) {std::cout << "AutoExposureEVCompensation Unable to Turn off. \n";}
+        try {
+            CEnumerationPtr ptrExposureCompensationAuto = nodeMap.GetNode("pgrExposureCompensationAuto");
+            CEnumEntryPtr ptrExposureCompensationAutoOff = ptrExposureCompensationAuto->GetEntryByName("Off");
+            const int64_t exposureCompensationAuto = ptrExposureCompensationAutoOff->GetValue();
+            ptrExposureCompensationAuto->SetIntValue(exposureCompensationAuto);
+        }
+        catch (Exception& e) {std::cout << "Unable to change ptrExposureCompensationAuto to Off. \n";}
         // If ExposureCompensation is Readable and Writable ...
-        CFloatPtr ptrExposureCompensation = nodeMap.GetNode("ExposureEVCompensation");
-        std::cout << "Here! " << endl;
+        CFloatPtr ptrExposureCompensation = nodeMap.GetNode("pgrExposureCompensation");
         if(!IsWritable(ptrExposureCompensation->GetAccessMode()) || !IsReadable(ptrExposureCompensation->GetAccessMode()) ) {
             std::cout << "Unable to set Exposure Compensation. Aborting..." << endl << endl;
             return false;
         }
-        std::cout << "Here! " << endl;
         // ... Set Exposure Compensation
         ptrExposureCompensation->SetValue(exposure_compensation);
         double exposureCompensationToSet = static_cast<double>(ptrExposureCompensation->GetValue());
         std::cout << "Exposure Compensation to be set to " << exposureCompensationToSet << "..." << endl;
-        std::cout << "Here! " << endl;
     }
     catch (Exception& e) {
         std::cout << "Error Configuring Exposure Compensation: " << e.what() << endl;
         result = false;
     }
     // Get Ptr to Node Exposure Compensation to Check New Value
-    CFloatPtr ptrExposureCompensation = nodeMap.GetNode("ExposureEVCompensation");
-    double exposureCompensationToSet = static_cast<double>(ptrExposureCompensation->GetValue());
+    ptrExposureCompensation = nodeMap.GetNode("pgrExposureCompensation");
+    exposureCompensationToSet = static_cast<double>(ptrExposureCompensation->GetValue());
     std::cout << "New Exposure Compensation: " << exposureCompensationToSet << endl;
-
     return result;
 }
 
@@ -845,9 +829,9 @@ bool configure(CameraPtr pCam, INodeMap& nodeMap, std::string cameraType, double
             return false;
         }
         // set exposure compensation
-        // if (!setExposureCompensation(nodeMap, exposure_compensation)) {
-        //     return false;
-        // }
+        if (!setExposureCompensation(nodeMap, exposure_compensation)) {
+            return false;
+        }
         // set exposure time
         if (!setExposureTime(nodeMap, exposure_time)) {
             return false;
