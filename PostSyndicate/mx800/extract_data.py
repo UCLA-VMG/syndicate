@@ -87,12 +87,11 @@ def generate_original_vital_dict(folder_path, save_folder=None, visualize=False)
 
 if __name__ == "__main__":
 
-    min_id = 1
-    max_id = 8
-    prefix_id = 't'
-    for i in range(min_id, max_id+1):
-        print(i)
-        folder_path = os.path.join("D:\syndicate_tests", prefix_id+str(i), "MX800")
+    root_path = r"D:\BP_RF_RGB_CAM"
+    recording_paths = os.listdir(root_path)
+    for i in recording_paths:
+        folder_path = os.path.join(root_path, i, "MX800")
+        print(folder_path)
         generate_original_vital_dict(folder_path=folder_path, save_folder=folder_path, visualize=False)
 
 

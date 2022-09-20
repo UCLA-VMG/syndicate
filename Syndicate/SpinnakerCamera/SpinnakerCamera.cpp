@@ -98,6 +98,9 @@ void SpinnakerCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
                 else if(pixelFormat == "RGB"){
                     convertedImage = pResultImage->Convert(PixelFormat_BGR8, NO_COLOR_PROCESSING);
                 }
+                else if(pixelFormat == "pRGB"){
+                    convertedImage = pResultImage->Convert(PixelFormat_BayerRGPolarized8, NO_COLOR_PROCESSING);
+                }
                 else
                     std::cout << "Error: Pixel Format Invalid. \n";
                 // runningBuffer.push(convertedImage);
@@ -222,6 +225,9 @@ void SpinnakerCamera::ConcurrentAcquire(double seconds, boost::barrier& frameBar
                 }
                 else if(pixelFormat == "RGB"){
                     convertedImage = pResultImage->Convert(PixelFormat_BGR8, NO_COLOR_PROCESSING);
+                }
+                else if(pixelFormat == "pRGB"){
+                    convertedImage = pResultImage->Convert(PixelFormat_BayerRG8, NO_COLOR_PROCESSING);
                 }
                 else
                     std::cout << "Error: Pixel Format Invalid. \n";

@@ -173,14 +173,12 @@ def get_interpolated_vital_dict(vital_dict_path, timestamp_path, save_folder_pat
 
 if __name__ == "__main__":
 
-    min_id = 1
-    max_id = 8
-    prefix_id = 't'
-    # a = [1,2,3,4,5,7,8,9,10]
-    for i in range(min_id, max_id+1):
+    root_path = r"D:\BP_RF_RGB_CAM"
+    recording_paths = os.listdir(root_path)
+    for i in recording_paths:
         print(i)
-        save_folder_path = os.path.join("D:\syndicate_tests", prefix_id+str(i), "MX800")
-        video_ts_file_path = os.path.join("D:\syndicate_tests", prefix_id+str(i), "NIR_Camera", "log_timestamps.txt")
+        save_folder_path = os.path.join("D:\syndicate_tests", i, "MX800")
+        video_ts_file_path = os.path.join("D:\syndicate_tests", i, "NIR_Camera", "log_timestamps.txt")
         vital_dict_file_path = os.path.join(save_folder_path, "vital_original_dictionary.pkl")
         get_interpolated_vital_dict(vital_dict_file_path, video_ts_file_path, save_folder_path)
 

@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
     std::cout << "Hello, world!\n";
     
     //0. Set Root Path
-    std::string rootPath("D:/BP_RF_CAM");
+    std::string rootPath("D:/BP_RF_RGB_CAM");
     if (argc > 1){
         rootPath = rootPath + std::string("/") + std::string(argv[1]) + std::string("/");
     }
@@ -61,6 +61,14 @@ int main(int argc, char *argv[]) {
         {"Height", 2048}, {"Width", 2448},
         {"Sensor Name", std::string("Polarized_Camera")},
         {"Root Path", rootPath}, {"Pixel Format", std::string("Mono")},
+        {"Hardware Sync", h_sync}, {"Primary", false}
+    };
+    std::unordered_map<std::string, std::any> rgb_pol_config = {
+        {"Camera ID", std::string("20406823")}, {"Camera Type", std::string("BackflyS")},
+        {"FPS", 30},
+        {"Height", 2048}, {"Width", 2448},
+        {"Sensor Name", std::string("RGB_Polarized_Camera")},
+        {"Root Path", rootPath}, {"Pixel Format", std::string("pRGB")},
         {"Hardware Sync", h_sync}, {"Primary", false}
     };
     std::unordered_map<std::string, std::any> thermal_config = {
@@ -121,7 +129,8 @@ int main(int argc, char *argv[]) {
     sensor_list.emplace_back(makeSensor<RFEthernet>);
     sensor_list.emplace_back(makeSensor<MX800>);
 
-    std::vector<std::unordered_map<std::string, std::any>> configs{polarized_config, radar_config, mx800_config};
+    // std::vector<std::unordered_map<std::string, std::any>> configs{polarized_config, radar_config, mx800_config};
+    std::vector<std::unordered_map<std::string, std::any>> configs{rgb_pol_config, radar_config, mx800_config};
     // std::vector<std::unordered_map<std::string, std::any>> configs{rgb_config, nir_vimba_config, nir_config, mx800_config};
     // std::vector<std::unordered_map<std::string, std::any>> configs{polarized_config};
     //std::vector<std::unordered_map<std::string, std::any>> configs{nir_config, polarized_config, mic_config};

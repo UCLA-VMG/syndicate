@@ -62,7 +62,7 @@ include_directories("${PROJECT_SOURCE_DIR}/include"
 
 #Include Libraries
 add_subdirectory(Syndicate)
-set (LIBS ${Spinnaker_LIBRARIES} ${VimbaCPP_LIBRARIES} ${VimbaC_LIBRARIES} ${VimbaImageTransform_LIBRARIES} ${Boost_LIBRARIES} ${Npcap_LIBRARIES} ${OpenCV_LIBRARIES} ${WINDOWS_SDK} realsense2::realsense2 syndicate )
+set (LIBS ${Spinnaker_LIBRARIES} ${VimbaCPP_LIBRARIES} ${VimbaC_LIBRARIES} ${VimbaImageTransform_LIBRARIES} ${Boost_LIBRARIES} ${Npcap_LIBRARIES} ${OpenCV_LIBRARIES} realsense2::realsense2 syndicate )
 
 #Generate Execs
 add_executable(capture ${PROJECT_SOURCE_DIR}/scripts/main.cpp)

@@ -1,6 +1,10 @@
+from __future__ import print_function
+import cv2 as cv
+import argparse
 from email.mime import image
 from json import tool
 from numbers import Rational
+from pickletools import uint8
 from threading import currentThread
 import cv2 as cv
 import numpy as np
@@ -9,8 +13,37 @@ from facenet_pytorch import MTCNN
 import os
 import matplotlib.pyplot as plt
 import torch
+import colour
+import cv2 as cv
+from colour_demosaicing import (
+    EXAMPLES_RESOURCES_DIRECTORY,
+    demosaicing_CFA_Bayer_bilinear,
+    demosaicing_CFA_Bayer_Malvar2004,
+    demosaicing_CFA_Bayer_Menon2007,
+    mosaicing_CFA_Bayer)
+
+from tqdm import tqdm
 
 from utils import get_video
+
+def bin_image(img, size=2):
+    bin_imgs = []
+    for i in range(size):
+        for j in range(size):
+            bin_imgs.append(img[i::size,j::size])
+    binned_img = np.mean(np.array(bin_imgs), axis = 0)
+    return binned_img
+
+def demosaic_bin_image(img, size = 2):
+    binned_img = bin_image(img.astype(np.float32), size=size)
+    img_demosaic = cv.cvtColor(binned_img.astype(np.uint8), cv.COLOR_BAYER_RG2RGB)
+    return img_demosaic
+
+def demosaic_bin_video(vid, size=2):
+    img_arr = []
+    for img in tqdm(vid, total=len(vid)):
+        img_arr.append(demosaic_bin_image(img))
+    return np.array(img_arr)
 
 class Single_Face_Cropper:
     def __init__(self):
@@ -47,16 +80,43 @@ class Single_Face_Cropper:
         # print(np.max(image), np.min(image), image.dtype)
         face = self.mtcnn.detect(image)
 
-        center = {
-            "x": int((face[0][0][0]+face[0][0][2])/2),
-            "y": int((face[0][0][1]+face[0][0][3])/2)
+        try:
+            print("MTCNN used.")
+            center = {
+                "x": int((face[0][0][0]+face[0][0][2])/2),
+                "y": int((face[0][0][1]+face[0][0][3])/2)
+                }
+            
+            box = {
+                    "x_left": int(min(face[0][0][0], face[0][0][2])),
+                    "x_right": int(max(face[0][0][0], face[0][0][2])),
+                    "y_top": int(min(face[0][0][1], face[0][0][3])),
+                    "y_bottom": int(max(face[0][0][1], face[0][0][3]))
+                }
+        except:
+            face_cascade = cv.CascadeClassifier()
+            #-- 1. Load the cascades
+            if not face_cascade.load(cv.samples.findFile(r'C:\Users\111\Desktop\repos\syndicate\PostSyndicate\camera\haarcascade_frontalface_alt.xml')):
+                print('--(!)Error loading face cascade')
+                exit(0)
+            print("HAAR used. ")
+            frame_gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+            frame_gray = cv.equalizeHist(frame_gray)
+            #-- Detect faces
+            faces = face_cascade.detectMultiScale(frame_gray)
+            x,y,w,h = faces[0]
+            center = (x + w//2, y + h//2)
+
+            center = {
+                "x": center[0],
+                "y": center[1]
             }
-        
-        box = {
-                "x_left": int(min(face[0][0][0], face[0][0][2])),
-                "x_right": int(max(face[0][0][0], face[0][0][2])),
-                "y_top": int(min(face[0][0][1], face[0][0][3])),
-                "y_bottom": int(max(face[0][0][1], face[0][0][3]))
+
+            box = {
+                "x_left": x,
+                "x_right": x+w,
+                "y_top": y,
+                "y_bottom": y+h
             }
 
         if ratio > 0:
@@ -94,7 +154,7 @@ class Single_Face_Cropper:
 
         # ret, frame = cap.read()
 
-        frame = video_input[0]
+        frame = video_input[600] #TODO
         frame_num = video_input.shape[0]
 
         if(len(frame.shape) == 3):
@@ -133,32 +193,34 @@ class Single_Face_Cropper:
 
 
 
+def detectAndDisplay(frame):
+    frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+    frame_gray = cv.equalizeHist(frame_gray)
+    #-- Detect faces
+    faces = face_cascade.detectMultiScale(frame_gray)
+    for (x,y,w,h) in faces:
+        center = (x + w//2, y + h//2)
+        frame = cv.ellipse(frame, center, (w//2, h//2), 0, 0, 360, (255, 0, 255), 4)
+        faceROI = frame_gray[y:y+h,x:x+w]
+
+    cv.imshow('Capture - Face detection', frame)
+
 if __name__ == "__main__":
     det = Single_Face_Cropper()
-    source = r'D:\syndicate_tests\d1\NIR_Vimba_Camera'
-    destination = r'D:\syndicate_tests\d1\NIR_Vimba_Camera'
+    source = r'D:\BP_RF_RGB_CAM'
 
-    # video_input = get_video(source, file_type=".bmp")
-    # print(video_input.shape)
-    # det.crop_video(video_input=video_input, destination=destination, evaluation_freq=-1)
+    # min_id = 1
+    # max_id = 10
+    # prefix_id = 'r'
+    file_list = os.listdir(source)
 
-    min_id = 11
-    max_id = 11
-    prefix_id = 'r'
-
-    for i in range(min_id, max_id+1):
+    for i in file_list:
         print(i)
-
-        source0 = os.path.join("D:\syndicate_tests", prefix_id+str(i), "RGB")
-        video_input0 = get_video(source0, file_type=".bmp")
-        det.crop_video(video_input=video_input0, destination=source0, evaluation_freq=-1)
-
-        source1 = os.path.join("D:\syndicate_tests", prefix_id+str(i), "NIR_Camera")
-        video_input1 = get_video(source1, file_type=".bmp")
-        det.crop_video(video_input=video_input1, destination=source1, evaluation_freq=-1)
-
-        source2 = os.path.join("D:\syndicate_tests", prefix_id+str(i), "NIR_Vimba_Camera")
-        video_input2 = get_video(source2, file_type=".bmp")
-        det.crop_video(video_input=video_input2, destination=source2, evaluation_freq=-1)
-        
-
+        try:
+            source0 = os.path.join(source, i, "RGB_Polarized_Camera")
+            if("img_0.png" not in os.listdir(source0)):
+                video_input0 = get_video(source0, file_type=".bmp")
+                video_input_binned = demosaic_bin_video(video_input0)
+                det.crop_video(video_input=video_input_binned, destination=source0, evaluation_freq=-1)
+        except:
+            print("MTCNN Failed Detecting Face.")
