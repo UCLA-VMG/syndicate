@@ -88,7 +88,10 @@ ar1.GetBSSFwVersion()
 
 -------- STATIC CONFIG STUFF --------
 -- ar1.ChanNAdcConfig(1, 0, 0, 1, 0, 0, 0, 2, 1, 0)
-ar1.ChanNAdcConfig(1, 1, 1, 1, 1, 1, 1, 2, 1, 0)
+-- use this if current does not work
+ar1.ChanNAdcConfig(1, 1, 1, 1, 1, 1, 1, 2, 1, 0) 
+-- ar1.ChanNAdcConfig(1, 1, 1, 1, 1, 1, 524289, 2, 1, 65536)
+
 ar1.LPModConfig(0, 0)
 ar1.RfInit()
 --------------------------------------
@@ -102,20 +105,23 @@ ar1.LVDSLaneConfig(0, 1, 1, 1, 1, 1, 0, 0)
 
 -------- SENSOR CONFIG STUFF --------
 -- ar1.ProfileConfig(0, START_FREQ, IDLE_TIME, ADC_START_TIME, RAMP_END_TIME, 0, 0, 0, 0, 0, 0, FREQ_SLOPE, TX_START_TIME, ADC_SAMPLES, SAMPLE_RATE, 0, 0, RX_GAIN)
-ar1.ProfileConfig(0, 77, 100, 6, 120, 0, 0, 0, 0, 0, 0, 30.012, 0, 128, 2500, 0, 0, 30)
+ar1.ProfileConfig(0, 77, 100, 6, 60, 0, 0, 0, 0, 0, 0, 60.012, 0, 256, 5000, 0, 0, 30)
 
 -- ar1.ChirpConfig(0, 0, 0, 0, 0, 0, 0, 1, 0, 0)
 ar1.ChirpConfig(0, 0, 0, 0, 0, 0, 0, 1, 0, 0)
 ar1.ChirpConfig(1, 1, 0, 0, 0, 0, 0, 0, 1, 0)
 ar1.ChirpConfig(2, 2, 0, 0, 0, 0, 0, 0, 0, 1)
 -- ar1.FrameConfig(START_CHIRP_TX, END_CHIRP_TX, NUM_FRAMES, CHIRP_LOOPS, PERIODICITY, 0, 0, 1)
-ar1.FrameConfig(0, 2, 0, 1, 33, 0, 0, 1)
+-- ar1.FrameConfig(0, 2, 0, 128, 1000, 0, 0, 1)
+ar1.FrameConfig(0, 2, 648000, 1, 33, 0, 0, 1)
+--  ar1.FrameConfig(0, 0, 0, 1, 999, 0, 0, 2)
+-- ar1.FrameConfig(0, 2, 0, 128, 999, 0, 0, 2)
 -------------------------------------
 
 -------- ETHERNET STUFF --------
 ar1.SelectCaptureDevice("DCA1000")
 ar1.CaptureCardConfig_EthInit("192.168.33.30", "192.168.33.180", "12:34:56:78:90:12", 4096, 4098)
-ar1.CaptureCardConfig_Mode(1, 2, 1, 2, 3, 30)
+ar1.CaptureCardConfig_Mode(1, 1, 1, 2, 3, 30)
 ar1.CaptureCardConfig_PacketDelay(25)
 --------------------------------
 

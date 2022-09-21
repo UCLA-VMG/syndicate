@@ -75,6 +75,7 @@ bool RFEthernet::LoadNpcapDlls()
 
 void RFEthernet::AcquireSave(double seconds, boost::barrier& startBarrier)
 {
+	seconds = seconds + 5;
 	pcap_dumper_t *dumpfile;
 	char errbuf[PCAP_ERRBUF_SIZE];
     /* Open the adapter */
