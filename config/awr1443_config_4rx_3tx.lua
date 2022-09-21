@@ -1,5 +1,10 @@
+-- require "socket"
 --- Lua Config for AWR 1443
 dofile("C:\\ti\\mmwave_studio_02_01_01_00\\mmWaveStudio\\Scripts\\Startup.lua")
+
+function sleep(n)
+    if n > 0 then os.execute("ping -n " .. tonumber(n+1) .. " localhost > NUL") end
+  end
 
 -- os.execute("sleep 10")
 
@@ -149,39 +154,44 @@ ar1.CaptureCardConfig_Mode(1, 1, 1, 2, 3, 30)
 ar1.CaptureCardConfig_PacketDelay(25)
 --------------------------------
 
-ar1.CaptureCardConfig_StartRecord(SAVE_DATA_PATH, 1)
-ar1.StartFrame()
+-- ar1.CaptureCardConfig_StartRecord(SAVE_DATA_PATH, 1)
+-- ar1.StartFrame()
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
 
 -------- CALCULATED AND NOT TOO SERIOUS PARAMETERS --------
-CHIRPS_PER_FRAME = (END_CHIRP_TX - START_CHIRP_TX + 1) * CHIRP_LOOPS
-NUM_DOPPLER_BINS = CHIRPS_PER_FRAME / NUM_TX
-NUM_RANGE_BINS = ADC_SAMPLES
-RANGE_RESOLUTION = (3e8 * SAMPLE_RATE * 1e3) / (2 * FREQ_SLOPE * 1e12 * ADC_SAMPLES)
-MAX_RANGE = (300 * 0.9 * SAMPLE_RATE) / (2 * FREQ_SLOPE * 1e3)
-DOPPLER_RESOLUTION = 3e8 / (2 * START_FREQ * 1e9 * (IDLE_TIME + RAMP_END_TIME) * 1e-6 * NUM_DOPPLER_BINS * NUM_TX)
-MAX_DOPPLER = 3e8 / (4 * START_FREQ * 1e9 * (IDLE_TIME + RAMP_END_TIME) * 1e-6 * NUM_TX)
+-- CHIRPS_PER_FRAME = (END_CHIRP_TX - START_CHIRP_TX + 1) * CHIRP_LOOPS
+-- NUM_DOPPLER_BINS = CHIRPS_PER_FRAME / NUM_TX
+-- NUM_RANGE_BINS = ADC_SAMPLES
+-- RANGE_RESOLUTION = (3e8 * SAMPLE_RATE * 1e3) / (2 * FREQ_SLOPE * 1e12 * ADC_SAMPLES)
+-- MAX_RANGE = (300 * 0.9 * SAMPLE_RATE) / (2 * FREQ_SLOPE * 1e3)
+-- DOPPLER_RESOLUTION = 3e8 / (2 * START_FREQ * 1e9 * (IDLE_TIME + RAMP_END_TIME) * 1e-6 * NUM_DOPPLER_BINS * NUM_TX)
+-- MAX_DOPPLER = 3e8 / (4 * START_FREQ * 1e9 * (IDLE_TIME + RAMP_END_TIME) * 1e-6 * NUM_TX)
 
-print("Chirps Per Frame:", CHIRPS_PER_FRAME)
-print("Num Doppler Bins:", NUM_DOPPLER_BINS)
-print("Num Range Bins:", NUM_RANGE_BINS)
-print("Range Resolution:", RANGE_RESOLUTION)
-print("Max Unambiguous Range:", MAX_RANGE)
-print("Doppler Resolution:", DOPPLER_RESOLUTION)
-print("Max Doppler:", MAX_DOPPLER)
+-- print("Chirps Per Frame:", CHIRPS_PER_FRAME)
+-- print("Num Doppler Bins:", NUM_DOPPLER_BINS)
+-- print("Num Range Bins:", NUM_RANGE_BINS)
+-- print("Range Resolution:", RANGE_RESOLUTION)
+-- print("Max Unambiguous Range:", MAX_RANGE)
+-- print("Doppler Resolution:", DOPPLER_RESOLUTION)
+-- print("Max Doppler:", MAX_DOPPLER)
 
 
 if NUM_SUBSETS ~= 1 then 
     for i = 1, NUM_SUBSETS - 1, 1 
     do
-        os.execute("timeout " .. tonumber(SUBSET_RECORDING_TIME))
-        ar1.StopFrame()
+        ar1.CaptureCardConfig_StartRecord(SAVE_DATA_PATH, 1)
         ar1.StartFrame()
+        sleep(SUBSET_RECORDING_TIME)
+        -- ar1.StopFrame()
+        ar1.CaptureCardConfig_StopRecord()
     end
 end
 
-os.execute("timeout " .. tonumber(SUBSET_RECORDING_TIME + 5))
-ar1.StopFrame()
+ar1.CaptureCardConfig_StartRecord(SAVE_DATA_PATH, 1)
+ar1.StartFrame()
+sleep(SUBSET_RECORDING_TIME + 5)
+-- ar1.StopFrame()
+ar1.CaptureCardConfig_StopRecord()
 
 -- Post Processing will only be done if scan is NOT realtime
 -- if NUM_FRAMES ~= 0 then

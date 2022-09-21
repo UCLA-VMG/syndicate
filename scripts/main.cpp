@@ -44,39 +44,39 @@ int main(int argc, char *argv[]) {
     //     {"Root Path", rootPath_E}, {"Pixel Format", std::string("Mono")},
     //     // {"Hardware Sync", h_sync}, {"Primary", false}
     // };
-    // std::unordered_map<std::string, std::any> nir_config_mm = { // 850 nm
-    //     {"Camera ID", std::string("21190637")}, {"Camera Type", std::string("Grasshopper3")},
-    //     {"FPS", 30.0},
-    //     {"Height", 2048}, {"Width", 2048}, // 2048 
-    //     {"Sensor Name", std::string("NIR_Camera_mm")},
-    //     {"Root Path", rootPath_E}, {"Pixel Format", std::string("Mono")},
-    //     {"Binning Size", 2}, // 1024 x 1024
-    //     {"Exposure Compensation", 0.09},
-    //     {"Exposure Time", 30000.0},
-    //     {"Gain", 1.8},
-    //     {"Black Level", 5.08}
-    //     // {"Hardware Sync", h_sync}, {"Primary", true}
-    // };
-    // std::unordered_map<std::string, std::any> nir_config = { // 940 nm
-    //     {"Camera ID", std::string("21290846")}, {"Camera Type", std::string("Grasshopper3")},
-    //     {"FPS", 30.0},
-    //     {"Height", 2048}, {"Width", 2048}, // 2048 x 2048
-    //     {"Sensor Name", std::string("NIR_Camera")},
-    //     {"Root Path", rootPath_E}, {"Pixel Format", std::string("Mono")},
-    //     {"Binning Size", 2}, // 1024 x 1024
-    //     {"Exposure Compensation", 0.08},
-    //     {"Exposure Time", 30000.0},
-    //     {"Gain", 3.29},
-    //     {"Black Level", 5.57}
-    //     // {"Hardware Sync", h_sync}, {"Primary", false}
-    // };
-    // std::unordered_map<std::string, std::any> thermal_config = {
-    //     {"Camera ID", 0}, {"Camera Type", std::string("Boson")},
-    //     {"FPS", 30}, 
-    //     // {"Height", 512}, {"Width", 640},
-    //     {"Sensor Name", std::string("Thermal_Camera")},
-    //     {"Root Path", rootPath_E}
-    // };
+    std::unordered_map<std::string, std::any> nir_config_mm = { // 850 nm
+        {"Camera ID", std::string("21190637")}, {"Camera Type", std::string("Grasshopper3")},
+        {"FPS", 30.0},
+        {"Height", 2048}, {"Width", 2048}, // 2048 
+        {"Sensor Name", std::string("NIR_Camera_mm")},
+        {"Root Path", rootPath_E}, {"Pixel Format", std::string("Mono")},
+        {"Binning Size", 2}, // 1024 x 1024
+        {"Exposure Compensation", 0.09},
+        {"Exposure Time", 30000.0},
+        {"Gain", 1.8},
+        {"Black Level", 5.08}
+        // {"Hardware Sync", h_sync}, {"Primary", true}
+    };
+    std::unordered_map<std::string, std::any> nir_config = { // 940 nm
+        {"Camera ID", std::string("21290846")}, {"Camera Type", std::string("Grasshopper3")},
+        {"FPS", 30.0},
+        {"Height", 2048}, {"Width", 2048}, // 2048 x 2048
+        {"Sensor Name", std::string("NIR_Camera")},
+        {"Root Path", rootPath_E}, {"Pixel Format", std::string("Mono")},
+        {"Binning Size", 2}, // 1024 x 1024
+        {"Exposure Compensation", 0.08},
+        {"Exposure Time", 30000.0},
+        {"Gain", 3.29},
+        {"Black Level", 5.57}
+        // {"Hardware Sync", h_sync}, {"Primary", false}
+    };
+    std::unordered_map<std::string, std::any> thermal_config = {
+        {"Camera ID", 0}, {"Camera Type", std::string("Boson")},
+        {"FPS", 30.0}, 
+        {"Height", 512}, {"Width", 640},
+        {"Sensor Name", std::string("Thermal_Camera")},
+        {"Root Path", rootPath_E}
+    };
     // std::unordered_map<std::string, std::any> rgb_config = {
     //     {"Camera ID", 0}, {"Camera Type", std::string("RGB")},
     //     {"FPS", 30}, 
@@ -119,17 +119,18 @@ int main(int argc, char *argv[]) {
     //2. Add Configurations and Factory Generator Functions into std::vectors
     std::vector<std::unique_ptr<Sensor>(*)(std::unordered_map<std::string, std::any>&)> sensor_list;
     // sensor_list.emplace_back(makeSensor<VimbaCamera>);
-    // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
-    // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
-    // sensor_list.emplace_back(makeSensor<OpenCVCamera>);
+    sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    sensor_list.emplace_back(makeSensor<OpenCVCamera>);
     sensor_list.emplace_back(makeSensor<RFEthernet>);
     // sensor_list.emplace_back(makeSensor<SerialPort>);
 
     // std::vector<std::unordered_map<std::string, std::any>> configs{nir_config, nir_config_mm, thermal_config, radar_config, serial_config};
+    std::vector<std::unordered_map<std::string, std::any>> configs{nir_config, nir_config_mm, thermal_config, radar_config};
     // std::vector<std::unordered_map<std::string, std::any>> configs{nir_config_mm, nir_config};
-    std::vector<std::unordered_map<std::string, std::any>> configs{radar_config};
+    // std::vector<std::unordered_map<std::string, std::any>> configs{radar_config};
     // std::vector<std::unordered_map<std::string, std::any>> configs{thermal_config};
-    
+
     //3. Initialize Sensor Stack
     SensorStack mainStack(sensor_list, configs);
     

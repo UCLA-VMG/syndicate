@@ -5,7 +5,8 @@ using namespace cv;
 using namespace Syndicate;
 
 OpenCVCamera::OpenCVCamera(std::unordered_map<std::string, std::any>& sample_config)
-    : Syndicate::Camera(sample_config), cameraID(std::any_cast<int>(sample_config["Camera ID"]))
+    : Syndicate::Camera(sample_config),
+    cameraID(std::any_cast<int>(sample_config["Camera ID"]))
 {
     std::cout << "opencv Camera Cstr\n";
     //--- OPEN CAP
