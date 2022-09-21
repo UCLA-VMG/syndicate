@@ -1,7 +1,7 @@
 --- Lua Config for AWR 1443
 dofile("C:\\ti\\mmwave_studio_02_01_01_00\\mmWaveStudio\\Scripts\\Startup.lua")
 
-os.execute("sleep 10")
+-- os.execute("sleep 10")
 
 -- ar1.FullReset()
 -- ar1.SOPControl(2)
@@ -55,10 +55,34 @@ TX_START_TIME = 1
 -- FrameConfig
 START_CHIRP_TX = 0
 END_CHIRP_TX = 0 
-NUM_FRAMES = 0 -- Set this to 0 to continuously stream data
+FPS = 30
+MAX_SUBSET_RECORDING_TIME = 5 -- in seconds: this value should not exceed 1800 seconds (30 minutes) or mmWave studio will stop recording during the subset
+TOTAL_RECORDING_TIME = 10 -- in seconds
+TOTAL_NUM_FRAMES = TOTAL_RECORDING_TIME * FPS  -- Set this to 0 to continuously stream data
 CHIRP_LOOPS = 1 
 PERIODICITY = 50 -- ms
 -----------------------------------------------------------
+
+-- determine the number of subsets, and length os subsets in time and frames
+if TOTAL_RECORDING_TIME <= MAX_SUBSET_RECORDING_TIME then
+    SUBSET_RECORDING_TIME = TOTAL_RECORDING_TIME
+    SUBSET_NUM_FRAMES = TOTAL_NUM_FRAMES
+    NUM_SUBSETS = 1
+else
+    SUBSET_RECORDING_TIME = MAX_SUBSET_RECORDING_TIME
+    SUBSET_NUM_FRAMES = MAX_SUBSET_RECORDING_TIME * FPS
+    NUM_SUBSETS = TOTAL_RECORDING_TIME / SUBSET_RECORDING_TIME
+end
+
+-- if continuous mode, set number of subsets = 1, and length of subsets in time and frames = max value
+if TOTAL_NUM_FRAMES == 0 then
+    -- if num_frames is set to 0, then given other parameters, max num frames is 58176, which at 30 fps is 1939.2 seconds
+    SUBSET_RECORDING_TIME = MAX_SUBSET_RECORDING_TIME
+    SUBSET_NUM_FRAMES = MAX_SUBSET_RECORDING_TIME * FPS
+    NUM_SUBSETS = 1
+end
+-----------------------------------------------------------
+
 
 -------- THIS IS FINE --------
 ar1.FullReset()
@@ -113,7 +137,7 @@ ar1.ChirpConfig(1, 1, 0, 0, 0, 0, 0, 0, 1, 0)
 ar1.ChirpConfig(2, 2, 0, 0, 0, 0, 0, 0, 0, 1)
 -- ar1.FrameConfig(START_CHIRP_TX, END_CHIRP_TX, NUM_FRAMES, CHIRP_LOOPS, PERIODICITY, 0, 0, 1)
 -- ar1.FrameConfig(0, 2, 0, 128, 1000, 0, 0, 1)
-ar1.FrameConfig(0, 2, 648000, 1, 33, 0, 0, 1)
+ar1.FrameConfig(0, 2, SUBSET_NUM_FRAMES, 1, 33, 0, 0, 1)
 --  ar1.FrameConfig(0, 0, 0, 1, 999, 0, 0, 2)
 -- ar1.FrameConfig(0, 2, 0, 128, 999, 0, 0, 2)
 -------------------------------------
@@ -125,7 +149,6 @@ ar1.CaptureCardConfig_Mode(1, 1, 1, 2, 3, 30)
 ar1.CaptureCardConfig_PacketDelay(25)
 --------------------------------
 
--------- https://www.google.com/search?q=everything+is+fine+meme+spongebob&rlz=1C1CHBF_enUS794US794&source=lnms&tbm=isch&sa=X&ved=0ahUKEwiBk7vfw9DjAhWVG80KHTdsDnoQ_AUIESgB&biw=1536&bih=722#imgrc=7BHtSeLSvvNceM: --------
 ar1.CaptureCardConfig_StartRecord(SAVE_DATA_PATH, 1)
 ar1.StartFrame()
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
@@ -139,10 +162,6 @@ MAX_RANGE = (300 * 0.9 * SAMPLE_RATE) / (2 * FREQ_SLOPE * 1e3)
 DOPPLER_RESOLUTION = 3e8 / (2 * START_FREQ * 1e9 * (IDLE_TIME + RAMP_END_TIME) * 1e-6 * NUM_DOPPLER_BINS * NUM_TX)
 MAX_DOPPLER = 3e8 / (4 * START_FREQ * 1e9 * (IDLE_TIME + RAMP_END_TIME) * 1e-6 * NUM_TX)
 
-print("\n\nI wanted to make the outputted parameters easy to find so I put them inbetween two memes:")
-print("https://www.google.com/search?q=the+nerd+life+chose+me+meme&rlz=1C1CHBF_enUS794US794&source=lnms&tbm=isch&sa=X&ved=0ahUKEwiEg_zw09DjAhVRCM0KHVgfC3cQ_AUIESgB&biw=1536&bih=722#imgrc=EW0Rq0cJqCXu6M:\n")
-
-
 print("Chirps Per Frame:", CHIRPS_PER_FRAME)
 print("Num Doppler Bins:", NUM_DOPPLER_BINS)
 print("Num Range Bins:", NUM_RANGE_BINS)
@@ -151,7 +170,18 @@ print("Max Unambiguous Range:", MAX_RANGE)
 print("Doppler Resolution:", DOPPLER_RESOLUTION)
 print("Max Doppler:", MAX_DOPPLER)
 
-print("\nhttps://inteng-storage.s3.amazonaws.com/images/JANUARY/sizes/memes_about_engineers_before_after_resize_md.jpg\n\n")
+
+if NUM_SUBSETS ~= 1 then 
+    for i = 1, NUM_SUBSETS - 1, 1 
+    do
+        os.execute("timeout " .. tonumber(SUBSET_RECORDING_TIME))
+        ar1.StopFrame()
+        ar1.StartFrame()
+    end
+end
+
+os.execute("timeout " .. tonumber(SUBSET_RECORDING_TIME + 5))
+ar1.StopFrame()
 
 -- Post Processing will only be done if scan is NOT realtime
 -- if NUM_FRAMES ~= 0 then
