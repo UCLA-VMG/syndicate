@@ -139,7 +139,7 @@ int main(int argc, char *argv[]) {
 
     //4.1 Asynchronously Acquire Data
     std::cout << "\n\n\nAsyn Capture \n";
-    mainStack.Acquire(10); // 10,800 [3 hrs] & 14,400 [4 hrs] & 21,600 [6 hrs]
+    mainStack.Acquire(15); // 10,800 [3 hrs] & 14,400 [4 hrs] & 21,600 [6 hrs]
 
     // 4.2 Barrier Sync Acquire Data
     // std::cout << "\n\n\n Barrier Sync Capture\n";
