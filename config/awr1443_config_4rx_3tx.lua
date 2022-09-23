@@ -61,9 +61,9 @@ TX_START_TIME = 1
 START_CHIRP_TX = 0
 END_CHIRP_TX = 0 
 FPS = 30
-MAX_SUBSET_RECORDING_TIME = 1800 -- in seconds: this value should not exceed 1800 seconds (30 minutes) or mmWave studio will stop recording during the subset
-TOTAL_RECORDING_TIME = 21600 -- in seconds
-TOTAL_NUM_FRAMES = TOTAL_RECORDING_TIME * FPS  -- Set this to 0 to continuously stream data
+MAX_SUBSET_RECORDING_TIME = 5 -- in seconds: this value should not exceed 1800 seconds (30 minutes) or mmWave studio will stop recording during the subset
+TOTAL_RECORDING_TIME = 10 -- in seconds
+-- TOTAL_NUM_FRAMES = 0  -- Set this to 0 to continuously stream data
 CHIRP_LOOPS = 1 
 PERIODICITY = 50 -- ms
 -----------------------------------------------------------
@@ -71,21 +71,12 @@ PERIODICITY = 50 -- ms
 -- determine the number of subsets, and length os subsets in time and frames
 if TOTAL_RECORDING_TIME <= MAX_SUBSET_RECORDING_TIME then
     SUBSET_RECORDING_TIME = TOTAL_RECORDING_TIME
-    SUBSET_NUM_FRAMES = TOTAL_NUM_FRAMES
     NUM_SUBSETS = 1
 else
     SUBSET_RECORDING_TIME = MAX_SUBSET_RECORDING_TIME
-    SUBSET_NUM_FRAMES = MAX_SUBSET_RECORDING_TIME * FPS
     NUM_SUBSETS = TOTAL_RECORDING_TIME / SUBSET_RECORDING_TIME
 end
 
--- if continuous mode, set number of subsets = 1, and length of subsets in time and frames = max value
-if TOTAL_NUM_FRAMES == 0 then
-    -- if num_frames is set to 0, then given other parameters, max num frames is 58176, which at 30 fps is 1939.2 seconds
-    SUBSET_RECORDING_TIME = MAX_SUBSET_RECORDING_TIME
-    SUBSET_NUM_FRAMES = MAX_SUBSET_RECORDING_TIME * FPS
-    NUM_SUBSETS = 1
-end
 -----------------------------------------------------------
 
 
@@ -142,7 +133,7 @@ ar1.ChirpConfig(1, 1, 0, 0, 0, 0, 0, 0, 1, 0)
 ar1.ChirpConfig(2, 2, 0, 0, 0, 0, 0, 0, 0, 1)
 -- ar1.FrameConfig(START_CHIRP_TX, END_CHIRP_TX, NUM_FRAMES, CHIRP_LOOPS, PERIODICITY, 0, 0, 1)
 -- ar1.FrameConfig(0, 2, 0, 128, 1000, 0, 0, 1)
-ar1.FrameConfig(0, 2, SUBSET_NUM_FRAMES, 1, 31, 0, 0, 1)
+ar1.FrameConfig(0, 2, 0, 1, 31, 0, 0, 2)
 --  ar1.FrameConfig(0, 0, 0, 1, 999, 0, 0, 2)
 -- ar1.FrameConfig(0, 2, 0, 128, 999, 0, 0, 2)
 -------------------------------------
@@ -189,8 +180,8 @@ end
 
 ar1.CaptureCardConfig_StartRecord(SAVE_DATA_PATH, 1)
 ar1.StartFrame()
-sleep(SUBSET_RECORDING_TIME + 5)
--- ar1.StopFrame()
+sleep(SUBSET_RECORDING_TIME + 20)
+ar1.StopFrame()
 ar1.CaptureCardConfig_StopRecord()
 
 -- Post Processing will only be done if scan is NOT realtime

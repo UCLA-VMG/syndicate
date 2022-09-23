@@ -6,7 +6,7 @@ RFEthernet::RFEthernet(std::unordered_map<std::string, std::any>& sample_config)
 	// launch cmd file to configure radar parameters
 	std::string command = "C:\\Users\\Adnan\\Documents\\Github\\syndicate\\config\\run_multi_4rx3tx_mmwavestudio.cmd";
 	WinExec(command.c_str(), SW_HIDE);
-	std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(47))); // wait 50 seconds for lua script to execute
+	std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(60))); // wait 60 seconds for lua script to execute
 
 	int interface_id;
 	int total_interfaces=0;
@@ -82,7 +82,6 @@ bool RFEthernet::LoadNpcapDlls()
 
 void RFEthernet::AcquireSave(double seconds, boost::barrier& startBarrier)
 {
-	seconds = seconds + 1;
 	pcap_dumper_t *dumpfile;
 	char errbuf[PCAP_ERRBUF_SIZE];
     /* Open the adapter */
