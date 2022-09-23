@@ -61,7 +61,8 @@ TX_START_TIME = 1
 START_CHIRP_TX = 0
 END_CHIRP_TX = 0 
 FPS = 30
-MAX_SUBSET_RECORDING_TIME = 5 -- in seconds: this value should not exceed 1800 seconds (30 minutes) or mmWave studio will stop recording during the subset
+MAX_SUBSET_RECORDING_TIME = 1800 -- in seconds: this value should not exceed 1800 seconds (30 minutes) or mmWave studio will stop recording during the subset
+MAX_SUBSET_RECORDING_TIME_MOD = 10800 -- to trigger stop frame
 TOTAL_RECORDING_TIME = 10 -- in seconds
 -- TOTAL_NUM_FRAMES = 0  -- Set this to 0 to continuously stream data
 CHIRP_LOOPS = 1 
@@ -75,6 +76,15 @@ if TOTAL_RECORDING_TIME <= MAX_SUBSET_RECORDING_TIME then
 else
     SUBSET_RECORDING_TIME = MAX_SUBSET_RECORDING_TIME
     NUM_SUBSETS = TOTAL_RECORDING_TIME / SUBSET_RECORDING_TIME
+end
+
+-- determine the number of subsets_mod for requesting stop frame
+if TOTAL_RECORDING_TIME <= MAX_SUBSET_RECORDING_TIME_MOD then
+    SUBSET_RECORDING_TIME_MOD = TOTAL_RECORDING_TIME
+    NUM_SUBSETS_MOD = 1
+else
+    SUBSET_RECORDING_TIME_MOD = MAX_SUBSET_RECORDING_TIME_MOD
+    NUM_SUBSETS_MOD = TOTAL_RECORDING_TIME / SUBSET_RECORDING_TIME
 end
 
 -----------------------------------------------------------
@@ -166,9 +176,31 @@ ar1.CaptureCardConfig_PacketDelay(25)
 -- print("Doppler Resolution:", DOPPLER_RESOLUTION)
 -- print("Max Doppler:", MAX_DOPPLER)
 
+NORM_NUM_SUBSETS = NUM_SUBSETS/NUM_SUBSETS_MOD
 
-if NUM_SUBSETS ~= 1 then 
-    for i = 1, NUM_SUBSETS - 1, 1 
+if NUM_SUBSETS_MOD ~= 1 then 
+    for i = 1, NUM_SUBSETS_MOD - 1, 1 
+    do
+        if NORM_NUM_SUBSETS ~= 1 then 
+            for i = 1, NORM_NUM_SUBSETS - 1, 1 
+            do
+                ar1.CaptureCardConfig_StartRecord(SAVE_DATA_PATH, 1)
+                ar1.StartFrame()
+                sleep(SUBSET_RECORDING_TIME)
+                -- ar1.StopFrame()
+                ar1.CaptureCardConfig_StopRecord()
+            end
+        end
+        ar1.CaptureCardConfig_StartRecord(SAVE_DATA_PATH, 1)
+        ar1.StartFrame()
+        sleep(SUBSET_RECORDING_TIME)
+        ar1.StopFrame()
+        ar1.CaptureCardConfig_StopRecord()
+    end
+end
+
+if NORM_NUM_SUBSETS ~= 1 then 
+    for i = 1, NORM_NUM_SUBSETS - 1, 1 
     do
         ar1.CaptureCardConfig_StartRecord(SAVE_DATA_PATH, 1)
         ar1.StartFrame()
@@ -177,7 +209,6 @@ if NUM_SUBSETS ~= 1 then
         ar1.CaptureCardConfig_StopRecord()
     end
 end
-
 ar1.CaptureCardConfig_StartRecord(SAVE_DATA_PATH, 1)
 ar1.StartFrame()
 sleep(SUBSET_RECORDING_TIME + 20)
