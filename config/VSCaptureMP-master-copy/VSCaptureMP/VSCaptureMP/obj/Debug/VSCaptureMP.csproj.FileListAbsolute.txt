@@ -1,0 +1,33 @@
+C:/Users/John/Documents/Philips connect/VSCaptureMP/VSCaptureMP/VSCaptureMP/bin/Debug/VSCaptureMP.exe.config
+C:/Users/John/Documents/Philips connect/VSCaptureMPWave/VSCaptureMP/VSCaptureMP/bin/Debug/VSCaptureMP.exe.config
+C:\Users\111\Documents\mmhealth_features\mmhealth_master\sensors\mx800\VSCaptureMP-master\VSCaptureMP\VSCaptureMP\bin\Debug\VSCaptureMP.exe.config
+C:\Users\111\Documents\mmhealth_features\mmhealth_master\sensors\mx800\VSCaptureMP-master\VSCaptureMP\VSCaptureMP\bin\Debug\VSCaptureMP.exe
+C:\Users\111\Documents\mmhealth_features\mmhealth_master\sensors\mx800\VSCaptureMP-master\VSCaptureMP\VSCaptureMP\bin\Debug\VSCaptureMP.pdb
+C:\Users\111\Documents\mmhealth_features\mmhealth_master\sensors\mx800\VSCaptureMP-master\VSCaptureMP\VSCaptureMP\bin\Debug\MQTTnet.dll
+C:\Users\111\Documents\mmhealth_features\mmhealth_master\sensors\mx800\VSCaptureMP-master\VSCaptureMP\VSCaptureMP\bin\Debug\MQTTnet.Extensions.ManagedClient.dll
+C:\Users\111\Documents\mmhealth_features\mmhealth_master\sensors\mx800\VSCaptureMP-master\VSCaptureMP\VSCaptureMP\obj\Debug\VSCaptureMP.csproj.AssemblyReference.cache
+C:\Users\111\Documents\mmhealth_features\mmhealth_master\sensors\mx800\VSCaptureMP-master\VSCaptureMP\VSCaptureMP\obj\Debug\VSCaptureMP.csproj.CoreCompileInputs.cache
+C:\Users\111\Documents\mmhealth_features\mmhealth_master\sensors\mx800\VSCaptureMP-master\VSCaptureMP\VSCaptureMP\obj\Debug\VSCaptureMP.csproj.CopyComplete
+C:\Users\111\Documents\mmhealth_features\mmhealth_master\sensors\mx800\VSCaptureMP-master\VSCaptureMP\VSCaptureMP\obj\Debug\VSCaptureMP.exe
+C:\Users\111\Documents\mmhealth_features\mmhealth_master\sensors\mx800\VSCaptureMP-master\VSCaptureMP\VSCaptureMP\obj\Debug\VSCaptureMP.pdb
+C:\Users\111\Desktop\mmhealth_2\sensors\VSCaptureMP-master-copy\VSCaptureMP\VSCaptureMP\obj\Debug\VSCaptureMP.csproj.AssemblyReference.cache
+C:\Users\111\Desktop\mmhealth_2\sensors\VSCaptureMP-master-copy\VSCaptureMP\VSCaptureMP\obj\Debug\VSCaptureMP.csproj.CoreCompileInputs.cache
+C:\Users\111\Desktop\mmhealth_2\sensors\VSCaptureMP-master-copy\VSCaptureMP\VSCaptureMP\obj\Debug\VSCaptureMP.exe
+C:\Users\111\Desktop\mmhealth_2\sensors\VSCaptureMP-master-copy\VSCaptureMP\VSCaptureMP\obj\Debug\VSCaptureMP.pdb
+C:\Users\111\Desktop\mmhealth_2\sensors\VSCaptureMP-master-copy\VSCaptureMP\VSCaptureMP\bin\Debug\VSCaptureMP.exe.config
+C:\Users\111\Desktop\mmhealth_2\sensors\VSCaptureMP-master-copy\VSCaptureMP\VSCaptureMP\bin\Debug\VSCaptureMP.exe
+C:\Users\111\Desktop\mmhealth_2\sensors\VSCaptureMP-master-copy\VSCaptureMP\VSCaptureMP\bin\Debug\VSCaptureMP.pdb
+C:\Users\111\Desktop\mmhealth_2\sensors\VSCaptureMP-master-copy\VSCaptureMP\VSCaptureMP\bin\Debug\MQTTnet.dll
+C:\Users\111\Desktop\mmhealth_2\sensors\VSCaptureMP-master-copy\VSCaptureMP\VSCaptureMP\bin\Debug\MQTTnet.Extensions.ManagedClient.dll
+C:\Users\111\Desktop\mmhealth_2\sensors\VSCaptureMP-master-copy\VSCaptureMP\VSCaptureMP\obj\Debug\VSCaptureMP.csproj.CopyComplete
+C:\Users\Adnan\Documents\Github\syndicate\config\VSCaptureMP-master-copy\VSCaptureMP\VSCaptureMP\bin\Debug\VSCaptureMP.exe.config
+C:\Users\Adnan\Documents\Github\syndicate\config\VSCaptureMP-master-copy\VSCaptureMP\VSCaptureMP\bin\Debug\VSCaptureMP.exe
+C:\Users\Adnan\Documents\Github\syndicate\config\VSCaptureMP-master-copy\VSCaptureMP\VSCaptureMP\bin\Debug\VSCaptureMP.pdb
+C:\Users\Adnan\Documents\Github\syndicate\config\VSCaptureMP-master-copy\VSCaptureMP\VSCaptureMP\bin\Debug\MQTTnet.dll
+C:\Users\Adnan\Documents\Github\syndicate\config\VSCaptureMP-master-copy\VSCaptureMP\VSCaptureMP\bin\Debug\MQTTnet.Extensions.ManagedClient.dll
+C:\Users\Adnan\Documents\Github\syndicate\config\VSCaptureMP-master-copy\VSCaptureMP\VSCaptureMP\obj\Debug\VSCaptureMP.csproj.AssemblyReference.cache
+C:\Users\Adnan\Documents\Github\syndicate\config\VSCaptureMP-master-copy\VSCaptureMP\VSCaptureMP\obj\Debug\VSCaptureMP.csproj.SuggestedBindingRedirects.cache
+C:\Users\Adnan\Documents\Github\syndicate\config\VSCaptureMP-master-copy\VSCaptureMP\VSCaptureMP\obj\Debug\VSCaptureMP.csproj.CoreCompileInputs.cache
+C:\Users\Adnan\Documents\Github\syndicate\config\VSCaptureMP-master-copy\VSCaptureMP\VSCaptureMP\obj\Debug\VSCaptureMP.csproj.CopyComplete
+C:\Users\Adnan\Documents\Github\syndicate\config\VSCaptureMP-master-copy\VSCaptureMP\VSCaptureMP\obj\Debug\VSCaptureMP.exe
+C:\Users\Adnan\Documents\Github\syndicate\config\VSCaptureMP-master-copy\VSCaptureMP\VSCaptureMP\obj\Debug\VSCaptureMP.pdb
