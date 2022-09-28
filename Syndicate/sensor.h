@@ -78,7 +78,7 @@ struct Sensor
 
     Sensor(int buffer_size);
 
-    ~Sensor();
+    virtual ~Sensor();
 
     // virtual void LogData();
 

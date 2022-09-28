@@ -34,6 +34,8 @@ struct SpinnakerCamera : public Syndicate::Camera
     // int height;
     // int width;
     std::string pixelFormat;
+    int offset_x;
+    int offset_y;
     
     int bin_size;
     double exposure_compensation;
@@ -48,7 +50,7 @@ struct SpinnakerCamera : public Syndicate::Camera
 
 Spinnaker::CameraPtr getCam(Spinnaker::SystemPtr system, Spinnaker::CameraList camList, std::string serialNumber);
 
-bool configure(Spinnaker::CameraPtr pCam, Spinnaker::GenApi::INodeMap& nodeMap, std::string cameraType, double fps, int height, int width, std::string pixelFormat, int bin_size, double exposure_compensation, double exposure_time, double gain, double black_level);
+bool configure(Spinnaker::CameraPtr pCam, Spinnaker::GenApi::INodeMap& nodeMap, std::string cameraType, double fps, int width, int height, int offset_x, int offset_y, std::string pixelFormat, int bin_size, double exposure_compensation, double exposure_time, double gain, double black_level);
 
 std::string GetDeviceSerial(Spinnaker::CameraPtr pCam);
 

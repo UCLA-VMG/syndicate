@@ -23,7 +23,7 @@ VimbaCamera::VimbaCamera(std::unordered_map<std::string, std::any>& sample_confi
 {
     VmbErrorType err;
     try {
-        std::cout << "I am the " << sensorName << "\n";
+        std::cout << endl << endl << "Configuring " << sensorName << "\n";
         // Start Vimba
         err = m_system.Startup();
         if( VmbErrorSuccess == err )

@@ -24,57 +24,42 @@ void OpenCVCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
     int num_frames(int(seconds)*int(fps)*2);
     // int num_frames(int(seconds)*int(fps));
     std::cout << std::endl << std::endl << "*** IMAGE ACQUISITION ***" << std::endl << std::endl;
-    auto start = std::chrono::steady_clock::now();
     startBarrier.wait();
-    try {
-        for (int i = 0; i < num_frames; i++)
-        {
-            cv::Mat frame;
-            cv::Mat save_frame;
-            // Wait for a new frame from camera and store it into 'frame'
-            cap.read(frame);
-            
-            if (i % 2 == 0) {
-                RecordTimeStamp();
-                save_frame = std::any_cast<cv::Mat>(frame);
-                // Create a unique filename
-                std::ostringstream filename;
-                filename << rootPath << sensorName << "_" << int(i/2) << ".tiff";
-                std::vector<int> tags = {TIFFTAG_COMPRESSION, COMPRESSION_NONE};
-                imwrite(filename.str().c_str(), save_frame,tags);
-            }
+    auto start = std::chrono::steady_clock::now();
+    for (int i = 0; i < num_frames; i++)
+    {
+        cv::Mat frame;
+        cv::Mat save_frame;
+        // Wait for a new frame from camera and store it into 'frame'
+        cap.read(frame);
+        
+        if (i % 2 == 0) {
+            RecordTimeStamp();
+            save_frame = std::any_cast<cv::Mat>(frame);
+            // Create a unique filename
+            std::ostringstream filename;
+            filename << rootPath << sensorName << "_" << int(i/2) << ".tiff";
+            std::vector<int> tags = {TIFFTAG_COMPRESSION, COMPRESSION_NONE};
+            imwrite(filename.str().c_str(), save_frame,tags);
 
-            // RecordTimeStamp();
-            // save_frame = std::any_cast<cv::Mat>(frame);
-            // // Create a unique filename
-            // std::ostringstream filename;
-            // filename << rootPath << sensorName << "_" << i << ".tiff";
-            // std::vector<int> tags = {TIFFTAG_COMPRESSION, COMPRESSION_NONE};
-            // imwrite(filename.str().c_str(), save_frame,tags);
+            logFile << sensorName << " " << std::to_string(int(i/2)) << std::endl;
         }
-            
-        }
-    catch (Exception& e) {
-        std::cout << "Error: " << e.what() << std::endl;
+
+        // RecordTimeStamp();
+        // save_frame = std::any_cast<cv::Mat>(frame);
+        // // Create a unique filename
+        // std::ostringstream filename;
+        // filename << rootPath << sensorName << "_" << i << ".tiff";
+        // std::vector<int> tags = {TIFFTAG_COMPRESSION, COMPRESSION_NONE};
+        // imwrite(filename.str().c_str(), save_frame,tags);
     }
+    // end acquisition 
+
+    std::cout << "I am here!" << std::endl;
     auto end = std::chrono::steady_clock::now();
     std::cout << "Time Taken for " << sensorName  << " " << float((end-start).count())/1'000'000'000 << "\n";
     SaveTimeStamps();
 
-    start = std::chrono::steady_clock::now();
-    // cv::Mat save_frame;
-    // for (int i = 0; i < num_frames; i++) {
-    //     save_frame = std::any_cast<cv::Mat>(runningBuffer.front());
-    //     // Create a unique filename
-    //     std::ostringstream filename;
-    //     filename << rootPath << sensorName << "_" << i << ".png";
-    //     imwrite(filename.str().c_str(), save_frame);
-    //     runningBuffer.pop();
-    //     // sprintf_s(filename, filename.str().c_str()); // select your folder - filename is "Frame_n"
-    //     // std::cout << sensorName <<"_Frame_" << i << std::endl;
-    // }
-    end = std::chrono::steady_clock::now();
-    // std::cout <<"Time Taken for Saving " << sensorName << " " << float((end-start).count())/1'000'000'000 << "\n";
     this->setHealthCode(HealthCode::ONLINE);
 }
 
@@ -245,8 +230,6 @@ VideoCapture OpenCVCamera::openCap(int cameraID) {
     int fourcc = cap.get(CAP_PROP_FOURCC);
     std::string fourcc_str = format("%c%c%c%c", fourcc & 255, (fourcc >> 8) & 255, (fourcc >> 16) & 255, (fourcc >> 24) & 255);
     std::cout << "CAP_PROP_FOURCC: " << fourcc_str << std::endl;
-
-    
 
     return cap;
 }
