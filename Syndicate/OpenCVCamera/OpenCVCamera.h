@@ -42,6 +42,7 @@ struct OpenCVCamera : public Syndicate::Camera
 
     int cameraID;
     cv::VideoCapture cap;
+    bool hardware_sync;
     // string filename;
     // double fps;
     // double height;

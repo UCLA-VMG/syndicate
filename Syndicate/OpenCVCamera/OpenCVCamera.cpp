@@ -8,7 +8,13 @@ OpenCVCamera::OpenCVCamera(std::unordered_map<std::string, std::any>& sample_con
     : Syndicate::Camera(sample_config),
     cameraID(std::any_cast<int>(sample_config["Camera ID"]))
 {
-    std::cout << "opencv Camera Cstr\n";
+    if (sample_config.count("Hardware Sync") == 0) {
+        hardware_sync = false;
+    }
+    else {
+        hardware_sync = true;
+    }
+    std::cout << std::endl << std::endl << "Configuring " << sensorName << "\n";
     //--- OPEN CAP
     cap = openCap(cameraID);
 }
@@ -21,19 +27,20 @@ OpenCVCamera::~OpenCVCamera()
 
 void OpenCVCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
 {
-    int num_frames(int(seconds)*int(fps)*2);
+    int num_frames(int(seconds)*int(fps));
     // int num_frames(int(seconds)*int(fps));
     std::cout << std::endl << std::endl << "*** IMAGE ACQUISITION ***" << std::endl << std::endl;
     startBarrier.wait();
     auto start = std::chrono::steady_clock::now();
-    for (int i = 0; i < num_frames; i++)
-    {
-        cv::Mat frame;
-        cv::Mat save_frame;
-        // Wait for a new frame from camera and store it into 'frame'
-        cap.read(frame);
-        
-        if (i % 2 == 0) {
+    // if hardware sync is enabled, then use that signal to record all frames
+    if (hardware_sync) {
+        for (int i = 0; i < num_frames; i++)
+        {
+            cv::Mat frame;
+            cv::Mat save_frame;
+            // Wait for a new frame from camera and store it into 'frame'
+            cap.read(frame);
+            
             RecordTimeStamp();
             save_frame = std::any_cast<cv::Mat>(frame);
             // Create a unique filename
@@ -44,18 +51,32 @@ void OpenCVCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
 
             logFile << sensorName << " " << std::to_string(int(i/2)) << std::endl;
         }
+    }
+    // if hardware sync is not enabled, then record at 30 fps by dropping every other frame
+    // (since thermal camera natively records at 60 fps)
+    else {
+        // MULTIPLY NUM_FRAMES BY 2 BECAUSE REQUESTED FPS IS 30 BUT ACTUAL FPS IS 60
+        for (int i = 0; i < int(num_frames*2); i++)
+        {
+            cv::Mat frame;
+            cv::Mat save_frame;
+            // Wait for a new frame from camera and store it into 'frame'
+            cap.read(frame);
+            
+            if (i % 2 == 0) {
+                RecordTimeStamp();
+                save_frame = std::any_cast<cv::Mat>(frame);
+                // Create a unique filename
+                std::ostringstream filename;
+                filename << rootPath << sensorName << "_" << int(i/2) << ".tiff";
+                std::vector<int> tags = {TIFFTAG_COMPRESSION, COMPRESSION_NONE};
+                imwrite(filename.str().c_str(), save_frame,tags);
 
-        // RecordTimeStamp();
-        // save_frame = std::any_cast<cv::Mat>(frame);
-        // // Create a unique filename
-        // std::ostringstream filename;
-        // filename << rootPath << sensorName << "_" << i << ".tiff";
-        // std::vector<int> tags = {TIFFTAG_COMPRESSION, COMPRESSION_NONE};
-        // imwrite(filename.str().c_str(), save_frame,tags);
+                logFile << sensorName << " " << std::to_string(int(i/2)) << std::endl;
+            }
+        }
     }
     // end acquisition 
-
-    std::cout << "I am here!" << std::endl;
     auto end = std::chrono::steady_clock::now();
     std::cout << "Time Taken for " << sensorName  << " " << float((end-start).count())/1'000'000'000 << "\n";
     SaveTimeStamps();
