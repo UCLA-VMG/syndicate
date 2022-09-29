@@ -9,6 +9,7 @@ SensorStack::SensorStack(boost::property_tree::ptree tree)
  
     std::vector<std::unique_ptr<Sensor>(*)(ptree::value_type&, std::string&)> sensor_list;
     std::vector<ptree::value_type> configs;
+    // ptree::value_type setting_config;
     std::string ATTR_SET("sensor");
     std::string SETTINGS("settings");
  
@@ -17,6 +18,7 @@ SensorStack::SensorStack(boost::property_tree::ptree tree)
         std::cout << at << " \n";
         if(at == ATTR_SET)
         {
+            /// @Adnan This needs to be modified for all sensors.
             //Check if sensor is in list of defined sensors
             if(f.second.get<std::string>("type") == "mx800")
                 sensor_list.emplace_back(makeSensor<MX800>);
