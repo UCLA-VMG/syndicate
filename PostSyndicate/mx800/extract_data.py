@@ -61,11 +61,15 @@ def generate_original_vital_dict(folder_path, save_folder=None, visualize=False)
     source1 = os.path.join(folder_path, "NOM_PLETHWaveExport.csv")
     mx_stamps, sys_stamps, data = extract_data(input_filepath=source1, vital_sign=1)
     vital_dict["PPG"] = [mx_stamps, sys_stamps, data, unroll_flag]
+
+    source2 = os.path.join(folder_path, "NOM_RESPWaveExport.csv")
+    mx_stamps, sys_stamps, data = extract_data(input_filepath=source2, vital_sign=1)
+    vital_dict["RESP"] = [mx_stamps, sys_stamps, data, unroll_flag]
     
     unroll_flag = 0
-    source2 =  os.path.join(folder_path, "MPDataExport.csv")
+    source3 =  os.path.join(folder_path, "MPDataExport.csv")
     for i in range(len(mx800_MPDataExport)):
-        mx_stamps, sys_stamps, data = extract_data(input_filepath=source2, vital_sign=i+1)
+        mx_stamps, sys_stamps, data = extract_data(input_filepath=source3, vital_sign=i+1)
         vital_dict[mx800_MPDataExport[i]["name"]] = [mx_stamps, sys_stamps, data, unroll_flag]
 
     if(save_folder is not None):
@@ -87,12 +91,14 @@ def generate_original_vital_dict(folder_path, save_folder=None, visualize=False)
 
 if __name__ == "__main__":
 
-    root_path = r"D:\BP_RF_RGB_CAM"
-    recording_paths = os.listdir(root_path)
-    for i in recording_paths:
-        folder_path = os.path.join(root_path, i, "MX800")
-        print(folder_path)
-        generate_original_vital_dict(folder_path=folder_path, save_folder=folder_path, visualize=False)
+    folder_path = r"D:\Adnan Inference Test\osa_test\trial_3\MX800"
+    # save_folder_path = r"D:\Adnan Inference Test\MX800\trial_1"
+    # video_ts_file_path = os.path.join(r"D:\Adnan Inference Test\NIR_Camera\trial_1", "log_timestamps.txt")
+    # vital_dict_file_path = os.path.join(save_folder_path, "vital_original_dictionary.pkl")
+    # get_interpolated_vital_dict(vital_dict_file_path, video_ts_file_path, 
+    #                             save_folder_path, plot_figure=True)
+
+    generate_original_vital_dict(folder_path=folder_path, save_folder=folder_path, visualize=False)
 
 
     ### Uncomment to test extraction->

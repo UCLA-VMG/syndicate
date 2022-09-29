@@ -66,6 +66,8 @@ void SpinnakerCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
     ImagePtr convertedImage = nullptr;
     
     // 1. Wait Until all other sensors have reached here
+    std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(5)));
+    std::cout << "Hit barrier\n";
     startBarrier.wait();
 
     auto start = std::chrono::steady_clock::now();

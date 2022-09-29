@@ -93,10 +93,11 @@ def timestamp_process(ts):
 
         return temp
 
-def interpolate_timestamp(vital_sign_dictionary, vid_ts, offset = 25/30):
+def interpolate_timestamp(vital_sign_dictionary, vid_ts, offset = 25/30, figure=False):
         #constucting arrays for the data
         vital_interpolated_dict = {}
         for key in vital_sign_dictionary.keys():
+            # print(key)
             mx_stamps, sys_stamps, data, unroll_flag = vital_sign_dictionary[key]
 
             delta_array = find_deltas(sys_stamps, mx_stamps)
@@ -110,7 +111,22 @@ def interpolate_timestamp(vital_sign_dictionary, vid_ts, offset = 25/30):
 
             ##CHECK FOR Data AND TS LENGTHS AND CORRECT
             l1 = len(health_ts)
+            # print(health_ts.shape)
+            # print("health_ts: ", l1)
             l2 = len(data)
+            # print("data: ", l2)
+
+            if(key == "RESP"):
+                for i in range (l2 - l1):
+                    health_ts = np.append(health_ts, [0])
+
+            l1 = len(health_ts)
+            # print(health_ts.shape)
+            # print("health_ts: ", l1)
+            l2 = len(data)
+            # print("data: ", l2)
+
+
             if l1<l2:
                 raise Exception("Unequal MX800 Data and Timestamp Lengths!")
             elif l2<l1:
@@ -128,7 +144,7 @@ def interpolate_timestamp(vital_sign_dictionary, vid_ts, offset = 25/30):
             output = np.array(reinterp_data)
             vital_interpolated_dict[key] = output
 
-            if(unroll_flag):
+            if(unroll_flag and figure):
                 plt.figure()
                 plt.plot(output)
         
@@ -154,7 +170,7 @@ def aslist(value, flatten=True):
         result.extend(subvalues)
     return result
 
-def get_interpolated_vital_dict(vital_dict_path, timestamp_path, save_folder_path, offset = 25/30):
+def get_interpolated_vital_dict(vital_dict_path, timestamp_path, save_folder_path, offset = 25/30, plot_figure=False):
     
     fileObj = open(os.path.join(vital_dict_path), 'rb')
     vital_dict = pickle.load(fileObj)
@@ -162,7 +178,7 @@ def get_interpolated_vital_dict(vital_dict_path, timestamp_path, save_folder_pat
 
     vid_ts = extract_timestamps(timestamp_path)
 
-    interpolated_vital_dict = interpolate_timestamp(vital_dict, vid_ts, offset)
+    interpolated_vital_dict = interpolate_timestamp(vital_dict, vid_ts, offset, figure=plot_figure)
     if(save_folder_path is not None):
         save_path = os.path.join(save_folder_path, "vital_interpolated_dictionary.pkl")
         filehandler = open(save_path, 'wb') 
@@ -173,14 +189,23 @@ def get_interpolated_vital_dict(vital_dict_path, timestamp_path, save_folder_pat
 
 if __name__ == "__main__":
 
-    root_path = r"D:\BP_RF_RGB_CAM"
-    recording_paths = os.listdir(root_path)
-    for i in recording_paths:
-        print(i)
-        save_folder_path = os.path.join("D:\syndicate_tests", i, "MX800")
-        video_ts_file_path = os.path.join("D:\syndicate_tests", i, "NIR_Camera", "log_timestamps.txt")
-        vital_dict_file_path = os.path.join(save_folder_path, "vital_original_dictionary.pkl")
-        get_interpolated_vital_dict(vital_dict_file_path, video_ts_file_path, save_folder_path)
+    # root_path = r"D:\BP_RF_RGB_CAM"
+    # recording_paths = os.listdir(root_path)
+    # for i in recording_paths:
+    #     print(i)
+    #     save_folder_path = os.path.join(root_path, i, "MX800")
+    #     video_ts_file_path = os.path.join(root_path, i, "RGB_Polarized_Camera", "log_timestamps.txt")
+    #     vital_dict_file_path = os.path.join(save_folder_path, "vital_original_dictionary.pkl")
+    #     get_interpolated_vital_dict(vital_dict_file_path, video_ts_file_path, 
+    #                                 save_folder_path, plot_figure=True)
 
+    # plt.show()
+    
+    root_path = r"D:\Adnan Inference Test\osa_test\trial_3\MX800"
+    save_folder_path = r"D:\Adnan Inference Test\MX800\trial_3"
+    video_ts_file_path = os.path.join(r"D:\Adnan Inference Test\NIR_Camera\trial_3", "log_timestamps.txt")
+    vital_dict_file_path = os.path.join(root_path, "vital_original_dictionary.pkl")
+    get_interpolated_vital_dict(vital_dict_file_path, video_ts_file_path, 
+                                save_folder_path, plot_figure=True)
 
-    plt.show()
+    # plt.show()

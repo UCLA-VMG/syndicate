@@ -75,6 +75,7 @@ bool RFEthernet::LoadNpcapDlls()
 
 void RFEthernet::AcquireSave(double seconds, boost::barrier& startBarrier)
 {
+	seconds = seconds + 15; // TODO Bug fix for radar prematurely ending ;)
 	pcap_dumper_t *dumpfile;
 	char errbuf[PCAP_ERRBUF_SIZE];
     /* Open the adapter */
@@ -107,7 +108,8 @@ void RFEthernet::AcquireSave(double seconds, boost::barrier& startBarrier)
     pcap_freealldevs(all_devs);
     
     /* start the capture */
-	startBarrier.wait();
+	// startBarrier.wait();
+	std::cout << "radar starting \n";
 	boost::thread interrupt_thread(boost::bind(&RFEthernet::interrupt_pcap_loop, this, seconds));
     pcap_loop(adhandle, 0, packet_handler, (unsigned char *)dumpfile);
 	std::cout << "RF Execution Complete\n\n";

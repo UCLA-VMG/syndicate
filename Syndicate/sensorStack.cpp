@@ -3,10 +3,10 @@
 SensorStack::SensorStack(
     std::vector<std::unique_ptr<Sensor>(*)(std::unordered_map<std::string, std::any>&)>& sensor_list,
     std::vector<std::unordered_map<std::string, std::any>>& configs)
-    : frameBarrier(sensor_list.size()), startAcq(sensor_list.size())
+    : frameBarrier(sensor_list.size()-1), startAcq(sensor_list.size()-1) //TODO Buf fix for premature radar
 {
     assert(sensor_list.size() == configs.size());
-
+    std::cout << std::to_string(sensor_list.size()-1) << " barr num\n";
     int length = sensor_list.size();
     for(auto i=0; i < length; ++i)
     {
