@@ -1,5 +1,8 @@
 #include "sensorStack.h"
 
+/// @Anirudh's idea for incorporating global + sensor settings = 
+/// have each sensor take 2 ptree's as input
+/// input A is global settings, input B is sensor settings
 SensorStack::SensorStack(boost::property_tree::ptree tree)
 {
     using boost::property_tree::ptree;

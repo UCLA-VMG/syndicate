@@ -3,7 +3,7 @@
 <sensor_stack>
     
     <settings>
-        <save_path>D:/syndicate_tests/</save_path>
+        <save_path>D:/syndicate_tests/sasha_config_test2/</save_path>
     </settings>
 
     <sensor>

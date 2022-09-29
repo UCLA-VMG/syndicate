@@ -28,20 +28,7 @@ int main(int argc, char *argv[]) {
     ptree tree;
     std::string XML_PATH("C:/Users/111/Desktop/repos/syndicate/scripts/test_mx800.xml");
     read_xml(XML_PATH, tree);
-    
-    //2. Add Configurations and Factory Generator Functions into std::vectors
-    // std::vector<std::unique_ptr<Sensor>(*)(std::unordered_map<std::string, std::any>&)> sensor_list;
-    // sensor_list.emplace_back(makeSensor<SimpleSensor>);
-    // sensor_list.emplace_back(makeSensor<SimpleSensor>);
-    // sensor_list.emplace_back(makeSensor<OpenCVCamera>);
-    // sensor_list.emplace_back(makeSensor<VimbaCamera>);
-    // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
-    //sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
-   //sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
-    // sensor_list.emplace_back(makeSensor<MiniDSPMic>);
-    // sensor_list.emplace_back(makeSensor<RealSenseCamera>);
-    // sensor_list.emplace_back(makeSensor<RFEthernet>);
-    
+
     //3. Initialize Sensor Stack
     std::cout << "\n\n\n Barrier Sync Capture\n";
 
