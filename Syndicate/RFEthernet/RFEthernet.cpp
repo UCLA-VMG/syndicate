@@ -3,6 +3,11 @@
 RFEthernet::RFEthernet(std::unordered_map<std::string, std::any>& sample_config)
     : Sensor(sample_config), _timeout(std::any_cast<int>(sample_config["Timeout"]))
 {
+	// launch cmd file to configure radar parameters
+	std::string command = "C:\\Users\\Adnan\\Documents\\Github\\syndicate\\config\\run_multi_4rx3tx_mmwavestudio.cmd";
+	WinExec(command.c_str(), SW_HIDE);
+	std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(60))); // wait 60 seconds for lua script to execute
+
 	int interface_id;
 	int total_interfaces=0;
 	char errbuf[PCAP_ERRBUF_SIZE];
@@ -39,8 +44,10 @@ RFEthernet::RFEthernet(std::unordered_map<std::string, std::any>& sample_config)
         exit(1);
     }
     
-    std::cout << "Enter the interface number (1-" << total_interfaces << "): ";
-    std::cin >> interface_id;
+    // std::cout << "Enter the interface number (1-" << total_interfaces << "): ";
+    // std::cin >> interface_id;
+
+	interface_id = 8;
     
     if(interface_id < 1 || interface_id > total_interfaces)
     {
@@ -116,6 +123,9 @@ void RFEthernet::AcquireSave(double seconds, boost::barrier& startBarrier)
 
 	interrupt_thread.join();
     pcap_close(adhandle);
+	// launch cmd file to configure radar parameters
+	// std::string command = "C://Users//Adnan//Documents//Github//syndicate//config//close_mmwavestudio.cmd";
+	// WinExec(command.c_str(), SW_HIDE);
 }
 
 static void packet_handler(u_char *dumpfile, const struct pcap_pkthdr *header, const u_char *pkt_data)

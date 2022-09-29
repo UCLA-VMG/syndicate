@@ -158,12 +158,12 @@ void SerialPort::signalWriteRead(unsigned int dealyTime, std::string command)
 void SerialPort::AcquireSave(double seconds, boost::barrier& startBarrier) {
     // Better than recusion
     // Avoid stack overflows
+    startBarrier.wait();
     auto start = std::chrono::steady_clock::now();
     auto end = std::chrono::steady_clock::now();
 
     while((static_cast<double>((end-start).count())/1'000'000'000) < seconds)
     {
-        startBarrier.wait();
         runBarker13();
         end = std::chrono::steady_clock::now();
     }
