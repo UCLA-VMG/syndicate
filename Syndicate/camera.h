@@ -18,13 +18,17 @@ namespace Syndicate
         virtual void AcquireSave(double seconds, boost::barrier& startBarrier) = 0;
         virtual void AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier) = 0;
 
-
         //Operating Characteristics
         std::string cameraType;
         double fps;
-        int height;
-        int width;
-
-
+        double height;
+        double width;
+        // std::string pixelFormat;
+    
+        // int bin_size;
+        // double exposure_compensation;
+        // double exposure_time;
+        // double gain;
+        // double black_level;
     };
 }

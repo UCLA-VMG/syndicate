@@ -7,6 +7,11 @@
 #include <windows.h>
 #include <ctime>
 
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <tiff.h>
+#include <tiffio.h>
+
 #include <chrono>
 #include <thread>
 #include <string>
@@ -31,19 +36,18 @@ struct OpenCVCamera : public Syndicate::Camera
     bool AcquireImages(cv::VideoCapture cap, int num_frames);
     bool getResolution(cv::VideoCapture cap);
     bool getFps(cv::VideoCapture cap);
-    bool setBitDepth(cv::VideoCapture cap, int bit_depth);
 
-    cv::VideoCapture& openCap(int cameraID);
+    cv::VideoCapture openCap(int cameraID);
     bool configure(cv::VideoCapture cap, int deviceID, double fps, double height, double width);
 
     int cameraID;
     cv::VideoCapture cap;
+    bool hardware_sync;
     // string filename;
     // double fps;
     // double height;
     // double width;
 
-    std::string type2str(int type);
 };
 
 // std::unique_ptr<Sensor> makeSimpleSensor(std::unordered_map<std::string, std::any>& sample_config);
