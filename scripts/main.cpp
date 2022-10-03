@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
     // std::string rootPath_C("C:/Users/Adnan/Downloads/patient_3/");
     // std::string rootPath_D("D:/patient_3/");
     // std::string rootPath_E("E:/patient_8/");
-    std::string rootPath_E("C:/Users/Adnan/Downloads/osa_test/");
+    std::string rootPath_E("D:/v_4_1/");
     // if(all_args.size()>0){rootPath_C = rootPath_C + all_args[0] + "/";}
     // if(all_args.size()>0){rootPath_D = rootPath_D + all_args[0] + "/";}
     if(all_args.size()>0){rootPath_E = rootPath_E + all_args[0] + "/";}
@@ -45,35 +45,34 @@ int main(int argc, char *argv[]) {
     //     {"Root Path", rootPath_E}, {"Pixel Format", std::string("Mono")},
     //     // {"Hardware Sync", h_sync}, {"Primary", false}
     // };
-    std::unordered_map<std::string, std::any> nir_config_mm = { // 850 nm
-        {"Camera ID", std::string("21190637")}, {"Camera Type", std::string("Grasshopper3")},
-        {"FPS", 30.0},
-        {"Width", 1024}, {"Height", 1024}, // 1024 x 1024
-        {"Offset X", 0}, {"Offset Y", 0}, 
-        {"Sensor Name", std::string("NIR_Camera_mm")},
-        {"Root Path", rootPath_E}, {"Pixel Format", std::string("Mono")},
-        {"Binning Size", 1}, // 1024 x 1024
-        {"Exposure Compensation", 0.09},
-        {"Exposure Time", 8500.0},
-        {"Gain", 0.0},
-        {"Black Level", 5.08},
-        {"Hardware Sync", h_sync}, {"Primary", false}
-    };
     std::unordered_map<std::string, std::any> nir_config = { // 940 nm
         {"Camera ID", std::string("21290846")}, {"Camera Type", std::string("Grasshopper3")},
         {"FPS", 30.0},
-        {"Width", 1024}, {"Height", 1024}, // 1024 x 1024
+        {"Width", 2048}, {"Height", 2048}, // 2048 x 2048
         {"Offset X", 0}, {"Offset Y", 0}, 
         {"Sensor Name", std::string("NIR_Camera")},
         {"Root Path", rootPath_E}, {"Pixel Format", std::string("Mono")},
-        {"Binning Size", 1}, // 1024 x 1024
+        {"Binning Size", 2}, // 1024 x 1024
         {"Exposure Compensation", 0.08},
         {"Exposure Time", 8500.0},
         {"Gain", 0.0},
         {"Black Level", 5.57},
         {"Hardware Sync", h_sync}, {"Primary", false}
     };
-
+    std::unordered_map<std::string, std::any> nir_config_mm = { // 850 nm
+        {"Camera ID", std::string("21190637")}, {"Camera Type", std::string("Grasshopper3")},
+        {"FPS", 30.0},
+        {"Width", 2048}, {"Height", 2048}, // 2048 x 2048
+        {"Offset X", 0}, {"Offset Y", 0}, 
+        {"Sensor Name", std::string("NIR_Camera_mm")},
+        {"Root Path", rootPath_E}, {"Pixel Format", std::string("Mono")},
+        {"Binning Size", 2}, // 1024 x 1024
+        {"Exposure Compensation", 0.09},
+        {"Exposure Time", 8500.0},
+        {"Gain", 0.0},
+        {"Black Level", 5.08},
+        {"Hardware Sync", h_sync}, {"Primary", false}
+    };
     std::unordered_map<std::string, std::any> thermal_config = {
         {"Camera ID", 0}, {"Camera Type", std::string("Boson")},
         {"FPS", 30.0}, 
@@ -89,12 +88,12 @@ int main(int argc, char *argv[]) {
         {"Sensor Name", std::string("FMCW_Radar")},
         {"Root Path", rootPath_E}
     };
-    // std::unordered_map<std::string, std::any> serial_config = {
-    //     {"Port Name", std::string("\\\\.\\COM14")},
-    //     {"Pulse Time", 1}, {"Total Time", 20},
-    //     {"Sensor Name", std::string("Arduino_Serial")},
-    //     {"Root Path", rootPath_E}
-    // };
+    std::unordered_map<std::string, std::any> serial_config = {
+        {"Port Name", std::string("\\\\.\\COM14")},
+        {"Pulse Time", 1}, {"Total Time", 20},
+        {"Sensor Name", std::string("Arduino_Serial")},
+        {"Root Path", rootPath_E}
+    };
     // std::unordered_map<std::string, std::any> mic_config = {
     //     {"FS", 44100}, {"Channels", 8}, {"Frames per Buffer", 512},
     //     {"Sensor Name", std::string("Microphone")},
@@ -109,17 +108,17 @@ int main(int argc, char *argv[]) {
     //2. Add Configurations and Factory Generator Functions into std::vectors
     std::vector<std::unique_ptr<Sensor>(*)(std::unordered_map<std::string, std::any>&)> sensor_list;
     // sensor_list.emplace_back(makeSensor<VimbaCamera>);
-    sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
-    sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+    // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
     sensor_list.emplace_back(makeSensor<OpenCVCamera>);
-    sensor_list.emplace_back(makeSensor<RFEthernet>);
+    // sensor_list.emplace_back(makeSensor<RFEthernet>);
     // sensor_list.emplace_back(makeSensor<SerialPort>);
 
     // std::vector<std::unordered_map<std::string, std::any>> configs{nir_config, nir_config_mm, thermal_config, radar_config, serial_config};
     // std::vector<std::unordered_map<std::string, std::any>> configs{nir_config, nir_config_mm, rgb_config, thermal_config, radar_config, mx800_config};
     // std::vector<std::unordered_map<std::string, std::any>> configs{nir_config, nir_config_mm};
-    std::vector<std::unordered_map<std::string, std::any>> configs{nir_config, nir_config_mm, thermal_config, radar_config};
-    std::cout << "Here" << std::endl;
+    // std::vector<std::unordered_map<std::string, std::any>> configs{nir_config, nir_config_mm, thermal_config, radar_config};
+    std::vector<std::unordered_map<std::string, std::any>> configs{thermal_config};
     //3. Initialize Sensor Stack
     SensorStack mainStack(sensor_list, configs);
     
@@ -128,7 +127,7 @@ int main(int argc, char *argv[]) {
 
     //4.1 Asynchronously Acquire Data
     std::cout << "\n\n\nAsyn Capture \n";
-    mainStack.Acquire(10); // 10,800 [3 hrs] & 14,400 [4 hrs] & 21,600 [6 hrs]
+    mainStack.Acquire(3600); // 10,800 [3 hrs] & 14,400 [4 hrs] & 21,600 [6 hrs]
 
     // 4.2 Barrier Sync Acquire Data
     // std::cout << "\n\n\n Barrier Sync Capture\n";
