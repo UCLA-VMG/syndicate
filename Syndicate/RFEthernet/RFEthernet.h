@@ -8,6 +8,8 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
+#include <winsock2.h>
+
 #include "sensor.h"
 
 #include <pcap.h>
@@ -21,7 +23,7 @@
 
 struct RFEthernet : public Sensor 
 {
-    RFEthernet(std::unordered_map<std::string, std::any>& sample_config);
+    RFEthernet(ptree::value_type& tree, std::string& savePath);
     ~RFEthernet();
 
     void AcquireSave(double seconds, boost::barrier& startBarrier);

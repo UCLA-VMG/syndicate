@@ -7,22 +7,10 @@ using namespace std;
 
 using namespace Syndicate;
 
-SpinnakerCamera::SpinnakerCamera(std::unordered_map<std::string, std::any>& sample_config)
-    : Syndicate::Camera(sample_config), 
-    cameraID(std::any_cast<std::string>(sample_config["Camera ID"])),
-    cameraType(std::any_cast<std::string>(sample_config["Camera Type"])),
-    // fps(std::any_cast<double>(sample_config["FPS"])),
-    // height(std::any_cast<int>(sample_config["Height"])),
-    // width(std::any_cast<int>(sample_config["Width"])),
-    pixelFormat(std::any_cast<std::string>(sample_config["Pixel Format"])),
-    offset_x(std::any_cast<int>(sample_config["Offset X"])),
-    offset_y(std::any_cast<int>(sample_config["Offset Y"])),
-    
-    bin_size(std::any_cast<int>(sample_config["Binning Size"])),
-    exposure_compensation(std::any_cast<double>(sample_config["Exposure Compensation"])),
-    exposure_time(std::any_cast<double>(sample_config["Exposure Time"])),
-    gain(std::any_cast<double>(sample_config["Gain"])),
-    black_level(std::any_cast<double>(sample_config["Black Level"]))
+SpinnakerCamera::SpinnakerCamera(ptree::value_type& tree, std::string& savePath)
+    : Syndicate::Camera(tree, savePath), 
+    cameraID(tree.second.get<std::string>("camera_id")),
+    pixelFormat(tree.second.get<std::string>("pixel_format"))
 {
     
     // std::cout << "FPS: " << fps << endl;

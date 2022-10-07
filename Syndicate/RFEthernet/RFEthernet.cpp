@@ -1,7 +1,7 @@
 #include "RFEthernet.h"
 
-RFEthernet::RFEthernet(std::unordered_map<std::string, std::any>& sample_config)
-    : Sensor(sample_config), _timeout(std::any_cast<int>(sample_config["Timeout"]))
+RFEthernet::RFEthernet(ptree::value_type& tree, std::string& savePath)
+    : Sensor(tree, savePath), _timeout(tree.second.get<int>("timeout"))
 {
 	// launch cmd file to configure radar parameters
 	std::string command = "C:\\Users\\Adnan\\Documents\\Github\\syndicate\\config\\run_multi_4rx3tx_mmwavestudio.cmd";

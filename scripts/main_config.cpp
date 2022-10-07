@@ -1,6 +1,7 @@
-#include <winsock2.h>
+#include <WinSock2.h>
+
+#include "SpinnakerCamera.h"
 #include <iostream>
-#include <Spinnaker.h>
 #include <functional>
 #include <boost/shared_ptr.hpp>
 #include <boost/property_tree/ptree.hpp>
@@ -10,12 +11,11 @@
 
 #include "sensor.h"
 // #include "simpleSensor.h"
-// #include "sensorStack.h"
-// #include "SpinnakerCamera.h"
+#include "sensorStack.h"
 // #include "VimbaCamera.h"
 // #include "SerialPort.h"
 // #include "OpenCVCamera.h"
-// #include "RFEthernet.h"
+#include "RFEthernet.h"
 // #include "MiniDSPMic.h"
 #include "MX800.h"
 // #include "RealSenseCamera.h"
@@ -47,12 +47,12 @@ int main(int argc, char *argv[]) {
 
     SensorStack mainStack(tree);
     
-    //4. Acquire Data
-    // std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    // 4. Acquire Data
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
-    //4.1 Asynchronously Acquire Data
-    // std::cout << "\n\n\nAsyn Capture \n";
-    // mainStack.Acquire(10);
+    // 4.1 Asynchronously Acquire Data
+    std::cout << "\n\n\nAsyn Capture \n";
+    mainStack.Acquire(10);
 
 
     // 4.2 Barrier Sync Acquire Data

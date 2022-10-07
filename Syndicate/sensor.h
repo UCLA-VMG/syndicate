@@ -116,5 +116,6 @@ struct Sensor
 template<class T>
 std::unique_ptr<Sensor> makeSensor(ptree::value_type& tree, std::string& savePath)
 {
+    std::cout << "hi2\n";
     return std::make_unique<T>(tree, savePath);
 }

@@ -1,5 +1,5 @@
 #pragma once
-
+#include <WinSock2.h>
 #include "sensor.h"
 
 #include <chrono>
@@ -12,7 +12,7 @@ namespace Syndicate
 {
     struct Camera : public Sensor 
     {
-        Camera(std::unordered_map<std::string, std::any>& sample_config);
+        Camera(ptree::value_type& tree, std::string& savePath);
         // ~Camera();
 
         virtual void AcquireSave(double seconds, boost::barrier& startBarrier) = 0;
