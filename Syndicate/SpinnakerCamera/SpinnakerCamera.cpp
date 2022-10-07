@@ -514,7 +514,7 @@ bool setFps(INodeMap& nodeMap, float fps, std::string cameraType) {
         if (cameraType == "Grasshopper3") {
             ptrAcquisitionFrameRateEnable = nodeMap.GetNode("AcquisitionFrameRateEnabled");
         }
-        else if (cameraType == "Grasshopper3") {
+        else if (cameraType == "BlackFlyS") {
             ptrAcquisitionFrameRateEnable = nodeMap.GetNode("AcquisitionFrameRateEnable");
         }
         else {
@@ -800,13 +800,13 @@ bool configure(CameraPtr pCam, INodeMap& nodeMap, std::string cameraType, double
             return false;
         }
         // set fps
-        if (!setFps(nodeMap, fps, cameraType)) {
-            return false;
-        }
+        // if (!setFps(nodeMap, fps, cameraType)) {
+        //     return false;
+        // }
         // set resolution
-        if (!setResolution(nodeMap, width, height, offset_x, offset_y)) {
-            return false;
-        }
+        // if (!setResolution(nodeMap, width, height, offset_x, offset_y)) {
+        //     return false;
+        // }
         // set binning
         if (!setBinning(nodeMap, bin_size)) {
             return false;

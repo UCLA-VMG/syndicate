@@ -45,11 +45,11 @@ void OpenCVCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
             save_frame = std::any_cast<cv::Mat>(frame);
             // Create a unique filename
             std::ostringstream filename;
-            filename << rootPath << sensorName << "_" << int(i/2) << ".tiff";
+            filename << rootPath << sensorName << "_" << int(i) << ".tiff";
             std::vector<int> tags = {TIFFTAG_COMPRESSION, COMPRESSION_NONE};
             imwrite(filename.str().c_str(), save_frame,tags);
 
-            logFile << sensorName << " " << std::to_string(int(i/2)) << std::endl;
+            logFile << sensorName << " " << std::to_string(int(i)) << std::endl;
         }
     }
     // if hardware sync is not enabled, then record at 30 fps by dropping every other frame
