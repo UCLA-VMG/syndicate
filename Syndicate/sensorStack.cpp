@@ -18,10 +18,22 @@ SensorStack::SensorStack(boost::property_tree::ptree tree)
         {
             /// @Adnan This needs to be modified for all sensors.
             // Check if sensor is in list of defined sensors
-            if(f.second.get<std::string>("type") == "mx800")
+            if(f.second.get<std::string>("type") == "MX800")
                 sensor_list.emplace_back(makeSensor<MX800>);
-            else if(f.second.get<std::string>("type") == "flir")
+            else if(f.second.get<std::string>("type") == "SpinnakerCamera")
                 sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+            else if(f.second.get<std::string>("type") == "OpenCVCamera")
+                sensor_list.emplace_back(makeSensor<OpenCVCamera>);
+            else if(f.second.get<std::string>("type") == "RealSenseCamera")
+                sensor_list.emplace_back(makeSensor<RealSenseCamera>);
+            else if(f.second.get<std::string>("type") == "VimbaCamera")
+                sensor_list.emplace_back(makeSensor<VimbaCamera>);
+            else if(f.second.get<std::string>("type") == "RFEthernet")
+                sensor_list.emplace_back(makeSensor<RFEthernet>);
+            else if(f.second.get<std::string>("type") == "SerialPort")
+                sensor_list.emplace_back(makeSensor<SerialPort>);
+            else if(f.second.get<std::string>("type") == "MiniDSPMic")
+                sensor_list.emplace_back(makeSensor<MiniDSPMic>);
             else
                 std::cout << "Sensor attribute not recognized.\n";
             // Append initialization params
