@@ -1,10 +1,10 @@
 #include "miniDSPMic.h"
 
-MiniDSPMic::MiniDSPMic(std::unordered_map<std::string, std::any>& sample_config)
-    : Sensor(sample_config), _frames_per_buffer(std::any_cast<int>(sample_config["Frames per Buffer"]))
+MiniDSPMic::MiniDSPMic(ptree::value_type& sensor_settings, ptree::value_type& global_settings)
+    : Sensor(sensor_settings, global_settings), _frames_per_buffer(sensor_settings.second.get<int>("Frames per Buffer"))
 {
-    _data.fs = std::any_cast<int>(sample_config["FS"]);
-    _data.channels = std::any_cast<int>(sample_config["Channels"]);
+    _data.fs = sensor_settings.second.get<int>("FS");
+    _data.channels = sensor_settings.second.get<int>("Channels");
     PaStreamParameters input_params;
     PaError err = paNoError;
 
@@ -121,10 +121,6 @@ void MiniDSPMic::AcquireSave(double seconds, boost::barrier& startBarrier) {
     std::cout << "Data has been written." << std::endl;
 }
 
-void MiniDSPMic::AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier) {
-    std::cout << "I am not defined yet.\n\n";
-}
-
 static int _callback(const void* input_buffer, void* output_buffer,
     unsigned long frames_per_buffer, const PaStreamCallbackTimeInfo* time_info,
     PaStreamCallbackFlags status_flags, void* user_data) {
@@ -180,14 +176,4 @@ MiniDSPMic::~MiniDSPMic() {
     //     fprintf(stderr, "Error number: %d\n", err);
     //     fprintf(stderr, "Error message: %s\n", Pa_GetErrorText(err));
     // }
-}
-
-void MiniDSPMic::ConcurrentAcquire(double seconds, boost::barrier& frameBarrier)
-{
-    std::cout << "I am not defined yet.\n\n";
-}
-
-void MiniDSPMic::ConcurrentSave()
-{
-    std::cout << "I am not defined yet.\n\n";
 }

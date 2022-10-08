@@ -2,8 +2,8 @@
 
 using namespace cv;
 
-RealSenseCamera::RealSenseCamera(std::unordered_map<std::string, std::any>& sample_config)
-    : Syndicate::Camera(sample_config), cameraID(std::any_cast<int>(sample_config["Camera ID"]))
+RealSenseCamera::RealSenseCamera(ptree::value_type& sensor_settings, ptree::value_type& global_settings)
+    : Syndicate::Camera(sensor_settings, global_settings), cameraID(sensor_settings.second.get<int>("Camera ID"))
 {
     std::cout << "Booting the Real Sense Camera";
     rs_pipe.start();
@@ -76,19 +76,4 @@ void metadata_to_csv(const rs2::frame& frm, const std::string& filename)
     }
 
     csv.close();
-}
-
-void RealSenseCamera::AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier)
-{
-    std::cout << "I am not defined yet.\n\n";
-}
-
-void RealSenseCamera::ConcurrentAcquire(double seconds, boost::barrier& frameBarrier)
-{
-    std::cout << "I am not defined yet.\n\n";
-}
-
-void RealSenseCamera::ConcurrentSave()
-{
-    std::cout << "I am not defined yet.\n\n";
 }

@@ -76,11 +76,11 @@ struct Sensor
     // Usage :: for streaming mode, a bufferSize should be specified to cut off extra data
     const int bufferSize;
     // logFile
-    // Usage :: file object used for logging details during acuisition.
+    // Usage :: file object used for logging details during acquisition.
     std::ofstream logFile;
 
     //-------- General Functions -------------------------------------------------------
-    Sensor(ptree::value_type& tree, std::string& savePath);
+    Sensor(ptree::value_type& sensor_settings, ptree::value_type& global_settings);
 
     Sensor(int buffer_size);
 
@@ -93,16 +93,9 @@ struct Sensor
     void SaveTimeStamps();
 
     //-------- Capture Data Functions : operatingCode == OpMode::COLLECT -------------
-    // virtual void AcquireSaveHsync(double seconds) = 0;
 
-    virtual void AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier) = 0;
 
     virtual void AcquireSave(double seconds, boost::barrier& startBarrier) = 0;
-
-    virtual void ConcurrentAcquire(double seconds, boost::barrier& frameBarrier) = 0;
-
-    virtual void ConcurrentSave() = 0;
-
     //-------- Inference Functions : operatingCode == OpMode::INFERENCE ---------
     void ContiniousAcquire(size_t queue_size);
 
@@ -114,8 +107,8 @@ struct Sensor
 };
 
 template<class T>
-std::unique_ptr<Sensor> makeSensor(ptree::value_type& tree, std::string& savePath)
+std::unique_ptr<Sensor> makeSensor(ptree::value_type& sensor_settings, ptree::value_type& global_settings)
 {
-    std::cout << "hi2\n";
-    return std::make_unique<T>(tree, savePath);
+    std::cout << "Create Sensor\n";
+    return std::make_unique<T>(sensor_settings, global_settings);
 }

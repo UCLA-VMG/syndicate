@@ -2,16 +2,21 @@
 
 namespace Syndicate
 {
-    Camera::Camera(ptree::value_type& tree, std::string& savePath)
-        : Sensor(tree, savePath),  fps(tree.second.get<int>("fps")),
-        height(tree.second.get<int>("height")),
-        width(tree.second.get<int>("width"))
+    Camera::Camera(ptree::value_type& sensor_settings, ptree::value_type& global_settings)
+        : Sensor(sensor_settings, global_settings),  fps(sensor_settings.second.get<int>("fps")),
+        height(sensor_settings.second.get<int>("height")),
+        width(sensor_settings.second.get<int>("width"))
 
     {
         std::cout << "Camera Cstr\n";
-        if(tree.second.find("type") != tree.second.not_found())
+        if(sensor_settings.second.find("type") != sensor_settings.second.not_found())
         {
-            cameraType = std::any_cast<std::string>(tree.second.get<std::string>("type"));
+            cameraType = std::any_cast<std::string>(sensor_settings.second.get<std::string>("type"));
         }
+    }
+
+    
+    Camera::~Camera()
+    {
     }
 }

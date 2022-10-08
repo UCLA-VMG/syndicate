@@ -2,9 +2,9 @@
 
 size_t Sensor::numSensors(0);
 
-Sensor::Sensor(ptree::value_type& tree, std::string& savePath)
-    : sensorName(tree.second.get<std::string>("name")),
-    rootPath(savePath),
+Sensor::Sensor(ptree::value_type& sensor_settings, ptree::value_type& global_settings)
+    : sensorName(sensor_settings.second.get<std::string>("name")),
+    rootPath(global_settings.second.get<std::string>("save_path")),
     bufferSize(0),
     extrinsicMatrix(3, std::vector<double>(4, 0)),
     statusCode(HealthCode::OFFLINE), operatingCode(OpMode::NONE),
@@ -17,15 +17,15 @@ Sensor::Sensor(ptree::value_type& tree, std::string& savePath)
     std::filesystem::create_directory(rootPath);
     logFile = std::ofstream(rootPath + "log_" + sensorName + ".txt", std::ios_base::out | std::ios_base::app );
     
-    if(tree.second.find("hardware_sync") != tree.second.not_found())
+    if(sensor_settings.second.find("hardware_sync") != sensor_settings.second.not_found())
     {
         std::cout << "hi\n";
-        hardwareSync = tree.second.get<bool>("hardware_sync");
+        hardwareSync = sensor_settings.second.get<bool>("hardware_sync");
         std::cout << "Hardware Sync Enabled\n";
     }
-    if(tree.second.find("primary") != tree.second.not_found())
+    if(sensor_settings.second.find("primary") != sensor_settings.second.not_found())
     {
-        primary = tree.second.get<bool>("primary");
+        primary = sensor_settings.second.get<bool>("primary");
         std::cout << "Primary/Secondary Enabled\n";
     }
 }

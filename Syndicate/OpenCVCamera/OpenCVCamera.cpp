@@ -4,11 +4,11 @@ using namespace cv;
 
 using namespace Syndicate;
 
-OpenCVCamera::OpenCVCamera(std::unordered_map<std::string, std::any>& sample_config)
-    : Syndicate::Camera(sample_config),
-    cameraID(std::any_cast<int>(sample_config["Camera ID"]))
+OpenCVCamera::OpenCVCamera(ptree::value_type& sensor_settings, ptree::value_type& global_settings)
+    : Syndicate::Camera(sensor_settings, global_settings),
+    cameraID(sensor_settings.second.get<int>("Camera ID"))
 {
-    if (sample_config.count("Hardware Sync") == 0) {
+    if (sensor_settings.second.get<bool>("Hardware Sync") == 0) {
         hardware_sync = false;
     }
     else {
@@ -84,35 +84,6 @@ void OpenCVCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
     this->setHealthCode(HealthCode::ONLINE);
 }
 
-void OpenCVCamera::AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier)
-{
-    int num_frames(int(seconds)*int(fps));
-    char filename[100];
-    std::cout << std::endl << std::endl << "*** IMAGE ACQUISITION ***" << std::endl << std::endl;
-    auto start = std::chrono::steady_clock::now();
-    try {
-        for (int i = 0; i < num_frames; i++)
-        {
-            frameBarrier.wait();
-            // wait for a new frame from camera and store it into 'frame'
-            cv::Mat frame;
-            cap.read(frame);
-            std::cout << "currentDateTime()=" << currentDateTime() << std::endl;
-
-            if(!frame.empty() ) {
-                sprintf_s(filename, "%s/%s_%d.png", rootPath, sensorName, i); // select your folder - filename is "Frame_n"
-                imwrite(filename, frame);
-                std::cout << "Frame_" << i << std::endl;
-            }
-        }
-    }
-    catch (Exception& e) {
-        std::cout << "Error: " << e.what() << std::endl;
-    }
-    auto end = std::chrono::steady_clock::now();
-    std::cout << "Time Taken for " << sensorName << (end-start).count() << "\n";
-}
-
 bool setResolution(VideoCapture cap, double width = 640, double height = 512) {
     bool result = true;
     try {
@@ -160,33 +131,6 @@ bool OpenCVCamera::configure(cv::VideoCapture cap, int cameraID, double fps = 30
     catch (Exception& e) {
         std::cout << "Error configuring camera: " << e.what() << std::endl;
         result = false;
-    }
-    return result;
-}
-
-// This function acquires and saves 10 images from a device.
-bool OpenCVCamera::AcquireImages(VideoCapture cap, int num_frames) {
-    bool result = true;
-    char filename[100];
-    std::cout << std::endl << std::endl << "*** IMAGE ACQUISITION ***" << std::endl << std::endl;
-    try {
-        for (int i = 0; i < num_frames; i++)
-        {
-            // wait for a new frame from camera and store it into 'frame'
-            cv::Mat frame;
-            cap.read(frame);
-            std::cout << "currentDateTime()=" << currentDateTime() << std::endl;
-
-            if(!frame.empty() ) {
-                sprintf_s(filename, "C:/Users/Adnan/Downloads/test/Images/Frame_%d.png", i); // select your folder - filename is "Frame_n"
-                imwrite(filename, frame);
-                std::cout << "Frame_" << i << std::endl;
-            }
-        }
-    }
-    catch (Exception& e) {
-        std::cout << "Error: " << e.what() << std::endl;
-        return false;
     }
     return result;
 }
@@ -253,16 +197,6 @@ VideoCapture OpenCVCamera::openCap(int cameraID) {
     std::cout << "CAP_PROP_FOURCC: " << fourcc_str << std::endl;
 
     return cap;
-}
-
-void OpenCVCamera::ConcurrentAcquire(double seconds, boost::barrier& frameBarrier)
-{
-    std::cout << "I am not defined yet.\n\n";
-}
-
-void OpenCVCamera::ConcurrentSave()
-{
-    std::cout << "I am not defined yet.\n\n";
 }
 
 const std::string currentDateTime() {

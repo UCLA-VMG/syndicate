@@ -12,13 +12,10 @@
 
 struct MX800 : public Sensor
 {
-    MX800(ptree::value_type& tree, std::string& savePath);
+    MX800(ptree::value_type& sensor_settings, ptree::value_type& global_settings);
     ~MX800();
 
     void AcquireSave(double seconds, boost::barrier& startBarrier);
-    void AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier);
-    void ConcurrentAcquire(double seconds, boost::barrier& frameBarrier);
-    void ConcurrentSave();
 
     std::string exe_path;
     const std::vector<std::string> list_of_files;
@@ -27,5 +24,3 @@ struct MX800 : public Sensor
     boost::process::ipstream _out;
     boost::process::child child_process_executable;
 };
-
-// std::unique_ptr<Sensor> makeSimpleSensor(std::unordered_map<std::string, std::any>& sample_config);

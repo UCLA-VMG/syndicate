@@ -2,10 +2,7 @@
 set(SpinnakerSOURCE 
         SpinnakerInfo.cpp SpinnakerCamera.cpp)
 
-set(SpinnakerHEADER
-        SpinnakerInfo.h SpinnakerCamera.h)
-
-add_library(SpinnakerCamera ${SpinnakerSOURCE} ${SpinnakerHEADER})
+add_library(SpinnakerCamera ${SpinnakerSOURCE})
 
 target_include_directories(SpinnakerCamera
   PUBLIC

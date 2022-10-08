@@ -16,13 +16,10 @@
 
 struct SerialPort : public Sensor
 {
-    explicit SerialPort(std::unordered_map<std::string, std::any>& sample_config);
+    explicit SerialPort(ptree::value_type& sensor_settings, ptree::value_type& global_settings);
     ~SerialPort();
 
     void AcquireSave(double seconds, boost::barrier& startBarrier);
-    void AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier);
-    void ConcurrentAcquire(double seconds, boost::barrier& frameBarrier);
-    void ConcurrentSave();
 
     int readSerialPort(const char *buffer, unsigned int buf_size);
     bool writeSerialPort(const char *buffer, unsigned int buf_size);
@@ -40,5 +37,3 @@ struct SerialPort : public Sensor
     COMSTAT _status;
     DWORD _errors;
 };
-
-// std::unique_ptr<Sensor> makeSimpleSensor(std::unordered_map<std::string, std::any>& sample_config);

@@ -1,10 +1,10 @@
 #include "RFEthernet.h"
 
-RFEthernet::RFEthernet(ptree::value_type& tree, std::string& savePath)
-    : Sensor(tree, savePath), _timeout(tree.second.get<int>("timeout"))
+RFEthernet::RFEthernet(ptree::value_type& sensor_settings, ptree::value_type& global_settings)
+    : Sensor(sensor_settings, global_settings), _timeout(sensor_settings.second.get<int>("timeout"))
 {
-	// launch cmd file to configure radar parameters
-	std::string command = "C:\\Users\\Adnan\\Documents\\Github\\syndicate\\config\\run_multi_4rx3tx_mmwavestudio.cmd";
+	// Launch cmd file to configure radar parameters.
+	std::string command = sensor_settings.second.get<std::string>("mmstudio_exe_path")
 	WinExec(command.c_str(), SW_HIDE);
 	std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(60))); // wait 60 seconds for lua script to execute
 
@@ -139,22 +139,6 @@ void RFEthernet::interrupt_pcap_loop(double seconds)
     std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(seconds)));
 	pcap_breakloop(adhandle);
 }
-
-void RFEthernet::AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier)
-{
-    std::cout << "I am not defined yet.\n\n";
-}
-
-void RFEthernet::ConcurrentAcquire(double seconds, boost::barrier& frameBarrier)
-{
-    std::cout << "I am not defined yet.\n\n";
-}
-
-void RFEthernet::ConcurrentSave()
-{
-    std::cout << "I am not defined yet.\n\n";
-}
-
 
 RFEthernet::~RFEthernet()
 {

@@ -1,6 +1,5 @@
 #include <WinSock2.h>
 #include <sensor.h>
-// #include "simpleSensor.h"
 #include "SpinnakerCamera.h"
 // #include "VimbaCamera.h"
 // #include "SerialPort.h"
@@ -27,18 +26,10 @@ struct SensorStack{
 
     std::vector<std::unique_ptr<Sensor>> sensors;
 
-    std::string savePath;
     size_t numSensors;
 
     SensorStack(boost::property_tree::ptree tree);
-    // ~SensorStack();
-
-    void ConcurrentAcquireSave(double seconds);
+    ~SensorStack();
 
     void Acquire(double seconds);
-
-    void AcquireBarrier(double seconds);
-
-
-
 };

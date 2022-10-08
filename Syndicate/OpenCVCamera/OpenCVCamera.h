@@ -23,13 +23,10 @@
 
 struct OpenCVCamera : public Syndicate::Camera 
 {
-    OpenCVCamera(std::unordered_map<std::string, std::any>& sample_config);
+    OpenCVCamera(ptree::value_type& sensor_settings, ptree::value_type& global_settings);
     ~OpenCVCamera();
 
     void AcquireSave(double seconds, boost::barrier& startBarrier);
-    void AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier);
-    void ConcurrentAcquire(double seconds, boost::barrier& frameBarrier);
-    void ConcurrentSave();
 
     bool setResolution(cv::VideoCapture cap, double width, double height);
     bool setFps(cv::VideoCapture cap, double fps);
@@ -43,12 +40,7 @@ struct OpenCVCamera : public Syndicate::Camera
     int cameraID;
     cv::VideoCapture cap;
     bool hardware_sync;
-    // string filename;
-    // double fps;
-    // double height;
-    // double width;
 
 };
 
-// std::unique_ptr<Sensor> makeSimpleSensor(std::unordered_map<std::string, std::any>& sample_config);
 const std::string currentDateTime();

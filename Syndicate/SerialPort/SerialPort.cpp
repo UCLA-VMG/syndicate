@@ -1,10 +1,10 @@
 #include "SerialPort.h"
 
-SerialPort::SerialPort(std::unordered_map<std::string, std::any>& sample_config)
-    : Sensor(sample_config), 
-    portName(std::any_cast<std::string>(sample_config["Port Name"])),
-    pulseTime(std::any_cast<int>(sample_config["Pulse Time"])), 
-    totalTime(std::any_cast<int>(sample_config["Total Time"]))
+SerialPort::SerialPort(ptree::value_type& sensor_settings, ptree::value_type& global_settings)
+    : Sensor(sensor_settings, global_settings), 
+    portName(sensor_settings.second.get<std::string>("Port Name")),
+    pulseTime(sensor_settings.second.get<int>("Pulse Time")), 
+    totalTime(sensor_settings.second.get<int>("Total Time"))
 {
     _connected = false;
 
@@ -146,7 +146,7 @@ void SerialPort::runBarker13()
 
 void SerialPort::signalWriteRead(unsigned int dealyTime, std::string command)
 {
-    // Keep the voltile qualifier and logging. Might not work without them
+    // Keep the volatile qualifier and logging. Might not work without them
     volatile int write_status, read_status;
     write_status = writeSerialPort(command.c_str(), MAX_DATA_LENGTH);
     read_status  = readSerialPort(incomingData, MAX_DATA_LENGTH);
@@ -156,7 +156,7 @@ void SerialPort::signalWriteRead(unsigned int dealyTime, std::string command)
 }
 
 void SerialPort::AcquireSave(double seconds, boost::barrier& startBarrier) {
-    // Better than recusion
+    // Better than recursion
     // Avoid stack overflows
     startBarrier.wait();
     auto start = std::chrono::steady_clock::now();
@@ -169,10 +169,6 @@ void SerialPort::AcquireSave(double seconds, boost::barrier& startBarrier) {
     }
     SaveTimeStamps();
     std::cout << "Serial execution complete" << std::endl;
-}
-
-void SerialPort::AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier) {
-    std::cout << "I am not defined yet.\n\n";
 }
 
 void SerialPort::closeSerial()
@@ -188,14 +184,4 @@ SerialPort::~SerialPort()
         CloseHandle(_handler);
     }
     std::cout << "SerialPort execution is complete" << std::endl << std::endl;
-}
-
-void SerialPort::ConcurrentAcquire(double seconds, boost::barrier& frameBarrier)
-{
-    std::cout << "I am not defined yet.\n";
-}
-
-void SerialPort::ConcurrentSave()
-{
-    std::cout << "I am not defined yet.\n";
 }

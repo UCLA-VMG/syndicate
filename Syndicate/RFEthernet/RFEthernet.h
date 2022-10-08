@@ -23,13 +23,10 @@
 
 struct RFEthernet : public Sensor 
 {
-    RFEthernet(ptree::value_type& tree, std::string& savePath);
+    RFEthernet(ptree::value_type& sensor_settings, ptree::value_type& global_settings);
     ~RFEthernet();
 
     void AcquireSave(double seconds, boost::barrier& startBarrier);
-    void AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier);
-    void ConcurrentAcquire(double seconds, boost::barrier& frameBarrier);
-    void ConcurrentSave();
 
     pcap_if_t *all_devs;
 	pcap_if_t *curr_dev;

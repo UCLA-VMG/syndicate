@@ -29,13 +29,10 @@ paRecordData;
 
 struct MiniDSPMic : public Sensor
 {
-    MiniDSPMic(std::unordered_map<std::string, std::any>& sample_config);
+    MiniDSPMic(ptree::value_type& sensor_settings, ptree::value_type& global_settings);
     ~MiniDSPMic();
 
     void AcquireSave(double seconds, boost::barrier& startBarrier);
-    void AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier);
-    void ConcurrentAcquire(double seconds, boost::barrier& frameBarrier);
-    void ConcurrentSave();
 
     int _frames_per_buffer;
     paRecordData _data;
@@ -48,5 +45,3 @@ struct MiniDSPMic : public Sensor
 static int _callback(const void* input_buffer, void* output_buffer,
     unsigned long frames_per_buffer, const PaStreamCallbackTimeInfo* time_info,
     PaStreamCallbackFlags status_flags, void* userData);
-
-// std::unique_ptr<Sensor> makeSimpleSensor(std::unordered_map<std::string, std::any>& sample_config);

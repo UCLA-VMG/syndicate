@@ -15,13 +15,10 @@
 
 struct SpinnakerCamera : public Syndicate::Camera 
 {
-    SpinnakerCamera(ptree::value_type& tree, std::string& savePath);
+    SpinnakerCamera(ptree::value_type& sensor_settings, ptree::value_type& global_settings);
     ~SpinnakerCamera();
 
     void AcquireSave(double seconds, boost::barrier& startBarrier);
-    void AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier);
-    void ConcurrentAcquire(double seconds, boost::barrier& frameBarrier);
-    void ConcurrentSave();
 
     Spinnaker::SystemPtr system;
     Spinnaker::CameraList camList;
@@ -29,10 +26,7 @@ struct SpinnakerCamera : public Syndicate::Camera
     
     std::string cameraID;
     std::string cameraType;
-    
-    // double fps;
-    // int height;
-    // int width;
+
     std::string pixelFormat;
     int offset_x;
     int offset_y;
@@ -57,5 +51,3 @@ std::string GetDeviceSerial(Spinnaker::CameraPtr pCam);
 bool setPrimary(Spinnaker::GenApi::INodeMap& nodeMap, std::string& cameraName);
 
 bool setSecondary(Spinnaker::GenApi::INodeMap& nodeMap);
-
-// std::unique_ptr<Sensor> makeSimpleSensor(std::unordered_map<std::string, std::any>& sample_config);
