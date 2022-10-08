@@ -18,7 +18,7 @@ using namespace VmbAPI;
 
 VimbaCamera::VimbaCamera(std::unordered_map<std::string, std::any>& sample_config)
     : Syndicate::Camera(sample_config),
-    cameraID(any_cast<string>(sample_config["Camera ID"])),
+    cameraID(any_cast<string>(sample_config["camera_id"])),
     m_system( VimbaSystem::GetInstance() )
 {
     VmbErrorType err;

@@ -3,7 +3,7 @@
 using namespace cv;
 
 RealSenseCamera::RealSenseCamera(ptree::value_type& sensor_settings, ptree::value_type& global_settings)
-    : Syndicate::Camera(sensor_settings, global_settings), cameraID(sensor_settings.second.get<int>("Camera ID"))
+    : Syndicate::Camera(sensor_settings, global_settings), cameraID(sensor_settings.second.get<int>("camera_id"))
 {
     std::cout << "Booting the Real Sense Camera";
     rs_pipe.start();

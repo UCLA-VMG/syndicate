@@ -2,9 +2,9 @@
 
 SerialPort::SerialPort(ptree::value_type& sensor_settings, ptree::value_type& global_settings)
     : Sensor(sensor_settings, global_settings), 
-    portName(sensor_settings.second.get<std::string>("Port Name")),
-    pulseTime(sensor_settings.second.get<int>("Pulse Time")), 
-    totalTime(sensor_settings.second.get<int>("Total Time"))
+    portName(sensor_settings.second.get<std::string>("port_name")),
+    pulseTime(sensor_settings.second.get<int>("pulse_time")), 
+    totalTime(sensor_settings.second.get<int>("total_time"))
 {
     _connected = false;
 

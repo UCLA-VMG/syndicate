@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
 
     //1. Extract XML pTree
     ptree tree;
-    std::string XML_PATH("C:/Users/111/Desktop/repos/syndicate/scripts/test_mx800.xml");
+    std::string XML_PATH("C:/Users/111/Desktop/repos/syndicate/scripts/sensor_config.xml");
     read_xml(XML_PATH, tree);
 
     //3. Initialize Sensor Stack
@@ -39,19 +39,4 @@ int main(int argc, char *argv[]) {
     // 4.1 Asynchronously Acquire Data
     std::cout << "\n\n\nAsyn Capture \n";
     mainStack.Acquire(10);
-
-
-    // 4.2 Barrier Sync Acquire Data
-    // std::cout << "\n\n\n Barrier Sync Capture\n";
-    // mainStack.AcquireBarrier(5);
-
-    //4.3 Barrier Acquire on One thread, and save asynchronously on another thread.
-    // std::cout << "\n\n\n Barrier Sync Capture and Asynch Save\n";
-    // mainStack.ConcurrentAcquireSave(30);
-
-
-    //Test base class calling derived class func
-    // Sensor* b = nullptr;
-    // b = &a;
-    // b->AcquireSave(10);
 }

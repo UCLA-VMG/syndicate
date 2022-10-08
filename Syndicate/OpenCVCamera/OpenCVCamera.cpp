@@ -6,9 +6,9 @@ using namespace Syndicate;
 
 OpenCVCamera::OpenCVCamera(ptree::value_type& sensor_settings, ptree::value_type& global_settings)
     : Syndicate::Camera(sensor_settings, global_settings),
-    cameraID(sensor_settings.second.get<int>("Camera ID"))
+    cameraID(sensor_settings.second.get<int>("camera_id"))
 {
-    if (sensor_settings.second.get<bool>("Hardware Sync") == 0) {
+    if (sensor_settings.second.get<bool>("hardware_sync") == 0) {
         hardware_sync = false;
     }
     else {

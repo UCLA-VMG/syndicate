@@ -7,7 +7,6 @@ SensorStack::SensorStack(boost::property_tree::ptree tree)
     std::vector<std::unique_ptr<Sensor>(*)(ptree::value_type&, ptree::value_type&)> sensor_list;
     std::vector<ptree::value_type> local_configs;
     ptree::value_type global_config;
-    // ptree::value_type setting_config;
     std::string ATTR_SET("sensor");
     std::string GLOBAL("global");
  
@@ -16,7 +15,6 @@ SensorStack::SensorStack(boost::property_tree::ptree tree)
         std::cout << at << " \n";
         if(at == ATTR_SET)
         {
-            /// @Adnan This needs to be modified for all sensors.
             // Check if sensor is in list of defined sensors
             if(f.second.get<std::string>("type") == "MX800")
                 sensor_list.emplace_back(makeSensor<MX800>);
@@ -64,7 +62,7 @@ void SensorStack::Acquire(double seconds)
     for(auto& i : sensors)
     {
         boost::thread thread_(boost::bind(&(Sensor::AcquireSave), boost::ref(i), seconds, boost::ref(startAcq)));
-        threads_.emplace_back(std::move(thread_)); //We have to move the thread.
+        threads_.emplace_back(std::move(thread_)); // We have to move the thread.
     }
     for(auto& j : threads_)
     {

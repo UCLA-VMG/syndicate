@@ -10,16 +10,16 @@ using namespace Syndicate;
 SpinnakerCamera::SpinnakerCamera(ptree::value_type& sensor_settings, ptree::value_type& global_settings)
     : Syndicate::Camera(sensor_settings, global_settings), 
     cameraID(sensor_settings.second.get<std::string>("camera_id")),
-    cameraType(sensor_settings.second.get<std::string>("Camera Type")),
+    cameraName(sensor_settings.second.get<std::string>("camera_name")),
     pixelFormat(sensor_settings.second.get<std::string>("pixel_format"))
-    pixelFormat(sensor_settings.second.get<std::string>("Pixel Format")),
-    offset_x(sensor_settings.second.get<int>("Offset X")),
-    offset_y(sensor_settings.second.get<int>("Offset Y")),
-    bin_size(sensor_settings.second.get<int>("Binning Size")),
-    exposure_compensation(sensor_settings.second.get<double>("Exposure Compensation")),
-    exposure_time(sensor_settings.second.get<double>("Exposure Time")),
-    gain(sensor_settings.second.get<double>("Gain")),
-    black_level(sensor_settings.second.get<double>("Black Level"))
+    pixelFormat(sensor_settings.second.get<std::string>("pixel_format")),
+    offset_x(sensor_settings.second.get<int>("offset_x")),
+    offset_y(sensor_settings.second.get<int>("offset_y")),
+    bin_size(sensor_settings.second.get<int>("binning_size")),
+    exposure_compensation(sensor_settings.second.get<double>("exposure_compensation")),
+    exposure_time(sensor_settings.second.get<double>("exposure_time")),
+    gain(sensor_settings.second.get<double>("gain")),
+    black_level(sensor_settings.second.get<double>("black_level"))
 {
     
     // std::cout << "FPS: " << fps << endl;
@@ -50,7 +50,7 @@ SpinnakerCamera::SpinnakerCamera(ptree::value_type& sensor_settings, ptree::valu
     // Configure camera with specified fps/height/width
     try {
         std::cout << endl << endl << "Configuring " << sensorName << "\n";
-        if (!configure(flir_cam, nodeMap, cameraType, fps, width, height, offset_x, offset_y, pixelFormat, bin_size, exposure_compensation, exposure_time, gain, black_level)) {
+        if (!configure(flir_cam, nodeMap, cameraName, fps, width, height, offset_x, offset_y, pixelFormat, bin_size, exposure_compensation, exposure_time, gain, black_level)) {
             std::cout << "Camera configuration for device " << cameraID << " unsuccessful, aborting...";
         }
     }
@@ -62,7 +62,7 @@ SpinnakerCamera::SpinnakerCamera(ptree::value_type& sensor_settings, ptree::valu
     {
         if(primary)
         {
-            setPrimary(nodeMap, cameraType);
+            setPrimary(nodeMap, cameraName);
         }
         if(!primary)
         {
@@ -167,9 +167,9 @@ std::string GetDeviceSerial(Spinnaker::CameraPtr pCam) {
     return "";
 }
 
-bool setPrimary(INodeMap& nodeMap, std::string& cameraType)
+bool setPrimary(INodeMap& nodeMap, std::string& cameraName)
 {
-    if(cameraType == "BackflyS") {
+    if(cameraName == "BackflyS") {
         std::cout << "***********\n";
         CEnumerationPtr ptrLine = nodeMap.GetNode("LineSelector");
         CEnumEntryPtr ptrLine1 = ptrLine->GetEntryByName("Line1");
@@ -187,7 +187,7 @@ bool setPrimary(INodeMap& nodeMap, std::string& cameraType)
         std::cout << "****done*******\n";
         return true;
     }
-    else if (cameraType == "Grasshopper3") {
+    else if (cameraName == "Grasshopper3") {
         std::cout << "***********\n";
         CEnumerationPtr ptrLine = nodeMap.GetNode("LineSelector");
         CEnumEntryPtr ptrLine1 = ptrLine->GetEntryByName("Line2");
@@ -305,7 +305,7 @@ bool setBinning(INodeMap& nodeMap, int bin_size) {
     return result;
 }
 
-bool setFps(INodeMap& nodeMap, float fps, std::string cameraType) {
+bool setFps(INodeMap& nodeMap, float fps, std::string cameraName) {
     // Set Default Result Value = True
     bool result = true;
     // Get Ptr to Node Acquisition Frame Rate to Check Prev Value
@@ -325,14 +325,14 @@ bool setFps(INodeMap& nodeMap, float fps, std::string cameraType) {
         
         // Set AcquisitionFrameRateEnable to true
         CBooleanPtr ptrAcquisitionFrameRateEnable;
-        if (cameraType == "Grasshopper3") {
+        if (cameraName == "Grasshopper3") {
             ptrAcquisitionFrameRateEnable = nodeMap.GetNode("AcquisitionFrameRateEnabled");
         }
-        else if (cameraType == "BlackFlyS") {
+        else if (cameraName == "BlackFlyS") {
             ptrAcquisitionFrameRateEnable = nodeMap.GetNode("AcquisitionFrameRateEnable");
         }
         else {
-            cout << "CameraType not recognized. Unable to acess AcquisitionFrameRateEnable. Aborting..." << endl;
+            cout << "cameraName not recognized. Unable to acess AcquisitionFrameRateEnable. Aborting..." << endl;
             return false;
         }
         if (!IsWritable(ptrAcquisitionFrameRateEnable)) {
@@ -598,7 +598,7 @@ bool setBlackLevel(INodeMap& nodeMap, double black_level) {
     return result;
 }
 
-bool configure(CameraPtr pCam, INodeMap& nodeMap, std::string cameraType, double fps, int width, int height, int offset_x, int offset_y, std::string pixelFormat, int bin_size, double exposure_compensation, double exposure_time, double gain, double black_level) {
+bool configure(CameraPtr pCam, INodeMap& nodeMap, std::string cameraName, double fps, int width, int height, int offset_x, int offset_y, std::string pixelFormat, int bin_size, double exposure_compensation, double exposure_time, double gain, double black_level) {
     bool result = true;
     try {
         // Get the device serial number
@@ -614,7 +614,7 @@ bool configure(CameraPtr pCam, INodeMap& nodeMap, std::string cameraType, double
             return false;
         }
         // set fps
-        // if (!setFps(nodeMap, fps, cameraType)) {
+        // if (!setFps(nodeMap, fps, cameraName)) {
         //     return false;
         // }
         // set resolution
