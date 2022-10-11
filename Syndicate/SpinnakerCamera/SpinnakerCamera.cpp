@@ -11,7 +11,6 @@ SpinnakerCamera::SpinnakerCamera(ptree::value_type& sensor_settings, ptree::valu
     : Syndicate::Camera(sensor_settings, global_settings), 
     cameraID(sensor_settings.second.get<std::string>("camera_id")),
     cameraName(sensor_settings.second.get<std::string>("camera_name")),
-    pixelFormat(sensor_settings.second.get<std::string>("pixel_format"))
     pixelFormat(sensor_settings.second.get<std::string>("pixel_format")),
     offset_x(sensor_settings.second.get<int>("offset_x")),
     offset_y(sensor_settings.second.get<int>("offset_y")),
@@ -22,17 +21,17 @@ SpinnakerCamera::SpinnakerCamera(ptree::value_type& sensor_settings, ptree::valu
     black_level(sensor_settings.second.get<double>("black_level"))
 {
     
-    // std::cout << "FPS: " << fps << endl;
-    // std::cout << "Width: " << width << endl;
-    // std::cout << "Height: " << height << endl;
-    // std::cout << "OffsetX: " << offset_x << endl;
-    // std::cout << "OffsetY: " << offset_y << endl;
-    // std::cout << "Pixel Format: " << pixelFormat << endl;
-    // std::cout << "Binning Size: " << bin_size << endl;
-    // std::cout << "Exposure Compensation: " << exposure_compensation << endl;
-    // std::cout << "Exposure Time: " << exposure_time << endl;
-    // std::cout << "Gain: " << gain << endl;
-    // std::cout << "Black Level: " << black_level << endl;
+    std::cout << "FPS: " << fps << endl;
+    std::cout << "Width: " << width << endl;
+    std::cout << "Height: " << height << endl;
+    std::cout << "OffsetX: " << offset_x << endl;
+    std::cout << "OffsetY: " << offset_y << endl;
+    std::cout << "Pixel Format: " << pixelFormat << endl;
+    std::cout << "Binning Size: " << bin_size << endl;
+    std::cout << "Exposure Compensation: " << exposure_compensation << endl;
+    std::cout << "Exposure Time: " << exposure_time << endl;
+    std::cout << "Gain: " << gain << endl;
+    std::cout << "Black Level: " << black_level << endl;
     
     // Retrieve singleton reference to system object
     system = System::GetInstance();

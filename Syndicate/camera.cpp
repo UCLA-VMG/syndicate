@@ -13,6 +13,7 @@ namespace Syndicate
         {
             cameraType = std::any_cast<std::string>(sensor_settings.second.get<std::string>("type"));
         }
+        std::cout << "Camera Cstr\n";
     }
 
     

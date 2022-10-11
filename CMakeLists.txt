@@ -66,7 +66,7 @@ set (LIBS ${Spinnaker_LIBRARIES} ${VimbaCPP_LIBRARIES} ${VimbaC_LIBRARIES} ${Vim
 
 #Generate Execs
 # add_executable(capture ${PROJECT_SOURCE_DIR}/scripts/main.cpp)
-add_executable(capture_config ${PROJECT_SOURCE_DIR}/scripts/main_config.cpp)
+add_executable(capture_config ${PROJECT_SOURCE_DIR}/scripts/main.cpp)
 add_executable(config_test  ${PROJECT_SOURCE_DIR}/scripts/test_config.cpp)
 # add_executable(dshow_test ${PROJECT_SOURCE_DIR}/scripts/dshow_test.cpp)
 # add_executable(acq ${PROJECT_SOURCE_DIR}/scripts/acq.cpp)

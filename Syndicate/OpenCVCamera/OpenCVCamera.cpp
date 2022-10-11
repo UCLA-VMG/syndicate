@@ -84,7 +84,7 @@ void OpenCVCamera::AcquireSave(double seconds, boost::barrier& startBarrier)
     this->setHealthCode(HealthCode::ONLINE);
 }
 
-bool setResolution(VideoCapture cap, double width = 640, double height = 512) {
+bool OpenCVCamera::setResolution(VideoCapture cap, double width = 640, double height = 512) {
     bool result = true;
     try {
         cap.set(CAP_PROP_FRAME_WIDTH, width);
@@ -99,7 +99,7 @@ bool setResolution(VideoCapture cap, double width = 640, double height = 512) {
     return result;
 }
 
-bool setFps(VideoCapture cap, double fps) {
+bool OpenCVCamera::setFps(VideoCapture cap, double fps) {
     bool result = true;
     try {
         cap.set(CAP_PROP_FPS, fps);
@@ -135,7 +135,7 @@ bool OpenCVCamera::configure(cv::VideoCapture cap, int cameraID, double fps = 30
     return result;
 }
 
-bool getResolution(VideoCapture cap) {
+bool OpenCVCamera::getResolution(VideoCapture cap) {
     bool result = true;
     try {
         double width = cap.get(CAP_PROP_FRAME_WIDTH);
@@ -150,7 +150,7 @@ bool getResolution(VideoCapture cap) {
     return result;
 }
 
-bool getFps(VideoCapture cap) {
+bool OpenCVCamera::getFps(VideoCapture cap) {
     bool result = true;
     try {
         double fps = cap.get(CAP_PROP_FPS);

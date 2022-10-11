@@ -2,12 +2,12 @@
 #include <sensor.h>
 #include "SpinnakerCamera.h"
 // #include "VimbaCamera.h"
-// #include "SerialPort.h"
-// #include "OpenCVCamera.h"
+#include "SerialPort.h"
+#include "OpenCVCamera.h"
 #include "RFEthernet.h"
-// #include "MiniDSPMic.h"
+#include "MiniDSPMic.h"
 #include "MX800.h"
-// #include "RealSenseCamera.h"
+#include "RealSenseCamera.h"
 
 #include <unordered_map>
 #include <any>

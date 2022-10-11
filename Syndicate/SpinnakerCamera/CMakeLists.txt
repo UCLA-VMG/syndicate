@@ -1,6 +1,6 @@
 
 set(SpinnakerSOURCE 
-        SpinnakerInfo.cpp SpinnakerCamera.cpp)
+        SpinnakerCamera.cpp)
 
 add_library(SpinnakerCamera ${SpinnakerSOURCE})
 

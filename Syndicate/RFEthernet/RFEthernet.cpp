@@ -4,7 +4,7 @@ RFEthernet::RFEthernet(ptree::value_type& sensor_settings, ptree::value_type& gl
     : Sensor(sensor_settings, global_settings), _timeout(sensor_settings.second.get<int>("timeout"))
 {
 	// Launch cmd file to configure radar parameters.
-	std::string command = sensor_settings.second.get<std::string>("mmstudio_exe_path")
+	std::string command = sensor_settings.second.get<std::string>("mmstudio_exe_path");
 	WinExec(command.c_str(), SW_HIDE);
 	std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(60))); // wait 60 seconds for lua script to execute
 

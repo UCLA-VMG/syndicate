@@ -3,9 +3,7 @@
 <sensor_stack>
     
     <global>
-        <settings>
-            <save_path>D:/syndicate_tests/sasha_config_test2/</save_path>
-        </settings>
+        <save_path>D:/syndicate_tests/config_test/</save_path>
     </global>
 
     <sensor>
@@ -15,124 +13,27 @@
         <level>5</level>
     </sensor>
 
-    <!-- 
-        Old Values for Polarized
-        <width>2448</width>
-        <camera_id>19224369</camera_id> 
-    -->
     <sensor>
-        <name>NIR_Camera_940nm</name>
+        <name>RGB_Polarized_Cam</name>
         <type>SpinnakerCamera</type>
-        <camera_id>21290846</camera_id>
-        <camera_name>Grasshopper3</camera_name>
+        <fps>30</fps>
+        <height>2048</height>
+        <width>2448</width>
+        <camera_id>20406823</camera_id>
+        <camera_name>BlackFlyS</camera_name>
         <fps>30</fps>
         <width>2048</width> 
         <height>2048</height>
         <offset_x>0</offset_x>
         <offset_y>0</offset_y>
         <pixel_format>Mono</pixel_format>
-        <binning_size>2</binning_size>
+        <binning_size>1</binning_size>
         <exposure_compensation>0.08</exposure_compensation>
-        <exposure_time>8500.0</exposure_time>
+        <exposure_time>30000.0</exposure_time>
         <gain>0.0</gain>
         <black_level>5.57</black_level>
-        <hardware_sync>1</hardware_sync>
-        <primary>0</primary>
-    </sensor>
-
-    <sensor>
-        <name>NIR_Camera_850nm</name>
-        <type>SpinnakerCamera</type>
-        <camera_id>21190637</camera_id>
-        <camera_name>Grasshopper3</camera_name>
-        <fps>30</fps>
-        <width>2048</width> 
-        <height>2048</height>
-        <offset_x>0</offset_x>
-        <offset_y>0</offset_y>
-        <pixel_format>Mono</pixel_format>
-        <binning_size>2</binning_size>
-        <exposure_compensation>0.09</exposure_compensation>
-        <exposure_time>8500.0</exposure_time>
-        <gain>0.0</gain>
-        <black_level>5.08</black_level>
-        <hardware_sync>1</hardware_sync>
-        <primary>0</primary>
-    </sensor>
-
-    <sensor>
-        <name>Thermal_Camera</name>
-        <type>OpenCVCamera</type>
-        <camera_id>0</camera_id>
-        <camera_name>Boson</camera_name>
-        <fps>30</fps>
-        <height>512</height>
-        <width>640</width>
         <hardware_sync>0</hardware_sync>
         <primary>0</primary>
     </sensor>
-
-
-    <sensor>
-        <name>FMCW_Radar</name>
-        <type>RFEthernet</type>
-        <timeout>1000</timeout>
-        <!-- <data_ip>192.168.33.30</data_ip>
-        <adc_ip>192.168.33.180</adc_ip>
-        <packet_size>1456</packet_size>
-        <max_packet_size>4096</max_packet_size> -->
-    </sensor>
-
-    <sensor>
-        <name>Arduino_Serial</name>
-        <type>SerialPort</type>
-        <port_name>\\\\.\\COM14</port_name>
-        <pulse_time>1</pulse_time>
-        <total_time>20</total_time>
-    </sensor>
-
-    <sensor>
-        <name>Depth_Camera</name>
-        <type>RealSenseCamera</type>
-        <fps>30</fps>
-        <height>2048</height>
-        <width>2448</width>
-        <pixel_format>Mono</pixel_format>
-        <hardware_sync>0</hardware_sync>
-        <primary>0</primary>
-        <camera_id>19224369</camera_id>
-    </sensor>
-
-    <sensor>
-        <name>Microphone</name>
-        <type>MiniDSPMic</type>
-        <fps>30</fps>
-        <height>2048</height>
-        <width>2448</width>
-        <pixel_format>Mono</pixel_format>
-        <hardware_sync>0</hardware_sync>
-        <primary>0</primary>
-        <camera_id>19224369</camera_id>
-        <!-- <name>8 Channel Microphone</name>
-        <type>mic</type>
-        <fps>44100</fps>
-        <channels>2</channels>
-        <buffer_size>512</buffer_size>
-        <pixel_format>RGB</pixel_format>
-        <hardware_sync>False</hardware_sync>
-        <primary>False</primary> -->
-    </sensor>
-
-    <!-- <sensor>
-        <name>Polarized_Cam</name>
-        <type>VimbaCamera</type>
-        <fps>30</fps>
-        <height>2048</height>
-        <width>2448</width>
-        <pixel_format>Mono</pixel_format>
-        <hardware_sync>0</hardware_sync>
-        <primary>0</primary>
-        <camera_id>19224369</camera_id>
-    </sensor> -->
 
 </sensor_stack>

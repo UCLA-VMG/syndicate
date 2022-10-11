@@ -16,6 +16,9 @@ Sensor::Sensor(ptree::value_type& sensor_settings, ptree::value_type& global_set
     rootPath = rootPath + sensorName + std::string("/");
     std::filesystem::create_directory(rootPath);
     logFile = std::ofstream(rootPath + "log_" + sensorName + ".txt", std::ios_base::out | std::ios_base::app );
+
+    std::cout << "hi5\n";
+
     
     if(sensor_settings.second.find("hardware_sync") != sensor_settings.second.not_found())
     {

@@ -6,7 +6,8 @@ SensorStack::SensorStack(boost::property_tree::ptree tree)
  
     std::vector<std::unique_ptr<Sensor>(*)(ptree::value_type&, ptree::value_type&)> sensor_list;
     std::vector<ptree::value_type> local_configs;
-    ptree::value_type global_config;
+    std::vector<ptree::value_type> global_config;
+    // ptree::value_type global_config;
     std::string ATTR_SET("sensor");
     std::string GLOBAL("global");
  
@@ -24,8 +25,8 @@ SensorStack::SensorStack(boost::property_tree::ptree tree)
                 sensor_list.emplace_back(makeSensor<OpenCVCamera>);
             else if(f.second.get<std::string>("type") == "RealSenseCamera")
                 sensor_list.emplace_back(makeSensor<RealSenseCamera>);
-            else if(f.second.get<std::string>("type") == "VimbaCamera")
-                sensor_list.emplace_back(makeSensor<VimbaCamera>);
+            // else if(f.second.get<std::string>("type") == "VimbaCamera")
+            //     sensor_list.emplace_back(makeSensor<VimbaCamera>);
             else if(f.second.get<std::string>("type") == "RFEthernet")
                 sensor_list.emplace_back(makeSensor<RFEthernet>);
             else if(f.second.get<std::string>("type") == "SerialPort")
@@ -40,7 +41,7 @@ SensorStack::SensorStack(boost::property_tree::ptree tree)
         }
         else if(at == GLOBAL)
         {
-            global_config = f.second.get<std::string>("settings");
+            global_config.emplace_back(std::move(f));
         }
         else
         {
@@ -51,8 +52,11 @@ SensorStack::SensorStack(boost::property_tree::ptree tree)
     numSensors = sensor_list.size();
     for(auto i=0; i < numSensors; ++i)
     {
-        sensors.emplace_back(std::move(sensor_list[i](local_configs[i], global_config)));
+        std::cout << "hi1\n";
+        sensors.emplace_back(std::move(sensor_list[i](local_configs[i], global_config[0])));
+        std::cout << "hi2\n";
     }
+    std::cout << "hi3\n";
 }
 
 void SensorStack::Acquire(double seconds)
