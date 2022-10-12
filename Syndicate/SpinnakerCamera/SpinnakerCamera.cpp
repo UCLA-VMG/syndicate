@@ -21,17 +21,17 @@ SpinnakerCamera::SpinnakerCamera(ptree::value_type& sensor_settings, ptree::valu
     black_level(sensor_settings.second.get<double>("black_level"))
 {
     
-    std::cout << "FPS: " << fps << endl;
-    std::cout << "Width: " << width << endl;
-    std::cout << "Height: " << height << endl;
-    std::cout << "OffsetX: " << offset_x << endl;
-    std::cout << "OffsetY: " << offset_y << endl;
-    std::cout << "Pixel Format: " << pixelFormat << endl;
-    std::cout << "Binning Size: " << bin_size << endl;
-    std::cout << "Exposure Compensation: " << exposure_compensation << endl;
-    std::cout << "Exposure Time: " << exposure_time << endl;
-    std::cout << "Gain: " << gain << endl;
-    std::cout << "Black Level: " << black_level << endl;
+    std::cout << "  Original FPS: " << fps << endl;
+    std::cout << "  Original Width: " << width << endl;
+    std::cout << "  Original Height: " << height << endl;
+    std::cout << "  Original OffsetX: " << offset_x << endl;
+    std::cout << "  Original OffsetY: " << offset_y << endl;
+    std::cout << "  Original Pixel Format: " << pixelFormat << endl;
+    std::cout << "  Original Binning Size: " << bin_size << endl;
+    std::cout << "  Original Exposure Compensation: " << exposure_compensation << endl;
+    std::cout << "  Original Exposure Time: " << exposure_time << endl;
+    std::cout << "  Original Gain: " << gain << endl;
+    std::cout << "  Original Black Level: " << black_level << endl;
     
     // Retrieve singleton reference to system object
     system = System::GetInstance();
@@ -49,7 +49,7 @@ SpinnakerCamera::SpinnakerCamera(ptree::value_type& sensor_settings, ptree::valu
     // Configure camera with specified fps/height/width
     try {
         std::cout << endl << endl << "Configuring " << sensorName << "\n";
-        if (!configure(flir_cam, nodeMap, cameraName, fps, width, height, offset_x, offset_y, pixelFormat, bin_size, exposure_compensation, exposure_time, gain, black_level)) {
+        if (!configure(flir_cam, nodeMap, cameraName, fps, width, height, offset_x, offset_y, pixelFormat, bin_size, exposure_compensation, exposure_time, gain, black_level, hardwareSync, primary)) {
             std::cout << "Camera configuration for device " << cameraID << " unsuccessful, aborting...";
         }
     }
@@ -168,7 +168,7 @@ std::string GetDeviceSerial(Spinnaker::CameraPtr pCam) {
 
 bool setPrimary(INodeMap& nodeMap, std::string& cameraName)
 {
-    if(cameraName == "BackflyS") {
+    if(cameraName == "BackFlyS") {
         std::cout << "***********\n";
         CEnumerationPtr ptrLine = nodeMap.GetNode("LineSelector");
         CEnumEntryPtr ptrLine1 = ptrLine->GetEntryByName("Line1");
@@ -244,41 +244,54 @@ bool setResolution(INodeMap& nodeMap, int width, int height, int offset_x, int o
         }
         ptrWidth->SetValue(width);
         int widthToSet = static_cast<int>(ptrWidth->GetValue());
-        std::cout << "Width: " << widthToSet << endl;
+        std::cout <<    "Width: " << widthToSet << endl;
 
         // Set height
         CIntegerPtr ptrHeight = nodeMap.GetNode("Height");
         if(!IsWritable(ptrHeight->GetAccessMode()) || !IsReadable(ptrHeight->GetAccessMode()) || ptrHeight->GetInc() == 0 || ptrHeight->GetMax() == 0) {
-            std::cout << "Unable to read or write to Height. Aborting..." << endl;
+            std::cout <<    "Unable to read or write to Height. Aborting..." << endl;
             return false;
         }
         ptrHeight->SetValue(height);
         int heightToSet = static_cast<int>(ptrHeight->GetValue());
-        std::cout << "Height: " << heightToSet << endl;
+        std::cout <<    "Height: " << heightToSet << endl;
         // CIntegerPtr ptrWidth = nodeMap.GetNode("Width");
 
-        // Set offset_x
-        CIntegerPtr ptrOffsetX = nodeMap.GetNode("OffsetX");
-        if(!IsWritable(ptrOffsetX->GetAccessMode()) || !IsReadable(ptrOffsetX->GetAccessMode()) || ptrOffsetX->GetInc() == 0 || ptrOffsetX->GetMax() == 0) {
-            std::cout << "Unable to read or write to OffsetX. Aborting..." << endl;
-            return false;
-        }
-        ptrOffsetX->SetValue(offset_x);
-        int offsetXToSet = static_cast<int>(ptrOffsetX->GetValue());
-        std::cout << "offset_x: " << offsetXToSet << endl;
+        // Get width Max
+        int widthMax = static_cast<int>(ptrWidth->GetMax());
+        std::cout <<    "Width Max: " << widthMax << endl;
 
-        // Set offset_y
-        CIntegerPtr ptrOffsetY = nodeMap.GetNode("OffsetY");
-        if(!IsWritable(ptrOffsetY->GetAccessMode()) || !IsReadable(ptrOffsetY->GetAccessMode()) || ptrOffsetY->GetInc() == 0 || ptrOffsetY->GetMax() == 0) {
-            std::cout << "Unable to read or write to OffsetY. Aborting..." << endl;
-            return false;
+        // Get width Max
+        int heightMax = static_cast<int>(ptrHeight->GetMax());
+        std::cout <<    "Height Max: " << heightMax << endl;
+
+        // Set offset_x
+        if (width != widthMax) {
+            CIntegerPtr ptrOffsetX = nodeMap.GetNode("OffsetX");
+            if(!IsWritable(ptrOffsetX->GetAccessMode()) || !IsReadable(ptrOffsetX->GetAccessMode()) || ptrOffsetX->GetInc() == 0 || ptrOffsetX->GetMax() == 0) {
+                std::cout <<    "Unable to read or write to OffsetX. Aborting..." << endl;
+                return false;
+            }
+            ptrOffsetX->SetValue(offset_x);
+            int offsetXToSet = static_cast<int>(ptrOffsetX->GetValue());
+            std::cout <<    "offset_x: " << offsetXToSet << endl;
         }
-        ptrOffsetY->SetValue(offset_y);
-        int offsetYToSet = static_cast<int>(ptrOffsetY->GetValue());
-        std::cout << "offset_y: " << offsetYToSet << endl;
+
+        if (height != heightMax) { 
+            // Set offset_y
+            CIntegerPtr ptrOffsetY = nodeMap.GetNode("OffsetY");
+            if(!IsWritable(ptrOffsetY->GetAccessMode()) || !IsReadable(ptrOffsetY->GetAccessMode()) || ptrOffsetY->GetInc() == 0 || ptrOffsetY->GetMax() == 0) {
+                std::cout <<    "Unable to read or write to OffsetY. Aborting..." << endl;
+                return false;
+            }
+            ptrOffsetY->SetValue(offset_y);
+            int offsetYToSet = static_cast<int>(ptrOffsetY->GetValue());
+            std::cout <<    "offset_y: " << offsetYToSet << endl;
+        }
+
     }
     catch (Exception& e) {
-        std::cout << "Error Configuring resolution: " << e.what() << endl;
+        std::cout <<    "Error Configuring resolution: " << e.what() << endl;
         result = false;
     }
     return result;
@@ -295,7 +308,7 @@ bool setBinning(INodeMap& nodeMap, int bin_size) {
         }
         ptrHeightBin->SetValue(bin_size);
         int heightBinToSet = static_cast<int>(ptrHeightBin->GetValue());
-        std::cout << "Bin Size: " << heightBinToSet << endl;
+        std::cout <<    "Bin Size: " << heightBinToSet << endl;
     }
     catch (Exception& e) {
         std::cout << "Error Configuring Bining: " << e.what() << endl;
@@ -310,31 +323,24 @@ bool setFps(INodeMap& nodeMap, float fps, std::string cameraName) {
     // Get Ptr to Node Acquisition Frame Rate to Check Prev Value
     CFloatPtr ptrAcquisitionFrameRate = nodeMap.GetNode("AcquisitionFrameRate");
     double frameRateToSet = static_cast<double>(ptrAcquisitionFrameRate->GetValue());
-    cout << "Prev FPS: " << frameRateToSet << endl;
+    cout << "   Prev FPS: " << frameRateToSet << endl;
     // Try Setting Acquisition Frame Rate
     try {
-        try {
-            // Set AcquisitionFrameRateAuto to false
-            CEnumerationPtr ptrAcquisitionFrameRateAuto = nodeMap.GetNode("AcquisitionFrameRateAuto");
-            CEnumEntryPtr node_frame_rate_auto_off = ptrAcquisitionFrameRateAuto->GetEntryByName("Off");
-            const int64_t frame_rate_auto_off = node_frame_rate_auto_off->GetValue();
-            ptrAcquisitionFrameRateAuto->SetIntValue(frame_rate_auto_off);
+        if (cameraName == "Grasshopper3") {
+            try {
+                // Set AcquisitionFrameRateAuto to false
+                CEnumerationPtr ptrAcquisitionFrameRateAuto = nodeMap.GetNode("AcquisitionFrameRateAuto");
+                CEnumEntryPtr node_frame_rate_auto_off = ptrAcquisitionFrameRateAuto->GetEntryByName("Off");
+                const int64_t frame_rate_auto_off = node_frame_rate_auto_off->GetValue();
+                ptrAcquisitionFrameRateAuto->SetIntValue(frame_rate_auto_off);
+            }
+            catch (Exception& e) {std::cout << "Unable to Change Acquisition Frame Rate Auto to Off. \n";}
         }
-        catch (Exception& e) {std::cout << "Unable to Change Acquisition Frame Rate Auto to Off. \n";}
         
         // Set AcquisitionFrameRateEnable to true
         CBooleanPtr ptrAcquisitionFrameRateEnable;
         if (cameraName == "Grasshopper3") {
             ptrAcquisitionFrameRateEnable = nodeMap.GetNode("AcquisitionFrameRateEnabled");
-        }
-        else if (cameraName == "BlackFlyS") {
-            ptrAcquisitionFrameRateEnable = nodeMap.GetNode("AcquisitionFrameRateEnable");
-        }
-        else {
-            cout << "cameraName not recognized. Unable to acess AcquisitionFrameRateEnable. Aborting..." << endl;
-            return false;
-        }
-        if (!IsWritable(ptrAcquisitionFrameRateEnable)) {
             try {
                 ptrAcquisitionFrameRateEnable->SetValue(true);
             }
@@ -342,6 +348,20 @@ bool setFps(INodeMap& nodeMap, float fps, std::string cameraName) {
                 cout << "Unable to set AcquisitionFrameRateEnabled. Aborting..." << endl;
                 std::cerr << e.what() << '\n'; // "Could not enable frame rate: {0}".format(ex)
             }
+        }
+        else if (cameraName == "BlackFlyS") {
+            ptrAcquisitionFrameRateEnable = nodeMap.GetNode("AcquisitionFrameRateEnable");
+            try {
+                ptrAcquisitionFrameRateEnable->SetValue(true);
+            }
+            catch(Exception& e) {
+                cout << "Unable to set AcquisitionFrameRateEnabled. Aborting..." << endl;
+                std::cerr << e.what() << '\n'; // "Could not enable frame rate: {0}".format(ex)
+            }
+        }
+        else {
+            cout << "cameraName not recognized. Unable to acess AcquisitionFrameRateEnable. Aborting..." << endl;
+            return false;
         }
 
         // If AcquisitionFrameRate is Readable and Writable ...
@@ -362,7 +382,7 @@ bool setFps(INodeMap& nodeMap, float fps, std::string cameraName) {
     // Get Ptr to Node Acquisition Frame Rate to Check New Value
     ptrAcquisitionFrameRate = nodeMap.GetNode("AcquisitionFrameRate");
     frameRateToSet = static_cast<double>(ptrAcquisitionFrameRate->GetValue());
-    cout << "New FPS: " << frameRateToSet << endl;
+    cout << "   New FPS: " << frameRateToSet << endl;
 
     return result;
 }
@@ -445,7 +465,7 @@ bool setExposureCompensation(INodeMap& nodeMap, double exposure_compensation) {
     // Get Ptr to Node Exposure Compensation to Check Prev Value
     CFloatPtr ptrExposureCompensation = nodeMap.GetNode("pgrExposureCompensation");
     double exposureCompensationToSet = static_cast<double>(ptrExposureCompensation->GetValue());
-    std::cout << "Prev Exposure Compensation: " << exposureCompensationToSet << endl;
+    std::cout << "  Prev Exposure Compensation: " << exposureCompensationToSet << endl;
     // Try Setting Exposure Compensation
     try {
         // Try Setting Exposure Compensation Auto to Off
@@ -474,7 +494,7 @@ bool setExposureCompensation(INodeMap& nodeMap, double exposure_compensation) {
     // Get Ptr to Node Exposure Compensation to Check New Value
     ptrExposureCompensation = nodeMap.GetNode("pgrExposureCompensation");
     exposureCompensationToSet = static_cast<double>(ptrExposureCompensation->GetValue());
-    std::cout << "New Exposure Compensation: " << exposureCompensationToSet << endl;
+    std::cout << "  New Exposure Compensation: " << exposureCompensationToSet << endl;
     return result;
 }
 
@@ -484,7 +504,7 @@ bool setExposureTime(INodeMap& nodeMap, double exposure_time) {
     // Get Ptr to Node Exposure Time to Check Prev Value
     CFloatPtr ptrExposureTime = nodeMap.GetNode("ExposureTime");
     double exposureTimeToSet = static_cast<double>(ptrExposureTime->GetValue());
-    std::cout << "Prev Exposure Time: " << exposureTimeToSet << endl;
+    std::cout << "  Prev Exposure Time: " << exposureTimeToSet << endl;
     // Try Setting Exposure Time
     try {
         // Try Setting Exposure Time Auto to Off
@@ -521,7 +541,7 @@ bool setExposureTime(INodeMap& nodeMap, double exposure_time) {
     // Get Ptr to Node Exposure Time to Check New Value
     ptrExposureTime = nodeMap.GetNode("ExposureTime");
     exposureTimeToSet = static_cast<double>(ptrExposureTime->GetValue());
-    std::cout << "New Exposure Time: " << exposureTimeToSet << endl;
+    std::cout << "  New Exposure Time: " << exposureTimeToSet << endl;
 
     return result;
 }
@@ -532,7 +552,7 @@ bool setGain(INodeMap& nodeMap, double gain) {
     // Get Ptr to Node Gain to Check Prev Value
     CFloatPtr ptrGain = nodeMap.GetNode("Gain");
     double gainToSet = static_cast<double>(ptrGain->GetValue());
-    std::cout << "Prev Gain: " << gainToSet << endl;
+    std::cout << "  Prev Gain: " << gainToSet << endl;
     // Try Setting Gain
     try {
         try {
@@ -560,7 +580,7 @@ bool setGain(INodeMap& nodeMap, double gain) {
     // Get Ptr to Node Gain to Check New Value
     ptrGain = nodeMap.GetNode("Gain");
     gainToSet = static_cast<double>(ptrGain->GetValue());
-    cout << "New Gain: " << gainToSet << endl;
+    cout << "  New Gain: " << gainToSet << endl;
 
     return result;
 }
@@ -571,7 +591,7 @@ bool setBlackLevel(INodeMap& nodeMap, double black_level) {
     // Get Ptr to Node Gain to Check Prev Value
     CFloatPtr ptrBlackLevel = nodeMap.GetNode("BlackLevel");
     double blackLevelToSet = static_cast<double>(ptrBlackLevel->GetValue());
-    std::cout << "Prev Black Level: " << blackLevelToSet << endl;
+    std::cout << "  Prev Black Level: " << blackLevelToSet << endl;
     // Try Setting Black Level
     try {
         // If Black Level is Readable and Writable ..
@@ -592,12 +612,15 @@ bool setBlackLevel(INodeMap& nodeMap, double black_level) {
     // Get Ptr to Node Black Level to Check New Value
     ptrBlackLevel = nodeMap.GetNode("BlackLevel");
     blackLevelToSet = static_cast<double>(ptrBlackLevel->GetValue());
-    cout << "New Black Level: " << blackLevelToSet << endl;
+    cout << "  New Black Level: " << blackLevelToSet << endl;
 
     return result;
 }
 
-bool configure(CameraPtr pCam, INodeMap& nodeMap, std::string cameraName, double fps, int width, int height, int offset_x, int offset_y, std::string pixelFormat, int bin_size, double exposure_compensation, double exposure_time, double gain, double black_level) {
+bool configure(CameraPtr pCam, INodeMap& nodeMap, std::string cameraName, double fps, int width, 
+                int height, int offset_x, int offset_y, std::string pixelFormat, int bin_size, 
+                double exposure_compensation, double exposure_time, double gain, double black_level, 
+                bool hardwareSync, bool primary) {
     bool result = true;
     try {
         // Get the device serial number
@@ -613,20 +636,24 @@ bool configure(CameraPtr pCam, INodeMap& nodeMap, std::string cameraName, double
             return false;
         }
         // set fps
-        // if (!setFps(nodeMap, fps, cameraName)) {
-        //     return false;
-        // }
+        if ((!hardwareSync) || (hardwareSync && primary)) {
+            if (!setFps(nodeMap, fps, cameraName)) {
+                return false;
+            }
+        }
         // set resolution
-        // if (!setResolution(nodeMap, width, height, offset_x, offset_y)) {
-        //     return false;
-        // }
+        if (!setResolution(nodeMap, width, height, offset_x, offset_y)) {
+            return false;
+        }
         // set binning
         if (!setBinning(nodeMap, bin_size)) {
             return false;
         }
         // set exposure compensation
-        if (!setExposureCompensation(nodeMap, exposure_compensation)) {
-            return false;
+        if(cameraName == "Grasshopper3") {
+            if (!setExposureCompensation(nodeMap, exposure_compensation)) {
+                return false;
+            }
         }
         // set exposure time
         if (!setExposureTime(nodeMap, exposure_time)) {

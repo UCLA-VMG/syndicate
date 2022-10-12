@@ -5,15 +5,11 @@ SensorStack::SensorStack(boost::property_tree::ptree tree)
     using boost::property_tree::ptree;
  
     std::vector<std::unique_ptr<Sensor>(*)(ptree::value_type&, ptree::value_type&)> sensor_list;
-    std::vector<ptree::value_type> local_configs;
-    std::vector<ptree::value_type> global_config;
-    // ptree::value_type global_config;
     std::string ATTR_SET("sensor");
     std::string GLOBAL("global");
  
     BOOST_FOREACH(ptree::value_type & f, tree.get_child("sensor_stack")){
         std::string at = f.first;
-        std::cout << at << " \n";
         if(at == ATTR_SET)
         {
             // Check if sensor is in list of defined sensors
@@ -37,7 +33,7 @@ SensorStack::SensorStack(boost::property_tree::ptree tree)
                 std::cout << "Sensor attribute not recognized.\n";
             // Append initialization params
             local_configs.emplace_back(std::move(f));
-            std::cout << f.second.get<std::string>("type") <<  "\n";
+            // std::cout << f.second.get<std::string>("type") <<  "\n";
         }
         else if(at == GLOBAL)
         {
@@ -52,15 +48,13 @@ SensorStack::SensorStack(boost::property_tree::ptree tree)
     numSensors = sensor_list.size();
     for(auto i=0; i < numSensors; ++i)
     {
-        std::cout << "hi1\n";
         sensors.emplace_back(std::move(sensor_list[i](local_configs[i], global_config[0])));
-        std::cout << "hi2\n";
     }
-    std::cout << "hi3\n";
 }
 
-void SensorStack::Acquire(double seconds)
+void SensorStack::Acquire()
 {
+    double seconds = global_config[0].second.get<double>("record_time");
     boost::barrier startAcq(numSensors);
     std::vector<boost::thread> threads_;
     for(auto& i : sensors)

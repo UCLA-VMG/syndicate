@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
     read_xml(XML_PATH, tree);
 
     //3. Initialize Sensor Stack
-    std::cout << "\n\n\n Barrier Sync Capture\n";
+    std::cout << "\n\n\n Starting Barrier Sync Capture\n";
 
     SensorStack mainStack(tree);
     
@@ -38,5 +38,5 @@ int main(int argc, char *argv[]) {
 
     // 4.1 Asynchronously Acquire Data
     std::cout << "\n\n\nAsyn Capture \n";
-    mainStack.Acquire(10);
+    mainStack.Acquire();
 }

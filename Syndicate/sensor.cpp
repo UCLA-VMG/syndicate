@@ -10,26 +10,23 @@ Sensor::Sensor(ptree::value_type& sensor_settings, ptree::value_type& global_set
     statusCode(HealthCode::OFFLINE), operatingCode(OpMode::NONE),
     hardwareSync(false), primary(false)
 {
-    std::cout << "hi4\n";
     ++numSensors;
     std::filesystem::create_directory(rootPath);
     rootPath = rootPath + sensorName + std::string("/");
     std::filesystem::create_directory(rootPath);
     logFile = std::ofstream(rootPath + "log_" + sensorName + ".txt", std::ios_base::out | std::ios_base::app );
 
-    std::cout << "hi5\n";
+    std::cout << "Initializing Sensor " << sensorName << ":\n";
 
-    
     if(sensor_settings.second.find("hardware_sync") != sensor_settings.second.not_found())
     {
-        std::cout << "hi\n";
         hardwareSync = sensor_settings.second.get<bool>("hardware_sync");
-        std::cout << "Hardware Sync Enabled\n";
+        std::cout << "  Hardware Sync Enabled\n";
     }
     if(sensor_settings.second.find("primary") != sensor_settings.second.not_found())
     {
         primary = sensor_settings.second.get<bool>("primary");
-        std::cout << "Primary/Secondary Enabled\n";
+        std::cout << "  Primary/Secondary Enabled\n";
     }
 }
 

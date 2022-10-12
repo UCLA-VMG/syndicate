@@ -4,9 +4,9 @@ RFEthernet::RFEthernet(ptree::value_type& sensor_settings, ptree::value_type& gl
     : Sensor(sensor_settings, global_settings), _timeout(sensor_settings.second.get<int>("timeout"))
 {
 	// Launch cmd file to configure radar parameters.
-	std::string command = sensor_settings.second.get<std::string>("mmstudio_exe_path");
-	WinExec(command.c_str(), SW_HIDE);
-	std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(60))); // wait 60 seconds for lua script to execute
+	// std::string command = sensor_settings.second.get<std::string>("mmstudio_exe_path");
+	// WinExec(command.c_str(), SW_HIDE);
+	// std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(60))); // wait 60 seconds for lua script to execute
 
 	int interface_id;
 	int total_interfaces=0;
@@ -47,7 +47,7 @@ RFEthernet::RFEthernet(ptree::value_type& sensor_settings, ptree::value_type& gl
     // std::cout << "Enter the interface number (1-" << total_interfaces << "): ";
     // std::cin >> interface_id;
 
-	interface_id = 8;
+	interface_id = 4;
     
     if(interface_id < 1 || interface_id > total_interfaces)
     {
@@ -82,7 +82,7 @@ bool RFEthernet::LoadNpcapDlls()
 
 void RFEthernet::AcquireSave(double seconds, boost::barrier& startBarrier)
 {
-	seconds = seconds + 15; // TODO Bug fix for radar prematurely ending ;)
+	seconds = seconds + 5; // TODO Bug fix for radar prematurely ending ;)
 	pcap_dumper_t *dumpfile;
 	char errbuf[PCAP_ERRBUF_SIZE];
     /* Open the adapter */
@@ -115,7 +115,7 @@ void RFEthernet::AcquireSave(double seconds, boost::barrier& startBarrier)
     pcap_freealldevs(all_devs);
     
     /* start the capture */
-	// startBarrier.wait();
+	startBarrier.wait();
 	std::cout << "radar starting \n";
 	boost::thread interrupt_thread(boost::bind(&RFEthernet::interrupt_pcap_loop, this, seconds));
     pcap_loop(adhandle, 0, packet_handler, (unsigned char *)dumpfile);
