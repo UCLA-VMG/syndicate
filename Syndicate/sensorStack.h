@@ -25,11 +25,13 @@
 struct SensorStack{
 
     std::vector<std::unique_ptr<Sensor>> sensors;
+    std::vector<ptree::value_type> local_configs;
+    std::vector<ptree::value_type> global_config;
 
     size_t numSensors;
 
     SensorStack(boost::property_tree::ptree tree);
     ~SensorStack();
 
-    void Acquire(double seconds);
+    void Acquire();
 };

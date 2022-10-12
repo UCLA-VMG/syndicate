@@ -5,8 +5,6 @@ SensorStack::SensorStack(boost::property_tree::ptree tree)
     using boost::property_tree::ptree;
  
     std::vector<std::unique_ptr<Sensor>(*)(ptree::value_type&, ptree::value_type&)> sensor_list;
-    std::vector<ptree::value_type> local_configs;
-    std::vector<ptree::value_type> global_config;
     // ptree::value_type global_config;
     std::string ATTR_SET("sensor");
     std::string GLOBAL("global");
@@ -59,8 +57,9 @@ SensorStack::SensorStack(boost::property_tree::ptree tree)
     std::cout << "hi3\n";
 }
 
-void SensorStack::Acquire(double seconds)
+void SensorStack::Acquire()
 {
+    double seconds = global_config[0].second.get<double>("record_time");
     boost::barrier startAcq(numSensors);
     std::vector<boost::thread> threads_;
     for(auto& i : sensors)

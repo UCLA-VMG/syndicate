@@ -67,12 +67,12 @@ set (LIBS ${Spinnaker_LIBRARIES} ${VimbaCPP_LIBRARIES} ${VimbaC_LIBRARIES} ${Vim
 #Generate Execs
 # add_executable(capture ${PROJECT_SOURCE_DIR}/scripts/main.cpp)
 add_executable(capture_config ${PROJECT_SOURCE_DIR}/scripts/main.cpp)
-add_executable(config_test  ${PROJECT_SOURCE_DIR}/scripts/test_config.cpp)
+# add_executable(config_test  ${PROJECT_SOURCE_DIR}/scripts/test_config.cpp)
 # add_executable(dshow_test ${PROJECT_SOURCE_DIR}/scripts/dshow_test.cpp)
 # add_executable(acq ${PROJECT_SOURCE_DIR}/scripts/acq.cpp)
 # add_executable(packets_acq ${PROJECT_SOURCE_DIR}/scripts/packets_acq.cpp)
 # target_link_libraries(capture ${LIBS})
-target_link_libraries(config_test ${LIBS})
+# target_link_libraries(config_test ${LIBS})
 target_link_libraries(capture_config ${LIBS})
 # target_link_libraries(dshow_test ${LIBS})
 # target_link_libraries(acq ${LIBS})
@@ -80,7 +80,7 @@ target_link_libraries(capture_config ${LIBS})
 
 #Targets
 ADD_CUSTOM_TARGET(build_all)
-ADD_DEPENDENCIES(build_all capture_config config_test)
+ADD_DEPENDENCIES(build_all capture_config)
 
 #Library Linking
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

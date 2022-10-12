@@ -3,7 +3,8 @@
 <sensor_stack>
     
     <global>
-        <save_path>D:/syndicate_tests/config_test/</save_path>
+        <save_path>D:/syndicate_tests/1_2/</save_path>
+        <record_time>15</record_time>
     </global>
 
     <sensor>
@@ -32,8 +33,14 @@
         <exposure_time>30000.0</exposure_time>
         <gain>0.0</gain>
         <black_level>5.57</black_level>
-        <hardware_sync>0</hardware_sync>
-        <primary>0</primary>
+        <hardware_sync>1</hardware_sync>
+        <primary>1</primary>
+    </sensor>
+
+    <sensor>
+        <name>FMCW_Radar</name>
+        <type>RFEthernet</type>
+        <timeout>1000</timeout>
     </sensor>
 
 </sensor_stack>
