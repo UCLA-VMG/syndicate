@@ -512,7 +512,7 @@ bool setFps(INodeMap& nodeMap, float fps, std::string cameraType) {
         if (cameraType == "Grasshopper3") {
             ptrAcquisitionFrameRateEnable = nodeMap.GetNode("AcquisitionFrameRateEnabled");
         }
-        else if (cameraType == "Grasshopper3") {
+        else if (cameraType == "BlackFlyS") {
             ptrAcquisitionFrameRateEnable = nodeMap.GetNode("AcquisitionFrameRateEnable");
         }
         else {

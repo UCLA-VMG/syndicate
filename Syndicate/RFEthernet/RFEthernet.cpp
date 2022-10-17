@@ -122,8 +122,13 @@ void RFEthernet::AcquireSave(double seconds, boost::barrier& startBarrier)
 	interrupt_thread.join();
     pcap_close(adhandle);
 	// launch cmd file to configure radar parameters
-	// std::string command = "C://Users//Adnan//Documents//Github//syndicate//config//close_mmwavestudio.cmd";
-	// WinExec(command.c_str(), SW_HIDE);
+
+	std::cout << "Waiting For RF Stop Frame to be called!" << std::endl;
+	std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(15))); // wait 5400 seconds for main script to execute (give patient chance to sleep)
+	std::cout << "Waiting For RF Stop Frame Done!" << std::endl;
+
+	std::string command = "C://Users//Adnan//Documents//Github//syndicate//config//close_mmwavestudio.cmd";
+	WinExec(command.c_str(), SW_HIDE);
 }
 
 static void packet_handler(u_char *dumpfile, const struct pcap_pkthdr *header, const u_char *pkt_data)
