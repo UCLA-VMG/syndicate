@@ -1,7 +1,8 @@
 #include "RFEthernet.h"
 
 RFEthernet::RFEthernet(ptree::value_type& sensor_settings, ptree::value_type& global_settings)
-    : Sensor(sensor_settings, global_settings), _timeout(sensor_settings.second.get<int>("timeout"))
+    : Sensor(sensor_settings, global_settings), _timeout(sensor_settings.second.get<int>("timeout")),
+	interface_id(sensor_settings.second.get<int>("interface_id"))
 {
 	// Launch cmd file to configure radar parameters.
 	// std::string command = sensor_settings.second.get<std::string>("mmstudio_exe_path");
@@ -47,7 +48,7 @@ RFEthernet::RFEthernet(ptree::value_type& sensor_settings, ptree::value_type& gl
     // std::cout << "Enter the interface number (1-" << total_interfaces << "): ";
     // std::cin >> interface_id;
 
-	interface_id = 4;
+	// interface_id = sensor_settings.second.get<int>("interface_id");
     
     if(interface_id < 1 || interface_id > total_interfaces)
     {
@@ -82,7 +83,6 @@ bool RFEthernet::LoadNpcapDlls()
 
 void RFEthernet::AcquireSave(double seconds, boost::barrier& startBarrier)
 {
-	seconds = seconds + 5; // TODO Bug fix for radar prematurely ending ;)
 	pcap_dumper_t *dumpfile;
 	char errbuf[PCAP_ERRBUF_SIZE];
     /* Open the adapter */
@@ -116,7 +116,6 @@ void RFEthernet::AcquireSave(double seconds, boost::barrier& startBarrier)
     
     /* start the capture */
 	startBarrier.wait();
-	std::cout << "radar starting \n";
 	boost::thread interrupt_thread(boost::bind(&RFEthernet::interrupt_pcap_loop, this, seconds));
     pcap_loop(adhandle, 0, packet_handler, (unsigned char *)dumpfile);
 	std::cout << "RF Execution Complete\n\n";
@@ -124,8 +123,13 @@ void RFEthernet::AcquireSave(double seconds, boost::barrier& startBarrier)
 	interrupt_thread.join();
     pcap_close(adhandle);
 	// launch cmd file to configure radar parameters
-	// std::string command = "C://Users//Adnan//Documents//Github//syndicate//config//close_mmwavestudio.cmd";
-	// WinExec(command.c_str(), SW_HIDE);
+
+	std::cout << "Waiting For RF Stop Frame to be called!" << std::endl;
+	std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(15))); // wait 5400 seconds for main script to execute (give patient chance to sleep)
+	std::cout << "Waiting For RF Stop Frame Done!" << std::endl;
+
+	std::string command = "C://Users//Adnan//Documents//Github//syndicate//config//close_mmwavestudio.cmd";
+	WinExec(command.c_str(), SW_HIDE);
 }
 
 static void packet_handler(u_char *dumpfile, const struct pcap_pkthdr *header, const u_char *pkt_data)
@@ -139,6 +143,22 @@ void RFEthernet::interrupt_pcap_loop(double seconds)
     std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(seconds)));
 	pcap_breakloop(adhandle);
 }
+
+void RFEthernet::AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier)
+{
+    std::cout << "I am not defined yet.\n\n";
+}
+
+void RFEthernet::ConcurrentAcquire(double seconds, boost::barrier& frameBarrier)
+{
+    std::cout << "I am not defined yet.\n\n";
+}
+
+void RFEthernet::ConcurrentSave()
+{
+    std::cout << "I am not defined yet.\n\n";
+}
+
 
 RFEthernet::~RFEthernet()
 {
