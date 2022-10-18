@@ -144,20 +144,20 @@ void RFEthernet::interrupt_pcap_loop(double seconds)
 	pcap_breakloop(adhandle);
 }
 
-void RFEthernet::AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier)
-{
-    std::cout << "I am not defined yet.\n\n";
-}
+// void RFEthernet::AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier)
+// {
+//     std::cout << "I am not defined yet.\n\n";
+// }
 
-void RFEthernet::ConcurrentAcquire(double seconds, boost::barrier& frameBarrier)
-{
-    std::cout << "I am not defined yet.\n\n";
-}
+// void RFEthernet::ConcurrentAcquire(double seconds, boost::barrier& frameBarrier)
+// {
+//     std::cout << "I am not defined yet.\n\n";
+// }
 
-void RFEthernet::ConcurrentSave()
-{
-    std::cout << "I am not defined yet.\n\n";
-}
+// void RFEthernet::ConcurrentSave()
+// {
+//     std::cout << "I am not defined yet.\n\n";
+// }
 
 
 RFEthernet::~RFEthernet()

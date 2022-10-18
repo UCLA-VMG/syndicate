@@ -15,16 +15,10 @@ SensorStack::SensorStack(boost::property_tree::ptree tree)
         if(at == ATTR_SET)
         {
             // Check if sensor is in list of defined sensors
-            if(f.second.get<std::string>("type") == "MX800")
-                sensor_list.emplace_back(makeSensor<MX800>);
-            else if(f.second.get<std::string>("type") == "SpinnakerCamera")
+            if(f.second.get<std::string>("type") == "SpinnakerCamera")
                 sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
             else if(f.second.get<std::string>("type") == "OpenCVCamera")
                 sensor_list.emplace_back(makeSensor<OpenCVCamera>);
-            else if(f.second.get<std::string>("type") == "RealSenseCamera")
-                sensor_list.emplace_back(makeSensor<RealSenseCamera>);
-            // else if(f.second.get<std::string>("type") == "VimbaCamera")
-            //     sensor_list.emplace_back(makeSensor<VimbaCamera>);
             else if(f.second.get<std::string>("type") == "RFEthernet")
                 sensor_list.emplace_back(makeSensor<RFEthernet>);
             else if(f.second.get<std::string>("type") == "SerialPort")

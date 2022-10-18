@@ -32,6 +32,7 @@ struct RFEthernet : public Sensor
 	pcap_if_t *curr_dev;
 	pcap_t *adhandle;
     int _timeout;
+    int interface_id;
 
     void interrupt_pcap_loop(double seconds);
 

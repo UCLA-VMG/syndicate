@@ -9,15 +9,8 @@
 #include <boost/foreach.hpp>
 #include <unordered_map>
 
-#include "sensor.h"
 #include "sensorStack.h"
-// #include "VimbaCamera.h"
-// #include "SerialPort.h"
-// #include "OpenCVCamera.h"
-#include "RFEthernet.h"
-// #include "MiniDSPMic.h"
-#include "MX800.h"
-// #include "RealSenseCamera.h"
+
 
 using boost::property_tree::ptree;
 

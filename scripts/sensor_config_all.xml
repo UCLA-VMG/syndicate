@@ -20,7 +20,7 @@
         <offset_y>0</offset_y>
         <pixel_format>Mono</pixel_format>
         <binning_size>2</binning_size>
-        <exposure_compensation>0.08</exposure_compensation>
+        <exposure_compens\ation>0.08</exposure_compensation>
         <exposure_time>8500.0</exposure_time>
         <gain>0.0</gain>
         <black_level>5.57</black_level>

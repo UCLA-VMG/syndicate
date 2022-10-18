@@ -6,8 +6,6 @@
 #include "OpenCVCamera.h"
 #include "RFEthernet.h"
 #include "MiniDSPMic.h"
-#include "MX800.h"
-#include "RealSenseCamera.h"
 
 #include <unordered_map>
 #include <any>
