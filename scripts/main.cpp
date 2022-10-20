@@ -141,17 +141,31 @@
 //     // b = &a;
 //     // b->AcquireSave(10);
 // }
-
+const int NUM_TRIALS = 1;
 
 int main(int argc, char *argv[]) {
 
-    std::cout << "Waiting Before Trial 1!" << std::endl;
-    std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(5400))); // wait 5400 seconds for main script to execute (give patient chance to sleep)
+    //0. Set Root Path
+    std::string rootPath("D:/rf_test_cmd");
+    if (argc > 1){
+        rootPath = rootPath + std::string("/") + std::string(argv[1]) + std::string("/");
+    }
+    else {
+        rootPath = rootPath + std::string("/");
+    }
+    std::string rootPath_E = rootPath;
+
+    std::cout << "Waiting Before Trial 0!" << std::endl;
+    std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(9))); // wait 5400 seconds for main script to execute (give patient chance to sleep)
     std::cout << "Waiting Done!" << std::endl;
     
-    for (int i = 0; i < 2; i++) {
-
+    for (int i = 0; i < NUM_TRIALS; i++) {
         if (i == 1) {
+            std::cout << "Waiting Before Trial 1!" << std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(120))); // wait 5400 seconds for main script to execute (give patient chance to sleep)
+            std::cout << "Waiting Done!" << std::endl;
+        }
+        if (i == 2) {
             std::cout << "Waiting Before Trial 2!" << std::endl;
             std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(120))); // wait 5400 seconds for main script to execute (give patient chance to sleep)
             std::cout << "Waiting Done!" << std::endl;
@@ -164,11 +178,11 @@ int main(int argc, char *argv[]) {
         //     all_args.assign(argv + 1, argv + argc);
         // }
         
-        //0. Set Root Path
-        // std::string rootPath_E("E:/rf_test/");
-        std::string trial_id = std::to_string(i);
-        std::string rootPath("E:/patient_15/trial_");
-        std::string rootPath_E = rootPath + trial_id + "/";
+        // //0. Set Root Path
+        // // std::string rootPath_E("E:/rf_test/");
+        // std::string trial_id = std::to_string(i);
+        // std::string rootPath("E:/patient_18/trial_");
+        // std::string rootPath_E = rootPath + trial_id + "/";
 
         std::cout << "Will save to this path: " << rootPath_E << std::endl;
 
@@ -186,7 +200,7 @@ int main(int argc, char *argv[]) {
             {"Root Path", rootPath_E}, {"Pixel Format", std::string("Mono")},
             {"Binning Size", 2}, // 1024 x 1024
             {"Exposure Compensation", 0.08},
-            {"Exposure Time", 8500.0},
+            {"Exposure Time", 8100.0},
             {"Gain", 0.0},
             {"Black Level", 5.57},
             {"Hardware Sync", h_sync}, {"Primary", false}
@@ -200,7 +214,7 @@ int main(int argc, char *argv[]) {
             {"Root Path", rootPath_E}, {"Pixel Format", std::string("Mono")},
             {"Binning Size", 2}, // 1024 x 1024
             {"Exposure Compensation", 0.09},
-            {"Exposure Time", 8500.0},
+            {"Exposure Time", 7800.0},
             {"Gain", 0.0},
             {"Black Level", 5.08},
             {"Hardware Sync", h_sync}, {"Primary", false}
@@ -226,30 +240,45 @@ int main(int argc, char *argv[]) {
             {"Sensor Name", std::string("Arduino_Serial")},
             {"Root Path", rootPath_E}
         };
+        std::unordered_map<std::string, std::any> reset_serial_config = {
+            {"Port Name", std::string("\\\\.\\COM20")},
+            {"Pulse Time", 0}, {"Total Time", 0},
+            {"Sensor Name", std::string("Arduino_Reset")},
+            {"Root Path", rootPath_E}
+        };
 
         //2. Add Configurations and Factory Generator Functions into std::vectors
         std::vector<std::unique_ptr<Sensor>(*)(std::unordered_map<std::string, std::any>&)> sensor_list;
         std::vector<std::unordered_map<std::string, std::any>> configs;
         // sensor_list.emplace_back(makeSensor<VimbaCamera>);
-        sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
-        configs.emplace_back(nir_config);
-        sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
-        configs.emplace_back(nir_config_mm);
-        sensor_list.emplace_back(makeSensor<OpenCVCamera>);
-        configs.emplace_back(thermal_config);
-        sensor_list.emplace_back(makeSensor<RFEthernet>);
-        configs.emplace_back(radar_config);
+        // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+        // configs.emplace_back(nir_config);
+        // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+        // configs.emplace_back(nir_config_mm);
+        // sensor_list.emplace_back(makeSensor<OpenCVCamera>);
+        // configs.emplace_back(thermal_config);
+        // sensor_list.emplace_back(makeSensor<RFEthernet>);
+        // configs.emplace_back(radar_config);
         sensor_list.emplace_back(makeSensor<SerialPort>);
         configs.emplace_back(serial_config);
 
         // std::vector<std::unordered_map<std::string, std::any>> configs{serial_config};
         //3. Initialize Sensor Stack
-        std::cout  << "Hello" << std::endl;
+        std::cout << "Initializing Sensor Stack!" << std::endl;
         SensorStack mainStack(sensor_list, configs);
 
         //4.1 Asynchronously Acquire Data
-        std::cout << "\n\n\n Asyn Capture \n";
-        mainStack.Acquire(10800); // 10,800 [3 hrs] & 14,400 [4 hrs] & 21,600 [6 hrs]
+        std::cout << "Beginning Acquisition Process!" << std::endl;
+        mainStack.Acquire(7200); // 10,800 [3 hrs] & 14,400 [4 hrs] & 21,600 [6 hrs]
+        std::cout << "Ended Acquisition Process!" << std::endl;
+        
+
+        SerialPort reset_arduino(reset_serial_config);
+        // SensorStack resetStack(reset_sensor_list, reset_configs);
+        //4.1 Asynchronously Acquire Data
+        std::cout << "Beginning Reset Process!" << std::endl;
+        reset_arduino.resetFPGA();
+        std::cout << "Ended Reset Process!" << std::endl;
     }
     
 }

@@ -2,9 +2,19 @@
 
 RFEthernet::RFEthernet(std::unordered_map<std::string, std::any>& sample_config)
     : Sensor(sample_config), _timeout(std::any_cast<int>(sample_config["Timeout"]))
-{
+{	
+	// launch cmd file to reset radar fpga data capture card
+	std::string cmd_reset_fpga = "C://Users//Adnan//Documents//syndicate//config//reset_fpga.cmd";
+	WinExec(cmd_reset_fpga.c_str(), SW_HIDE);
+	std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(30))); // wait 30 seconds for fpga to reset
+
+	// launch cmd file to reset AWR radar device
+	std::string cmd_reset_ar = "C://Users//Adnan//Documents//syndicate//config//reset_ar_device.cmd";
+	WinExec(cmd_reset_ar.c_str(), SW_HIDE);
+	std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(30))); // wait 60 seconds for AWR device to reset
+	
 	// launch cmd file to configure radar parameters
-	std::string command = "C:\\Users\\Adnan\\Documents\\Github\\syndicate\\config\\run_multi_4rx3tx_mmwavestudio.cmd";
+	std::string command = "C://Users//Adnan//Documents//syndicate//config//run_multi_4rx3tx_mmwavestudio.cmd";
 	WinExec(command.c_str(), SW_HIDE);
 	std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(60))); // wait 60 seconds for lua script to execute
 
@@ -124,11 +134,22 @@ void RFEthernet::AcquireSave(double seconds, boost::barrier& startBarrier)
 	// launch cmd file to configure radar parameters
 
 	std::cout << "Waiting For RF Stop Frame to be called!" << std::endl;
-	std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(15))); // wait 5400 seconds for main script to execute (give patient chance to sleep)
+	std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(30))); // wait 5400 seconds for main script to execute (give patient chance to sleep)
 	std::cout << "Waiting For RF Stop Frame Done!" << std::endl;
 
-	std::string command = "C://Users//Adnan//Documents//Github//syndicate//config//close_mmwavestudio.cmd";
-	WinExec(command.c_str(), SW_HIDE);
+	std::string cmd_close_mmwave = "C://Users//Adnan//Documents//syndicate//config//close_mmwavestudio.cmd";
+	WinExec(cmd_close_mmwave.c_str(), SW_HIDE);
+	std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(30))); // wait 60 seconds for lua script to execute
+
+	// launch cmd file to reset AWR radar device
+	std::string cmd_reset_ar = "C://Users//Adnan//Documents//syndicate//config//reset_ar_device.cmd";
+	WinExec(cmd_reset_ar.c_str(), SW_HIDE);
+	std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(30))); // wait 60 seconds for AWR device to reset
+
+	std::string cmd_reset_fpga = "C://Users//Adnan//Documents//syndicate//config//reset_fpga.cmd";
+	WinExec(cmd_reset_fpga.c_str(), SW_HIDE);
+	std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(30))); // wait 60 seconds for lua script to execute
+
 }
 
 static void packet_handler(u_char *dumpfile, const struct pcap_pkthdr *header, const u_char *pkt_data)

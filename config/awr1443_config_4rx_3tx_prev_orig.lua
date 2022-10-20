@@ -187,7 +187,7 @@ if NUM_SUBSETS_MOD ~= 1 then
                 ar1.CaptureCardConfig_StartRecord(SAVE_DATA_PATH, 1)
                 ar1.StartFrame()
                 sleep(SUBSET_RECORDING_TIME)
-                ar1.StopFrame()
+                -- ar1.StopFrame()
                 ar1.CaptureCardConfig_StopRecord()
             end
         end
@@ -205,7 +205,7 @@ if NORM_NUM_SUBSETS ~= 1 then
         ar1.CaptureCardConfig_StartRecord(SAVE_DATA_PATH, 1)
         ar1.StartFrame()
         sleep(SUBSET_RECORDING_TIME)
-        ar1.StopFrame()
+        -- ar1.StopFrame()
         ar1.CaptureCardConfig_StopRecord()
     end
 end

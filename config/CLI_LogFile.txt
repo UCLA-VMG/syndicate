@@ -1,0 +1,10 @@
+
+Tue Oct 18 15:00:48 2022
+Reset FPGA Command (req)
+
+Tue Oct 18 15:00:58 2022
+Reset FPGA : 
+Timeout Error! System disconnected
+
+Tue Oct 18 15:00:58 2022
+Return status : -5

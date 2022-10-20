@@ -30,6 +30,7 @@ struct SerialPort : public Sensor
     void closeSerial();
     void signalWriteRead(unsigned int delayTime, std::string command);
     void runBarker13();
+    void resetFPGA();
 
     char incomingData[MAX_DATA_LENGTH];
     std::string portName;

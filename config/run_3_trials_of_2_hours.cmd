@@ -1,0 +1,3 @@
+cmd /C "C:\Users\Adnan\Documents\syndicate\bin\Debug\capture.exe trial_0 > C:\Users\Adnan\Downloads\osa_log_folder\patient_18\trial_0_log.txt"
+cmd /C "C:\Users\Adnan\Documents\syndicate\bin\Debug\capture.exe trial_1 > C:\Users\Adnan\Downloads\osa_log_folder\patient_18\trial_1_log.txt"
+cmd /C "C:\Users\Adnan\Documents\syndicate\bin\Debug\capture.exe trial_2 > C:\Users\Adnan\Downloads\osa_log_folder\patient_18\trial_2_log.txt"

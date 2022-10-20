@@ -123,7 +123,8 @@ void SerialPort::runBarker13()
 {
     std::string str_cmd;
     int remainingTime = totalTime - (13 * pulseTime);
-    // Add assertion (2 * 13 * pulseTime) < totalTime
+    // Add assertion (2 + 13 * pulseTime) < totalTime
+    // The 2 is a buffer
     int idx = 0;
     int seq[] = {1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1};
     RecordTimeStamp();
@@ -156,7 +157,7 @@ void SerialPort::signalWriteRead(unsigned int dealyTime, std::string command)
 }
 
 void SerialPort::AcquireSave(double seconds, boost::barrier& startBarrier) {
-    // Better than recusion
+    // Better than recursion
     // Avoid stack overflows
     startBarrier.wait();
     auto start = std::chrono::steady_clock::now();
@@ -173,6 +174,12 @@ void SerialPort::AcquireSave(double seconds, boost::barrier& startBarrier) {
 
 void SerialPort::AcquireSaveBarrier(double seconds, boost::barrier& frameBarrier) {
     std::cout << "I am not defined yet.\n\n";
+}
+
+void SerialPort::resetFPGA() {
+    std::string reset_cmd = "<RESET>";
+    signalWriteRead(0, reset_cmd);
+    std::cout << "Reset Command Sent" << std::endl;
 }
 
 void SerialPort::closeSerial()
