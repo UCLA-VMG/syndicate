@@ -4,7 +4,13 @@
     
     <global>
         <save_path>D:/config_test/</save_path>
-        <record_time>30</record_time>
+        <save_path_0>D:/config_test/trial_0/</save_path_0>
+        <save_path_1>D:/config_test/trial_1/</save_path_1>
+        <save_path_2>D:/config_test/trial_2/</save_path_2>
+        <record_time>10</record_time>
+        <wait_time_0>5</wait_time_0>
+        <wait_time_1>120</wait_time_1>
+        <wait_time_2>120</wait_time_2>
     </global>
 
     <sensor>
