@@ -8,12 +8,10 @@ namespace Syndicate
         width(sensor_settings.second.get<int>("width"))
 
     {
-        std::cout << "Camera Cstr\n";
         if(sensor_settings.second.find("type") != sensor_settings.second.not_found())
         {
             cameraType = std::any_cast<std::string>(sensor_settings.second.get<std::string>("type"));
         }
-        std::cout << "Camera Cstr\n";
     }
 
     

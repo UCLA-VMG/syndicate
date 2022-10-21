@@ -3,14 +3,13 @@
 <sensor_stack>
     
     <global>
-        <save_path>D:/rf_test/</save_path>
-        <record_time>15</record_time>
+        <save_path>D:/config_test/</save_path>
+        <record_time>30</record_time>
     </global>
 
     <sensor>
         <name>NIR_Camera</name>
         <type>SpinnakerCamera</type>
-        <fps>30</fps>
         <height>2048</height>
         <width>2048</width>
         <camera_id>21290846</camera_id>
@@ -20,7 +19,7 @@
         <offset_y>0</offset_y>
         <pixel_format>Mono</pixel_format>
         <binning_size>2</binning_size>
-        <exposure_compens\ation>0.08</exposure_compensation>
+        <exposure_compensation>0.08</exposure_compensation>
         <exposure_time>8500.0</exposure_time>
         <gain>0.0</gain>
         <black_level>5.57</black_level>
@@ -31,7 +30,6 @@
     <sensor>
         <name>NIR_Camera_mm</name>
         <type>SpinnakerCamera</type>
-        <fps>30</fps>
         <height>2048</height>
         <width>2048</width>
         <camera_id>21190637</camera_id>
@@ -42,7 +40,7 @@
         <pixel_format>Mono</pixel_format>
         <binning_size>2</binning_size>
         <exposure_compensation>0.09</exposure_compensation>
-        <exposure_time>8500.0</exposure_time>
+        <exposure_time>8200.0</exposure_time>
         <gain>0.0</gain>
         <black_level>5.08</black_level>
         <hardware_sync>1</hardware_sync>
@@ -66,6 +64,9 @@
         <type>RFEthernet</type>
         <timeout>1000</timeout>
         <interface_id>8</interface_id>
+        <reset_fpga_path>C:/Users/Adnan/Documents/Github/syndicate/config/reset_fpga.cmd</reset_fpga_path>
+        <run_mmwave_path>C:/Users/Adnan/Documents/Github/syndicate/config/run_multi_4rx3tx_mmwavestudio.cmd</run_mmwave_path>
+        <close_mmwave_path>C:/Users/Adnan/Documents/Github/syndicate/config/close_mmwavestudio.cmd</close_mmwave_path>
     </sensor>
 
     <sensor>
@@ -74,6 +75,7 @@
         <port_name>\\\\.\\COM14</port_name>
         <pulse_time>1</pulse_time>
         <total_time>20</total_time>
+        <baud_rate>9600</baud_rate>
     </sensor>
 
 </sensor_stack>

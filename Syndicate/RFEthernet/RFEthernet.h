@@ -33,6 +33,10 @@ struct RFEthernet : public Sensor
 	pcap_t *adhandle;
     int _timeout;
     int interface_id;
+    std::string cmd_reset_fpga;
+    std::string cmd_run_mmwave;
+    std::string cmd_close_mmwave;
+
 
     void interrupt_pcap_loop(double seconds);
 

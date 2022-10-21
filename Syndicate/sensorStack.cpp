@@ -11,7 +11,6 @@ SensorStack::SensorStack(boost::property_tree::ptree tree)
  
     BOOST_FOREACH(ptree::value_type & f, tree.get_child("sensor_stack")){
         std::string at = f.first;
-        std::cout << at << " \n";
         if(at == ATTR_SET)
         {
             // Check if sensor is in list of defined sensors
@@ -44,11 +43,8 @@ SensorStack::SensorStack(boost::property_tree::ptree tree)
     numSensors = sensor_list.size();
     for(auto i=0; i < numSensors; ++i)
     {
-        std::cout << "hi1\n";
         sensors.emplace_back(std::move(sensor_list[i](local_configs[i], global_config[0])));
-        std::cout << "hi2\n";
     }
-    std::cout << "hi3\n";
 }
 
 void SensorStack::Acquire()

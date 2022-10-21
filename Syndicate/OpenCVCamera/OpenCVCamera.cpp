@@ -112,7 +112,7 @@ bool OpenCVCamera::setFps(VideoCapture cap, double fps) {
     return result;
 }
 
-bool OpenCVCamera::configure(cv::VideoCapture cap, int cameraID, double fps = 30.0, double height = 320, double width = 320) {
+bool OpenCVCamera::configure(cv::VideoCapture cap, int cameraID, double fps = 30.0, double height = 512, double width = 640) {
     bool result = true;
     try {
         // Print the device serial number

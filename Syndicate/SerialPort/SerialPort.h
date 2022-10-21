@@ -30,7 +30,7 @@ struct SerialPort : public Sensor
 
     char incomingData[MAX_DATA_LENGTH];
     std::string portName;
-    unsigned int pulseTime, totalTime;
+    unsigned int pulseTime, totalTime, baudRate;
 
     HANDLE _handler;
     bool _connected;
