@@ -4,13 +4,11 @@
     
     <global>
         <save_path>D:/config_test/</save_path>
-        <save_path_0>D:/config_test/trial_0/</save_path_0>
-        <save_path_1>D:/config_test/trial_1/</save_path_1>
-        <save_path_2>D:/config_test/trial_2/</save_path_2>
-        <record_time>10</record_time>
+        <record_time>7200</record_time>
+        <num_trials>3</num_trials>
         <wait_time_0>5</wait_time_0>
-        <wait_time_1>120</wait_time_1>
-        <wait_time_2>120</wait_time_2>
+        <wait_time_1>60</wait_time_1>
+        <wait_time_2>60</wait_time_2>
     </global>
 
     <sensor>
@@ -23,4 +21,12 @@
         <close_mmwave_path>C:/Users/Adnan/Documents/Github/syndicate/config/close_mmwavestudio.cmd</close_mmwave_path>
     </sensor>
 
+    <reset_sensor>
+        <name>FPGA_Reset_Arduino</name>
+        <type>SerialPort</type>
+        <port_name>\\.\COM20</port_name>
+        <pulse_time>0</pulse_time>
+        <total_time>10</total_time>
+        <baud_rate>19200</baud_rate>
+    </reset_sensor>
 </sensor_stack>

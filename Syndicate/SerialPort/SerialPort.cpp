@@ -145,14 +145,14 @@ void SerialPort::runBarker13()
     std::this_thread::sleep_for(std::chrono::seconds(remainingTime));
 }
 
-void SerialPort::signalWriteRead(unsigned int dealyTime, std::string command)
+void SerialPort::signalWriteRead(unsigned int delayTime, std::string command)
 {
     // Keep the volatile qualifier and logging. Might not work without them
     volatile int write_status, read_status;
     write_status = writeSerialPort(command.c_str(), MAX_DATA_LENGTH);
     read_status  = readSerialPort(incomingData, MAX_DATA_LENGTH);
-    if (dealyTime)
-        std::this_thread::sleep_for(std::chrono::seconds(dealyTime));
+    if (delayTime)
+        std::this_thread::sleep_for(std::chrono::seconds(delayTime));
     logFile << incomingData << std::endl;
 }
 
@@ -170,6 +170,14 @@ void SerialPort::AcquireSave(double seconds, boost::barrier& startBarrier) {
     }
     SaveTimeStamps();
     std::cout << "Serial execution complete" << std::endl;
+}
+
+void SerialPort::resetFPGA() {
+    std::string reset_cmd = "<RESET>";
+    signalWriteRead(0, reset_cmd);
+    std::cout << "Reset Command Sent" << std::endl;
+    logFile << "Reset Command Sent" << std::endl;
+    std::this_thread::sleep_for(std::chrono::seconds(totalTime));
 }
 
 void SerialPort::closeSerial()
