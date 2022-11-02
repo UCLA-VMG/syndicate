@@ -7,8 +7,8 @@
         <record_time>7200</record_time>
         <num_trials>3</num_trials>
         <wait_time_0>5</wait_time_0>
-        <wait_time_1>60</wait_time_1>
-        <wait_time_2>60</wait_time_2>
+        <wait_time_1>120</wait_time_1>
+        <wait_time_2>120</wait_time_2>
     </global>
 
     <sensor>
@@ -26,7 +26,7 @@
         <type>SerialPort</type>
         <port_name>\\.\COM20</port_name>
         <pulse_time>0</pulse_time>
-        <total_time>10</total_time>
+        <total_time>60</total_time>
         <baud_rate>19200</baud_rate>
     </reset_sensor>
 </sensor_stack>
