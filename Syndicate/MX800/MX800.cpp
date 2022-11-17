@@ -35,7 +35,7 @@ void MX800::AcquireSave(double seconds, boost::barrier& startBarrier) {
     {
         try
         {
-            std::filesystem::rename(file, rootPath + '/' + file);
+            std::filesystem::rename(file, rootPath + file);
         }
         catch (std::filesystem::filesystem_error& e)
         {

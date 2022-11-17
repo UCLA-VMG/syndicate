@@ -11,7 +11,6 @@ Sensor::Sensor(ptree::value_type& sensor_settings, ptree::value_type& global_set
     hardwareSync(false), primary(false)
 {
     ++numSensors;
-    std::filesystem::create_directory(rootPath);
     rootPath = rootPath + sensorName + std::string("/");
     std::filesystem::create_directory(rootPath);
     logFile = std::ofstream(rootPath + "log_" + sensorName + ".txt", std::ios_base::out | std::ios_base::app );

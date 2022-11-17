@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<sensor_stack>
+    
+    <global>
+        <save_path>D:/spo2_verify_dl/</save_path>
+        <prefix_id>3</prefix_id>
+        <record_time>90</record_time>
+    </global>
+
+    <sensor>
+        <name>RGB_Polarized_Cam</name>
+        <type>SpinnakerCamera</type>
+        <fps>30</fps>
+        <height>2048</height>
+        <width>2448</width>
+        <camera_id>20406823</camera_id>
+        <camera_name>BlackFlyS</camera_name>
+        <offset_x>0</offset_x>
+        <offset_y>0</offset_y>
+        <pixel_format>Mono</pixel_format>
+        <binning_size>1</binning_size>
+        <exposure_compensation>0.00</exposure_compensation>
+        <exposure_time>30000.0</exposure_time>
+        <gain>0.0</gain>
+        <black_level>0.0</black_level>
+        <hardware_sync>1</hardware_sync>
+        <primary>1</primary>
+    </sensor>
+
+    <sensor>
+        <name>MX800</name>
+        <type>MX800</type>
+        <exe_path>C:/Users/111/Desktop/repos/mmhealth_2/sensors/VSCaptureMP-master-copy/VSCaptureMP/VSCaptureMP/bin/Debug/VSCaptureMP.exe</exe_path>
+        <level>5</level>
+    </sensor>
+
+</sensor_stack>

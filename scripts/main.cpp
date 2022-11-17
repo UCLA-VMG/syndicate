@@ -25,7 +25,10 @@ int main(int argc, char *argv[]) {
 
     //1. Extract XML pTree
     ptree tree;
-    std::string XML_PATH("C:/Users/111/Desktop/repos/syndicate/scripts/sensor_config.xml");
+    std::string XML_PATH;
+    if(argc == 2){XML_PATH = argv[1];}
+    else{XML_PATH ="C:/Users/111/Desktop/repos/syndicate/scripts/sensor_config_spo2.xml";}
+    
     read_xml(XML_PATH, tree);
 
     //3. Initialize Sensor Stack

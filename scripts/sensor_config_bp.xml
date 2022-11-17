@@ -3,8 +3,9 @@
 <sensor_stack>
     
     <global>
-        <save_path>D:/syndicate_tests/1_2/</save_path>
-        <record_time>15</record_time>
+        <save_path>D:/bp_radar_rgb_dataset2/</save_path>
+        <prefix_id>13</prefix_id>
+        <record_time>60</record_time>
     </global>
 
     <sensor>

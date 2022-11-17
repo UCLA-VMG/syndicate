@@ -94,10 +94,6 @@
         <name>FMCW_Radar</name>
         <type>RFEthernet</type>
         <timeout>1000</timeout>
-        <!-- <data_ip>192.168.33.30</data_ip>
-        <adc_ip>192.168.33.180</adc_ip>
-        <packet_size>1456</packet_size>
-        <max_packet_size>4096</max_packet_size> -->
     </sensor> -->
 
     <sensor>
