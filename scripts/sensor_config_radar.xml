@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<sensor_stack>
+    
+    <global>
+        <save_path>D:/radarCameraLocArduino/</save_path>
+        <prefix_id>1</prefix_id>
+        <record_time>30</record_time>
+    </global>
+
+    <sensor>
+        <name>FMCW_Radar</name>
+        <type>RFEthernet</type>
+        <timeout>1000</timeout>
+    </sensor>
+
+    <sensor>
+        <name>MX800</name>
+        <type>MX800</type>
+        <exe_path>C:/Users/111/Desktop/repos/mmhealth_2/sensors/VSCaptureMP-master-copy/VSCaptureMP/VSCaptureMP/bin/Debug/VSCaptureMP.exe</exe_path>
+        <level>5</level>
+    </sensor>
+
+
+</sensor_stack>

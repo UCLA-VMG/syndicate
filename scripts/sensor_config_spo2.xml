@@ -3,9 +3,9 @@
 <sensor_stack>
     
     <global>
-        <save_path>D:/spo2_verify/</save_path>
-        <prefix_id>11</prefix_id>
-        <record_time>120</record_time>
+        <save_path>D:/spo2_verify_dl/</save_path>
+        <prefix_id>8</prefix_id>
+        <record_time>90</record_time>
     </global>
 
     <sensor>
@@ -21,7 +21,7 @@
         <pixel_format>Mono</pixel_format>
         <binning_size>2</binning_size>
         <exposure_compensation>0.00</exposure_compensation>
-        <exposure_time>3501.95</exposure_time>
+        <exposure_time>2100</exposure_time>
         <gain>0.0</gain>
         <black_level>0.0</black_level>
         <hardware_sync>1</hardware_sync>
@@ -41,7 +41,7 @@
         <pixel_format>Mono</pixel_format>
         <binning_size>2</binning_size>
         <exposure_compensation>0.00</exposure_compensation>
-        <exposure_time>2298.77</exposure_time>
+        <exposure_time>2800</exposure_time>
         <gain>0.0</gain>
         <black_level>0.0</black_level>
         <hardware_sync>1</hardware_sync>
@@ -61,7 +61,7 @@
         <pixel_format>Mono</pixel_format>
         <binning_size>1</binning_size>
         <exposure_compensation>0.00</exposure_compensation>
-        <exposure_time>9999.0</exposure_time>
+        <exposure_time>30000.0</exposure_time>
         <gain>0.0</gain>
         <black_level>0.0</black_level>
         <hardware_sync>1</hardware_sync>

@@ -82,7 +82,7 @@ bool RFEthernet::LoadNpcapDlls()
 
 void RFEthernet::AcquireSave(double seconds, boost::barrier& startBarrier)
 {
-	seconds = seconds + 5; // TODO Bug fix for radar prematurely ending ;)
+	seconds = seconds + 10; // TODO Bug fix for radar prematurely ending ;)
 	pcap_dumper_t *dumpfile;
 	char errbuf[PCAP_ERRBUF_SIZE];
     /* Open the adapter */

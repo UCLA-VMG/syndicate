@@ -22,7 +22,7 @@ void MX800::AcquireSave(double seconds, boost::barrier& startBarrier) {
     // The command below runs the executable needs to operate the Philips MX800 monitor.
     _in << " " << std::endl;
     // The MX800 is started before all the other sensors. Hence, the startBarrier is called after the executable is run.
-    std::this_thread::sleep_for(std::chrono::seconds(3));
+    std::this_thread::sleep_for(std::chrono::seconds(6));
     // Wait for the other sensors to get ready,
     startBarrier.wait();
     // We need to wait for a little longer after the data capture to make sure we have all the necessary ground truth signals.

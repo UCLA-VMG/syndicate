@@ -39,6 +39,8 @@ int main(int argc, char *argv[]) {
     // 4. Acquire Data
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
+    
+
     // 4.1 Asynchronously Acquire Data
     std::cout << "\n\n\nAsyn Capture \n";
     mainStack.Acquire();
