@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<sensor_stack>
+    
+    <global>
+        <save_path>D:/iccp23/</save_path>
+        <prefix_id>1</prefix_id>
+        <record_time>30</record_time>
+    </global>
+
+    <sensor>
+        <name>Logitech</name>
+        <type>OpenCVCamera</type>
+        <fps>30</fps>
+        <height>720</height>
+        <width>2560</width>
+        <hardware_sync>0</hardware_sync>
+        <primary>1</primary>
+    </sensor>
+
+    <sensor>
+        <name>FMCW_Radar</name>
+        <type>RFEthernet</type>
+        <timeout>1000</timeout>
+    </sensor>
+
+</sensor_stack>

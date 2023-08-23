@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<sensor_stack>
+    
+    <global>
+        <save_path>D:/osa_test/</save_path>
+        <prefix_id>1</prefix_id>
+        <record_time>10</record_time>
+    </global>
+
+    <!-- <sensor>
+        <name>zed2</name>
+        <type>OpenCVCamera</type>
+        <fps>30</fps>
+        <height>720</height>
+        <width>2560</width>
+        <hardware_sync>1</hardware_sync>
+        <primary>1</primary>
+    </sensor> -->
+
+    <!-- <sensor>
+        <name>zed2</name>
+        <type>ZedCamera</type>
+        <fps>30</fps>
+        <height>720</height>
+        <width>2560</width>
+        <hardware_sync>1</hardware_sync>
+        <primary>1</primary>
+    </sensor>
+
+    <sensor>
+        <name>FMCW_Radar</name>
+        <type>RFEthernet</type>
+        <timeout>1000</timeout>
+    </sensor> -->
+
+    <sensor>
+        <name>MX800</name>
+        <type>MX800</type>
+        <exe_path>C:/Users/111/Desktop/repos/mmhealth_2/sensors/VSCaptureMP-master-copy/VSCaptureMP/VSCaptureMP/bin/Debug/VSCaptureMP.exe</exe_path>
+        <level>5</level>
+    </sensor>
+
+
+</sensor_stack>

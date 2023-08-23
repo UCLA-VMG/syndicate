@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<sensor_stack>
+    
+    <global>
+        <save_path>D:/synthetic_radar/</save_path>
+        <prefix_id>3</prefix_id>
+        <record_time>30</record_time>
+    </global>
+
+    <sensor>
+        <name>FMCW_Radar</name>
+        <type>RFEthernet</type>
+        <timeout>1000</timeout>
+    </sensor>
+
+</sensor_stack>

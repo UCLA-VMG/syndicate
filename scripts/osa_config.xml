@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<sensor_stack>
+    
+    <global>
+        <save_path>D:/osa_test/</save_path>
+        <prefix_id>1</prefix_id>
+        <record_time>30</record_time>
+    </global>
+
+    <sensor>
+        <name>RGB_Polarized_Cam</name>
+        <type>SpinnakerCamera</type>
+        <fps>160</fps>
+        <height>800</height>
+        <width>800</width>
+        <camera_id>20406823</camera_id>
+        <camera_name>BlackFlyS</camera_name>
+        <offset_x>824</offset_x>
+        <offset_y>624</offset_y>
+        <pixel_format>Mono</pixel_format>
+        <binning_size>1</binning_size>
+        <exposure_compensation>0.08</exposure_compensation>
+        <exposure_time>6000.0</exposure_time>
+        <gain>8.0</gain>
+        <black_level>5.57</black_level>
+        <hardware_sync>0</hardware_sync>
+        <primary>0</primary>
+    </sensor>
+
+    <sensor>
+        <name>FMCW_Radar</name>
+        <type>RFEthernet</type>
+        <timeout>1000</timeout>
+    </sensor>
+
+    <!-- <sensor>
+        <name>MX800</name>
+        <type>MX800</type>
+        <exe_path>C:/Users/111/Desktop/repos/mmhealth_2/sensors/VSCaptureMP-master-copy/VSCaptureMP/VSCaptureMP/bin/Debug/VSCaptureMP.exe</exe_path>
+        <level>5</level>
+    </sensor> -->
+
+
+</sensor_stack>
