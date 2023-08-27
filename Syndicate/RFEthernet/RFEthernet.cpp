@@ -47,7 +47,7 @@ RFEthernet::RFEthernet(ptree::value_type& sensor_settings, ptree::value_type& gl
     // std::cout << "Enter the interface number (1-" << total_interfaces << "): ";
     // std::cin >> interface_id;
 
-	interface_id = 4;
+	interface_id = 8;
     
     if(interface_id < 1 || interface_id > total_interfaces)
     {

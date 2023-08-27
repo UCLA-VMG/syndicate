@@ -18,14 +18,18 @@ SensorStack::SensorStack(boost::property_tree::ptree tree)
                 sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
             else if(f.second.get<std::string>("type") == "OpenCVCamera")
                 sensor_list.emplace_back(makeSensor<OpenCVCamera>);
-            else if(f.second.get<std::string>("type") == "RealSenseCamera")
-                sensor_list.emplace_back(makeSensor<RealSenseCamera>);
+            // else if(f.second.get<std::string>("type") == "RealSenseCamera")
+            //     sensor_list.emplace_back(makeSensor<RealSenseCamera>);
             // else if(f.second.get<std::string>("type") == "VimbaCamera")
             //     sensor_list.emplace_back(makeSensor<VimbaCamera>);
             else if(f.second.get<std::string>("type") == "RFEthernet")
                 sensor_list.emplace_back(makeSensor<RFEthernet>);
+            else if(f.second.get<std::string>("type") == "HardwareTrigger")
+                sensor_list.emplace_back(makeSensor<HardwareTrigger>);
             else if(f.second.get<std::string>("type") == "SerialPort")
                 sensor_list.emplace_back(makeSensor<SerialPort>);
+            else if(f.second.get<std::string>("type") == "RespBelt")
+                sensor_list.emplace_back(makeSensor<RespBelt>);
             else if(f.second.get<std::string>("type") == "MiniDSPMic")
                 sensor_list.emplace_back(makeSensor<MiniDSPMic>);
             else
@@ -39,7 +43,7 @@ SensorStack::SensorStack(boost::property_tree::ptree tree)
         }
         else
         {
-            std::cout << "Houston we have a problem.\n";
+            std::cout << "Houston we have a problem.\n" << f.second.get<std::string>("type") << " is causing issues.\n";
         }
     }
     // 2. Create Directory. If folder with prefix already exists, increment suffix value. (1_1->1_2)

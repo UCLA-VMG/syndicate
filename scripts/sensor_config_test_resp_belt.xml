@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<sensor_stack>
+    <global>
+        <save_path>D:/radar_thermal/</save_path>
+        <prefix_id>3</prefix_id>
+        <record_time>30</record_time>
+    </global>
+
+    <sensor>
+        <name>Resp_Belt</name>
+        <type>RespBelt</type>
+        <port_name>\\.\COM11</port_name>
+        <pulse_time>2</pulse_time>
+    </sensor>
+
+    <sensor>
+        <name>HardwareTrigger</name>
+        <type>HardwareTrigger</type>
+        <port_name>\\.\COM13</port_name>
+        <frequency>30</frequency>
+    </sensor>
+
+</sensor_stack>
+

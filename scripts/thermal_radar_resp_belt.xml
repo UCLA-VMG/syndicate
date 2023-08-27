@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<sensor_stack>
+    <global>
+        <save_path>D:/osa_lab_data/</save_path>
+        <prefix_id>3</prefix_id>
+        <record_time>1800</record_time>
+    </global>
+
+    <sensor>
+        <name>FMCW_Radar</name>
+        <type>RFEthernet</type>
+        <timeout>1000</timeout>
+    </sensor>
+
+    <sensor>
+        <name>Resp_Belt</name>
+        <type>RespBelt</type>
+        <port_name>\\.\COM11</port_name>
+        <pulse_time>2</pulse_time>
+    </sensor>
+
+    <sensor>
+        <name>HardwareTrigger</name>
+        <type>HardwareTrigger</type>
+        <port_name>\\.\COM13</port_name>
+        <frequency>30</frequency>
+    </sensor>
+
+    <sensor>
+        <name>Thermal_Camera</name>
+        <type>OpenCVCamera</type>
+        <fps>30</fps>
+        <height>640</height>
+        <width>512</width>
+        <camera_id>0</camera_id>
+        <camera_name>Boson</camera_name>
+        <hardware_sync>1</hardware_sync>
+        <primary>0</primary>
+    </sensor>
+
+    
+</sensor_stack>

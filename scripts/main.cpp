@@ -13,10 +13,10 @@
 #include "sensorStack.h"
 // #include "VimbaCamera.h"
 // #include "SerialPort.h"
-// #include "OpenCVCamera.h"
+#include "OpenCVCamera.h"
 #include "RFEthernet.h"
 // #include "MiniDSPMic.h"
-#include "MX800.h"
+// #include "MX800.h"
 // #include "RealSenseCamera.h"
 
 using boost::property_tree::ptree;
@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
     ptree tree;
     std::string XML_PATH;
     if(argc == 2){XML_PATH = argv[1];}
-    else{XML_PATH ="C:/Users/111/Desktop/repos/syndicate/scripts/sensor_config_spo2.xml";}
+    else{XML_PATH ="C:/Users/Adnan/Desktop/syndicate/scripts/radar_thermal.xml";}
     
     read_xml(XML_PATH, tree);
 
@@ -42,4 +42,5 @@ int main(int argc, char *argv[]) {
     // 4.1 Asynchronously Acquire Data
     std::cout << "\n\n\nAsyn Capture \n";
     mainStack.Acquire();
+    
 }

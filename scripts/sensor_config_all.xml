@@ -105,6 +105,13 @@
     </sensor>
 
     <sensor>
+        <name>Resp_Belt</name>
+        <type>RespBelt</type>
+        <port_name>\\\\.\\COM14</port_name>
+        <pulse_time>5</pulse_time>
+    </sensor>
+
+    <sensor>
         <name>Depth_Camera</name>
         <type>RealSenseCamera</type>
         <fps>30</fps>

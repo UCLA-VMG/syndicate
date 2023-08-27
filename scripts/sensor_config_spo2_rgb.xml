@@ -5,7 +5,7 @@
     <global>
         <save_path>D:/spo2_verify_dl/</save_path>
         <prefix_id>3</prefix_id>
-        <record_time>90</record_time>
+        <record_time>10</record_time>
     </global>
 
     <sensor>
@@ -31,7 +31,7 @@
     <sensor>
         <name>MX800</name>
         <type>MX800</type>
-        <exe_path>C:/Users/111/Desktop/repos/mmhealth_2/sensors/VSCaptureMP-master-copy/VSCaptureMP/VSCaptureMP/bin/Debug/VSCaptureMP.exe</exe_path>
+        <exe_path>C:/Users/Adnan/Downloads/VSCaptureMP-master-copy_edited/VSCaptureMP-master-copy/VSCaptureMP/VSCaptureMP/bin/Debug/VSCaptureMP.exe</exe_path>
         <level>5</level>
     </sensor>
 

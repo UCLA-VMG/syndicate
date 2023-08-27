@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<sensor_stack>
+    <global>
+        <save_path>D:/radar_thermal/</save_path>
+        <prefix_id>3</prefix_id>
+        <record_time>30</record_time>
+    </global>
+
+    <sensor>
+        <name>Thermal_Camera</name>
+        <type>OpenCVCamera</type>
+        <fps>30</fps>
+        <height>640</height>
+        <width>512</width>
+        <camera_id>0</camera_id>
+        <camera_name>Boson</camera_name>
+        <hardware_sync>0</hardware_sync>
+        <primary>0</primary>
+    </sensor>
+
+    <sensor>
+        <name>FMCW_Radar</name>
+        <type>RFEthernet</type>
+        <timeout>1000</timeout>
+        <!-- <interface_id>8</interface_id>
+        <reset_fpga_path>C:/Users/Adnan/Documents/Github/syndicate/config/reset_fpga.cmd</reset_fpga_path>
+        <run_mmwave_path>C:/Users/Adnan/Documents/Github/syndicate/config/run_multi_4rx3tx_mmwavestudio.cmd</run_mmwave_path>
+        <close_mmwave_path>C:/Users/Adnan/Documents/Github/syndicate/config/close_mmwavestudio.cmd</close_mmwave_path> -->
+    </sensor>
+
+    <sensor>
+        <name>Resp_Belt</name>
+        <type>RespBelt</type>
+        <port_name>\\\\.\\COM14</port_name>
+        <pulse_time>5.5555555555</pulse_time>
+    </sensor>
+
+</sensor_stack>

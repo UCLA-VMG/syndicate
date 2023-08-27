@@ -12,12 +12,14 @@ target_include_directories(syndicate
 
 add_subdirectory(SpinnakerCamera)
 add_subdirectory(OpenCVCamera)
-add_subdirectory(RealSenseCamera)
+# add_subdirectory(RealSenseCamera)
 add_subdirectory(RFEthernet)
 add_subdirectory(MiniDSPMic)
 add_subdirectory(MX800)
 add_subdirectory(SerialPort)
+add_subdirectory(RespBelt)
+add_subdirectory(HardwareTrigger)
 # add_subdirectory(VimbaCamera)
 
 # target_link_libraries (syndicate SpinnakerCamera VimbaCamera OpenCVCamera RFEthernet MiniDSPMic MX800 RealSenseCamera SerialPort)
-target_link_libraries (syndicate SpinnakerCamera OpenCVCamera RFEthernet MiniDSPMic MX800 RealSenseCamera SerialPort)
+target_link_libraries (syndicate SpinnakerCamera OpenCVCamera RFEthernet MiniDSPMic MX800 SerialPort RespBelt HardwareTrigger)
