@@ -18,5 +18,6 @@ add_subdirectory(MiniDSPMic)
 add_subdirectory(MX800)
 add_subdirectory(SerialPort)
 add_subdirectory(VimbaCamera)
+add_subdirectory(HardwareTrigger)
 
 target_link_libraries (syndicate SimpleSensor SpinnakerCamera VimbaCamera OpenCVCamera RFEthernet MiniDSPMic MX800 SerialPort)
