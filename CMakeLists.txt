@@ -62,15 +62,11 @@ set (LIBS ${Spinnaker_LIBRARIES} ${VimbaCPP_LIBRARIES} ${VimbaC_LIBRARIES} ${Vim
 
 #Generate Execs
 add_executable(capture ${PROJECT_SOURCE_DIR}/scripts/main.cpp)
-add_executable(acq ${PROJECT_SOURCE_DIR}/scripts/acq.cpp)
-add_executable(packets_acq ${PROJECT_SOURCE_DIR}/scripts/packets_acq.cpp)
 target_link_libraries(capture ${LIBS})
-target_link_libraries(acq ${LIBS})
-target_link_libraries(packets_acq ${LIBS})
 
 #Targets
 ADD_CUSTOM_TARGET(build_all)
-ADD_DEPENDENCIES(build_all capture acq packets_acq)
+ADD_DEPENDENCIES(build_all capture)
 
 #Library Linking
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

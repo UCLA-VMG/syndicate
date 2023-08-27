@@ -63,7 +63,7 @@ END_CHIRP_TX = 0
 FPS = 30
 MAX_SUBSET_RECORDING_TIME = 1800 -- in seconds: this value should not exceed 1800 seconds (30 minutes) or mmWave studio will stop recording during the subset
 MAX_SUBSET_RECORDING_TIME_MOD = 10800 -- to trigger stop frame
-TOTAL_RECORDING_TIME = 7200 -- in seconds
+TOTAL_RECORDING_TIME = 10 -- in seconds
 -- TOTAL_NUM_FRAMES = 0  -- Set this to 0 to continuously stream data
 CHIRP_LOOPS = 1 
 PERIODICITY = 50 -- ms
@@ -187,7 +187,7 @@ if NUM_SUBSETS_MOD ~= 1 then
                 ar1.CaptureCardConfig_StartRecord(SAVE_DATA_PATH, 1)
                 ar1.StartFrame()
                 sleep(SUBSET_RECORDING_TIME)
-                -- ar1.StopFrame()
+                ar1.StopFrame()
                 ar1.CaptureCardConfig_StopRecord()
             end
         end
@@ -205,7 +205,7 @@ if NORM_NUM_SUBSETS ~= 1 then
         ar1.CaptureCardConfig_StartRecord(SAVE_DATA_PATH, 1)
         ar1.StartFrame()
         sleep(SUBSET_RECORDING_TIME)
-        -- ar1.StopFrame()
+        ar1.StopFrame()
         ar1.CaptureCardConfig_StopRecord()
     end
 end

@@ -141,34 +141,40 @@
 //     // b = &a;
 //     // b->AcquireSave(10);
 // }
-const int NUM_TRIALS = 1;
+const int NUM_TRIALS = 3;
 
 int main(int argc, char *argv[]) {
 
     //0. Set Root Path
-    std::string rootPath("D:/rf_test_cmd");
-    if (argc > 1){
-        rootPath = rootPath + std::string("/") + std::string(argv[1]) + std::string("/");
-    }
-    else {
-        rootPath = rootPath + std::string("/");
-    }
-    std::string rootPath_E = rootPath;
+    // std::string rootPath("D:/rf_test_cmd");
+    // if (argc > 1){
+    //     rootPath = rootPath + std::string("/") + std::string(argv[1]) + std::string("/");
+    // }
+    // else {
+    //     rootPath = rootPath + std::string("/");
+    // }
+    // std::string rootPath_E = rootPath;
 
     std::cout << "Waiting Before Trial 0!" << std::endl;
-    std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(9))); // wait 5400 seconds for main script to execute (give patient chance to sleep)
+    std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(5400))); // wait 5400 seconds for main script to execute (give patient chance to sleep)
     std::cout << "Waiting Done!" << std::endl;
     
+    std::string rootPath_E;
     for (int i = 0; i < NUM_TRIALS; i++) {
+        if (i == 0) {
+            rootPath_E = "D:/patient_18/trial_0/";
+        }
         if (i == 1) {
             std::cout << "Waiting Before Trial 1!" << std::endl;
             std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(120))); // wait 5400 seconds for main script to execute (give patient chance to sleep)
             std::cout << "Waiting Done!" << std::endl;
+            rootPath_E = "D:/patient_18/trial_1/";
         }
         if (i == 2) {
             std::cout << "Waiting Before Trial 2!" << std::endl;
             std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(120))); // wait 5400 seconds for main script to execute (give patient chance to sleep)
             std::cout << "Waiting Done!" << std::endl;
+            rootPath_E = "E:/patient_18/trial_2/";
         }
 
         // std::string current_exec_name = argv[0]; // Name of the current exec program
@@ -250,15 +256,14 @@ int main(int argc, char *argv[]) {
         //2. Add Configurations and Factory Generator Functions into std::vectors
         std::vector<std::unique_ptr<Sensor>(*)(std::unordered_map<std::string, std::any>&)> sensor_list;
         std::vector<std::unordered_map<std::string, std::any>> configs;
-        // sensor_list.emplace_back(makeSensor<VimbaCamera>);
-        // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
-        // configs.emplace_back(nir_config);
-        // sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
-        // configs.emplace_back(nir_config_mm);
-        // sensor_list.emplace_back(makeSensor<OpenCVCamera>);
-        // configs.emplace_back(thermal_config);
-        // sensor_list.emplace_back(makeSensor<RFEthernet>);
-        // configs.emplace_back(radar_config);
+        sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+        configs.emplace_back(nir_config);
+        sensor_list.emplace_back(makeSensor<SpinnakerCamera>);
+        configs.emplace_back(nir_config_mm);
+        sensor_list.emplace_back(makeSensor<OpenCVCamera>);
+        configs.emplace_back(thermal_config);
+        sensor_list.emplace_back(makeSensor<RFEthernet>);
+        configs.emplace_back(radar_config);
         sensor_list.emplace_back(makeSensor<SerialPort>);
         configs.emplace_back(serial_config);
 
@@ -273,12 +278,12 @@ int main(int argc, char *argv[]) {
         std::cout << "Ended Acquisition Process!" << std::endl;
         
 
-        SerialPort reset_arduino(reset_serial_config);
-        // SensorStack resetStack(reset_sensor_list, reset_configs);
-        //4.1 Asynchronously Acquire Data
-        std::cout << "Beginning Reset Process!" << std::endl;
-        reset_arduino.resetFPGA();
-        std::cout << "Ended Reset Process!" << std::endl;
+        // SerialPort reset_arduino(reset_serial_config);
+        // // SensorStack resetStack(reset_sensor_list, reset_configs);
+        // //4.1 Asynchronously Acquire Data
+        // std::cout << "Beginning Reset Process!" << std::endl;
+        // reset_arduino.resetFPGA();
+        // std::cout << "Ended Reset Process!" << std::endl;
     }
     
 }
