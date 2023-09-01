@@ -5,6 +5,7 @@
 #include "SerialPort.h"
 #include "OpenCVCamera.h"
 #include "RFEthernet.h"
+#include "HardwareTrigger.h"
 #include "MiniDSPMic.h"
 
 #include <unordered_map>

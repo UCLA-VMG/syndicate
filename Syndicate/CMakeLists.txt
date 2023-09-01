@@ -15,5 +15,6 @@ add_subdirectory(OpenCVCamera)
 add_subdirectory(RFEthernet)
 add_subdirectory(MiniDSPMic)
 add_subdirectory(SerialPort)
+add_subdirectory(HardwareTrigger)
 
-target_link_libraries (syndicate SpinnakerCamera OpenCVCamera RFEthernet MiniDSPMic SerialPort)
+target_link_libraries (syndicate SpinnakerCamera OpenCVCamera RFEthernet MiniDSPMic SerialPort HardwareTrigger)

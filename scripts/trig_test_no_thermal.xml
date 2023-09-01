@@ -2,10 +2,10 @@
 
 <sensor_stack>
     <global>
-        <save_path>D:/osa_raw_new/patient_1</save_path>
-        <record_time>7200</record_time>
+        <save_path>D:/config_test/</save_path>
+        <record_time>30</record_time>
         <num_trials>3</num_trials>
-        <wait_time_init>9000</wait_time_init>
+        <wait_time_init>30</wait_time_init>
         <wait_time_0>180</wait_time_0>
         <wait_time_1>180</wait_time_1>
         <wait_time_2>180</wait_time_2>
@@ -19,18 +19,6 @@
         <reset_fpga_path>C:/Users/Adnan/Documents/Github/syndicate/config/reset_fpga.cmd</reset_fpga_path> 
         <run_mmwave_path>C:/Users/Adnan/Documents/Github/syndicate/config/run_multi_4rx3tx_mmwavestudio.cmd</run_mmwave_path>
         <close_mmwave_path>C:/Users/Adnan/Documents/Github/syndicate/config/close_mmwavestudio.cmd</close_mmwave_path>
-    </sensor>
-
-    <sensor>
-        <name>Thermal_Camera</name>
-        <type>OpenCVCamera</type>
-        <fps>30</fps>
-        <height>640</height>
-        <width>512</width>
-        <camera_id>0</camera_id>
-        <camera_name>Boson</camera_name>
-        <hardware_sync>1</hardware_sync>
-        <primary>0</primary>
     </sensor>
 
     <sensor>
