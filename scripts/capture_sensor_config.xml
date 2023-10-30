@@ -2,10 +2,10 @@
 
 <sensor_stack>
     <global>
-        <save_path>D:/osa_raw_new/patient_1</save_path>
+        <save_path>E:/osa_raw_new/patient_3/</save_path>
         <record_time>7200</record_time>
         <num_trials>3</num_trials>
-        <wait_time_init>9000</wait_time_init>
+        <wait_time_init>10800</wait_time_init>
         <wait_time_0>180</wait_time_0>
         <wait_time_1>180</wait_time_1>
         <wait_time_2>180</wait_time_2>
