@@ -1,6 +1,6 @@
 # C++ codebase for synchronized data capture from a "syndicate" of multimodal sensors.
 
-**Contributing Authors**: [Adnan Armouti](https://github.com/adnan-armouti), [Anirudh Bindiganavale Harish](https://github.com/Anirudh0707), [Alexander (Sasha) Vilesov](https://github.com/asvilesov/).
+**Contributing Authors**: [Adnan Armouti](https://github.com/adnan-armouti), [Anirudh Bindiganavale Harish](https://github.com/AnirudhBHarish), [Alexander (Sasha) Vilesov](https://github.com/asvilesov/).
 
 **Please note**: This code respository is currently under development, and may therefore have bugs. Some of the libraries may have specific CPU and OS dependencies (Windows only). We will release detailed documentation to successfully operate the repository, as well as video tutorials over time.
 
